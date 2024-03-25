@@ -1,0 +1,31 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+*,
+body {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.header {
+  background-color: #efefef;
+}
+
+.nav {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 4rem;
+}
+.nav > .nav--name {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  align-content: center;
+}
+.footer {
+  color: #ededed;
+  background-color: #484848;
+}
