@@ -1,18 +1,32 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { auth } from '../firebase'
+import { redirect } from "react-router-dom";
+import {
+  createUserWithEmailAndPassword,
+} from "firebase/auth";
 
 export default function Signup() {
-  const [identifier, setIdentifier] = useState(''); // Change from 'email' to 'identifier'
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleSignup = (e) => {
+  const handleSignup = async (e) => {
     e.preventDefault();
+
+    try {
+      await createUserWithEmailAndPassword(auth, email, password);
+      return redirect("/login");
+    } catch (err) {
+      console.error(err);
+    }
     // Simulate signup process
-    console.log('Signing up with:', identifier, password);
+    console.log('Signing up with:', email, password);
     // Clear input fields after signup
-    setIdentifier('');
+    setEmail('');
     setPassword('');
   };
+
+
 
   return (
     <div className="flex min-h-dvh flex-col justify-center px-6 py-12 lg:px-8">
@@ -35,18 +49,18 @@ export default function Signup() {
             <label
               htmlFor="identifier"
               className="block text-sm font-medium leading-6 text-gray-900">
-              Username or Email address
+              Email address
             </label>
             <div className="mt-2">
               <input
-                id="identifier"
-                name="identifier"
+                id="email"
+                name="email"
                 type="text"
-                autoComplete="username email"
+                autoComplete="email"
                 required
-                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                value={identifier}
-                onChange={(e) => setIdentifier(e.target.value)}
+                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 pl-3"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
               />
             </div>
           </div>
@@ -64,7 +78,7 @@ export default function Signup() {
                 type="password"
                 autoComplete="new-password"
                 required
-                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 pl-3"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />

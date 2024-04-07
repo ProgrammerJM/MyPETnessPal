@@ -8,12 +8,12 @@ import Signup from './pages/Signup';
 import ForgotPassword from './pages/ForgotPassword';
 import './App.css';
 import PetsLayout from './components/PetsLayout';
-import Dashboard from './pages/pets/Dashboard';
-import PetProfile from './pages/pets/PetProfile';
-import Notifications from './pages/pets/Notifications';
-import TankManagement from './pages/pets/Tank';
-import Help from './pages/pets/Help';
-import Settings from './pages/pets/Settings';
+import Dashboard from './pages/profile/Dashboard';
+import PetProfile from './pages/profile/PetProfile';
+import Notifications from './pages/profile/Notifications';
+import TankManagement from './pages/profile/Tank';
+import Help from './pages/profile/Help';
+import Settings from './pages/profile/Settings';
 
 function App() {
   return (
@@ -49,7 +49,7 @@ function App() {
             />
           </Route>
           <Route
-            path="pets"
+            path="profile"
             element={<PetsLayout />}>
             <Route
               index
