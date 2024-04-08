@@ -1,32 +1,29 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { auth } from '../firebase'
-import { redirect } from "react-router-dom";
-import {
-  createUserWithEmailAndPassword,
-} from "firebase/auth";
+import { useState } from "react";
+import { Link } from "react-router-dom";
+import { auth } from "../config/firebase";
+import { useNavigate } from "react-router-dom";
+import { createUserWithEmailAndPassword } from "firebase/auth";
 
 export default function Signup() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const navigate = useNavigate();
 
   const handleSignup = async (e) => {
     e.preventDefault();
 
     try {
       await createUserWithEmailAndPassword(auth, email, password);
-      return redirect("/login");
+      navigate("/login");
     } catch (err) {
       console.error(err);
     }
     // Simulate signup process
-    console.log('Signing up with:', email, password);
+    console.log("Signing up with:", email, password);
     // Clear input fields after signup
-    setEmail('');
-    setPassword('');
+    setEmail("");
+    setPassword("");
   };
-
-
 
   return (
     <div className="flex min-h-dvh flex-col justify-center px-6 py-12 lg:px-8">
@@ -42,13 +39,12 @@ export default function Signup() {
       </div>
 
       <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-        <form
-          onSubmit={handleSignup}
-          className="space-y-6">
+        <form onSubmit={handleSignup} className="space-y-6">
           <div>
             <label
               htmlFor="identifier"
-              className="block text-sm font-medium leading-6 text-gray-900">
+              className="block text-sm font-medium leading-6 text-gray-900"
+            >
               Email address
             </label>
             <div className="mt-2">
@@ -68,7 +64,8 @@ export default function Signup() {
           <div>
             <label
               htmlFor="password"
-              className="block text-sm font-medium leading-6 text-gray-900">
+              className="block text-sm font-medium leading-6 text-gray-900"
+            >
               Password
             </label>
             <div className="mt-2">
@@ -93,10 +90,11 @@ export default function Signup() {
         </form>
 
         <p className="mt-10 text-center text-sm text-gray-500">
-          Already have an account?{' '}
+          Already have an account?{" "}
           <Link
             to="/login"
-            className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500">
+            className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500"
+          >
             Sign in here
           </Link>
         </p>

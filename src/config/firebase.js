@@ -3,6 +3,7 @@ import { initializeApp } from "firebase/app";
 // import { getAnalytics } from "firebase/analytics";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
+import { getStorage } from "firebase/storage";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -15,11 +16,12 @@ const firebaseConfig = {
   storageBucket: "petness-92c55.appspot.com",
   messagingSenderId: "115182665138",
   appId: "1:115182665138:web:8782a3e937e136897e38ab",
-  measurementId: "G-Y0PW9RDDCN"
+  measurementId: "G-Y0PW9RDDCN",
 };
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-export const auth = getAuth(app)
-export const db = getFirestore(app)
+export const auth = getAuth(app);
+export const db = getFirestore(app);
+export const storage = getStorage(app);
 // const analytics = getAnalytics(app);
