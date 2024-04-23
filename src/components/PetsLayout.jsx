@@ -1,57 +1,63 @@
-import { NavLink, Outlet } from 'react-router-dom';
-import Footer from './Footer';
+import { NavLink, Outlet } from "react-router-dom";
+import Footer from "./Footer";
 
-export default function Sidebar() {
+export default function PetsLayout() {
   const activeStyles = {
-    fontWeight: 'bold',
-    textDecoration: 'underline',
-    color: '#161616',
+    fontWeight: "bold",
+    textDecoration: "underline",
+    color: "#161616",
   };
 
   return (
-    <>
-      <div className="flex h-screen">
+    <div className="flex flex-col min-h-screen">
+      <div className="flex-grow flex">
         <nav className="flex flex-col bg-gray-200 py-4 px-2 w-48">
           <NavLink
             to="."
             end
             className="text-gray-800 hover:text-gray-600"
-            activeStyle={activeStyles}>
+            activeStyle={activeStyles}
+          >
             Dashboard
           </NavLink>
 
           <NavLink
             to="petprofile"
             className="text-gray-800 hover:text-gray-600"
-            activeStyle={activeStyles}>
+            activeStyle={activeStyles}
+          >
             Pet Profile
           </NavLink>
 
           <NavLink
             to="notifications"
             className="text-gray-800 hover:text-gray-600"
-            activeStyle={activeStyles}>
+            activeStyle={activeStyles}
+          >
             Notifications
           </NavLink>
 
           <NavLink
             to="tank"
             className="text-gray-800 hover:text-gray-600"
-            activeStyle={activeStyles}>
+            activeStyle={activeStyles}
+          >
             Tank Management
           </NavLink>
 
           <NavLink
             to="help"
             className="text-gray-800 hover:text-gray-600"
-            activeStyle={activeStyles}>
+            activeStyle={activeStyles}
+          >
             Help Guidelines
           </NavLink>
 
           <NavLink
             to="settings"
             className="text-gray-800 hover:text-gray-600"
-            activeStyle={activeStyles}>
+            activeStyle={activeStyles}
+          >
             Settings
           </NavLink>
         </nav>
@@ -60,6 +66,6 @@ export default function Sidebar() {
         </div>
       </div>
       <Footer />
-    </>
+    </div>
   );
 }
