@@ -7,10 +7,10 @@ export default function About() {
       <div className="flex justify-center h-dvh">
         <img
           src="./src/assets/aboutus.png"
-          className="size-fit mx-10"
+          className="w-auto h-auto max-w-[50%] max-h-[75%] mx-10"
         />
-        <div className="flex flex-col w-96 mt-5">
-          <p>
+        <div className="flex flex-col w-96 mt-5 overflow-y-auto max-h-[calc(100vh-200px)] max-w-[50%]">
+          <p className="mb-4">
             Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla
             fringilla nunc in molestie feugiat. Nunc auctor consectetur elit,
             quis pulvina. Lorem ipsum dolor sit amet, consectetur adipiscing
@@ -18,7 +18,7 @@ export default function About() {
             consectetur elit, quis pulvina.
           </p>
           <br />
-          <p>
+          <p className="mb-4">
             Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla
             fringilla nunc in molestie feugiat. Nunc auctor consectetur elit,
             quis pulvina. Lorem ipsum dolor sit amet, consectetur adipiscing
@@ -26,7 +26,7 @@ export default function About() {
             consectetur elit, quis pulvina.
           </p>
           <br />
-          <p>
+          <p className="mb-4">
             Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla
             fringilla nunc in molestie feugiat. Nunc auctor consectetur elit,
             quis pulvina. Lorem ipsum dolor sit amet, consectetur adipiscing
