@@ -14,15 +14,19 @@ import {
   getDownloadURL,
   uploadBytesResumable,
 } from "firebase/storage";
+import WeightComponent from "./getWeight";
+import FeedAmountComponent from "./feedAmountComponent";
 
 export default function PetProfile() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [petList, setPetList] = useState([]);
+  const [smartFeedingActivated, setSmartFeedingActivated] = useState(false); // State for smart feeding activation
 
   // New Pet States
   const [newPetName, setNewPetName] = useState("");
   const [newPetType, setNewPetType] = useState("");
-  const [newPetWeight, setNewPetWeight] = useState(0);
+  // const [petWeight, setNewPetWeight] = useState(0);
+  const [petWeight, setPetWeight] = useState(null);
   const [newPetActivityLevel, setNewPetActivityLevel] = useState(0);
 
   // Update Activity Level State
@@ -52,6 +56,27 @@ export default function PetProfile() {
   useEffect(() => {
     getPetList();
   }, []);
+
+  useEffect(() => {
+    // Retrieve smart feeding activation state from localStorage
+    const savedSmartFeedingState = localStorage.getItem(
+      "smartFeedingActivated"
+    );
+    if (savedSmartFeedingState !== null) {
+      setSmartFeedingActivated(JSON.parse(savedSmartFeedingState));
+    }
+  }, []);
+
+  const toggleSmartFeeding = () => {
+    // Toggle smart feeding state
+    const newSmartFeedingState = !smartFeedingActivated;
+    setSmartFeedingActivated(newSmartFeedingState);
+    // Store updated smart feeding state in localStorage
+    localStorage.setItem(
+      "smartFeedingActivated",
+      JSON.stringify(newSmartFeedingState)
+    );
+  };
 
   // Function to toggle the modal state
   const toggleModal = () => {
@@ -104,7 +129,7 @@ export default function PetProfile() {
       await addDoc(petCollectionRef, {
         name: newPetName,
         petType: newPetType,
-        weight: newPetWeight,
+        weight: petWeight,
         activityLevel: newPetActivityLevel,
         userId: auth?.currentUser?.uid,
         imageURL: data,
@@ -172,17 +197,30 @@ export default function PetProfile() {
             <h1>Name : {pet.name}</h1>
             <p>Pet Type : {pet.petType}</p>
             <p>Weight (KG) : {pet.weight}</p>
-            <p>Pet Activity Level : {pet.activityLevel}</p>
+            <div className="flex">
+              <p>Pet Activity Level : {pet.activityLevel} </p>
+              <input
+                placeholder="New Pet's Activity Level"
+                onChange={(e) =>
+                  setUpdatedPetActivityLevel(Number(e.target.value))
+                }
+                className="ml-2 mr-2"
+              />
+              <button onClick={() => updatePetActivityLevel(pet.id)}>
+                Update Activity Level
+              </button>
+            </div>
             <button onClick={() => deletePet(pet.id)}>Delete Pet</button>
-            <input
-              placeholder="New Pet's Activity Level"
-              onChange={(e) =>
-                setUpdatedPetActivityLevel(Number(e.target.value))
-              }
+
+            {/* SMART FEEDING */}
+            <FeedAmountComponent
+              petId={String(pet.id)}
+              petName={String(pet.name)}
+              petType={pet.petType} // Use pet.petType instead of newPetType
+              weight={Number(pet.weight)} // Use pet.weight instead of petWeight
+              activityLevel={Number(pet.activityLevel)} // Use pet.activityLevel
+              smartFeedingActivated={Boolean(smartFeedingActivated)}
             />
-            <button onClick={() => updatePetActivityLevel(pet.id)}>
-              Update Activity Level
-            </button>
           </div>
         ))}
       </div>
@@ -225,12 +263,9 @@ export default function PetProfile() {
                 onChange={(e) => setNewPetType(e.target.value)}
                 className="pl-2"
               />
-              <input
-                placeholder="Weight in KG"
-                type="number"
-                onChange={(e) => setNewPetWeight(Number(e.target.value))}
-                className="pl-2"
-              />
+              {/* GET PET WEIGHT FROM FIRESTORE */}
+              <WeightComponent setPetWeight={setPetWeight} />
+
               <input
                 placeholder="Pet's Activity Level"
                 type="number"
