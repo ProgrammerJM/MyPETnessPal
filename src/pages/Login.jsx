@@ -1,6 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { auth } from "../config/firebase";
 import { signInWithEmailAndPassword } from "firebase/auth";
 
@@ -69,12 +68,12 @@ export default function Login() {
                 Password
               </label>
               <div className="text-sm">
-                <a
-                  href="#"
+                <Link
+                  to="/forgot-password"
                   className="font-semibold text-indigo-600 hover:text-indigo-500"
                 >
                   Forgot password?
-                </a>
+                </Link>
               </div>
             </div>
             <div className="mt-2">
@@ -93,7 +92,7 @@ export default function Login() {
 
           <div>
             <button
-              onClick={handleLogin}
+              type="submit"
               className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
             >
               Sign in
