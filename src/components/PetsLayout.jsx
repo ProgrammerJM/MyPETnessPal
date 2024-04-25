@@ -2,7 +2,7 @@ import { NavLink, Outlet } from "react-router-dom";
 import Footer from "./Footer";
 
 export default function PetsLayout() {
-  const activeStyles = {
+  const activestyle = {
     fontWeight: "bold",
     textDecoration: "underline",
     color: "#161616",
@@ -16,7 +16,7 @@ export default function PetsLayout() {
             to="."
             end
             className="text-gray-800 hover:text-gray-600"
-            activeStyle={activeStyles}
+            activestyle={activestyle}
           >
             Dashboard
           </NavLink>
@@ -24,7 +24,7 @@ export default function PetsLayout() {
           <NavLink
             to="petprofile"
             className="text-gray-800 hover:text-gray-600"
-            activeStyle={activeStyles}
+            activestyle={activestyle}
           >
             Pet Profile
           </NavLink>
@@ -32,7 +32,7 @@ export default function PetsLayout() {
           <NavLink
             to="notifications"
             className="text-gray-800 hover:text-gray-600"
-            activeStyle={activeStyles}
+            activestyle={activestyle}
           >
             Notifications
           </NavLink>
@@ -40,7 +40,7 @@ export default function PetsLayout() {
           <NavLink
             to="tank"
             className="text-gray-800 hover:text-gray-600"
-            activeStyle={activeStyles}
+            activestyle={activestyle}
           >
             Tank Management
           </NavLink>
@@ -48,7 +48,7 @@ export default function PetsLayout() {
           <NavLink
             to="help"
             className="text-gray-800 hover:text-gray-600"
-            activeStyle={activeStyles}
+            activestyle={activestyle}
           >
             Help Guidelines
           </NavLink>
@@ -56,7 +56,7 @@ export default function PetsLayout() {
           <NavLink
             to="settings"
             className="text-gray-800 hover:text-gray-600"
-            activeStyle={activeStyles}
+            activestyle={activestyle}
           >
             Settings
           </NavLink>
