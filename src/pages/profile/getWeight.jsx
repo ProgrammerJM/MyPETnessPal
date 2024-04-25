@@ -42,12 +42,13 @@
 // };
 
 // export default WeightComponent;
+
 import { useState, useEffect } from "react";
 import { doc, setDoc, onSnapshot } from "firebase/firestore";
 import { db } from "../../config/firebase";
 import PropTypes from "prop-types";
 
-const WeightComponent = ({ setPetWeight }) => {
+export default function GetWeight({ setPetWeight }) {
   const [loading, setLoading] = useState(false);
   const [weight, setWeight] = useState(null);
 
@@ -84,10 +85,59 @@ const WeightComponent = ({ setPetWeight }) => {
       {weight !== null && <p>Current Weight: {weight} kg</p>}
     </div>
   );
-};
+}
 
-WeightComponent.propTypes = {
+GetWeight.propTypes = {
   setPetWeight: PropTypes.func.isRequired,
 };
 
-export default WeightComponent;
+// import { useState, useEffect } from "react";
+// import { doc, onSnapshot } from "firebase/firestore";
+// import { db } from "../../config/firebase";
+// import { rtd } from "../../config/firebase"; // Import Realtime Database from Firebase config
+// import PropTypes from "prop-types";
+
+// const WeightComponent = ({ setPetWeight }) => {
+//   const [loading, setLoading] = useState(false);
+//   const [weight, setWeight] = useState(null);
+
+//   const handleClick = async () => {
+//     setLoading(true);
+
+//     // Update Realtime Database to trigger ESP32 to send weight data
+//     const triggerRef = rtd.ref("trigger/getPetWeight");
+//     await triggerRef.set({ status: true });
+//   };
+
+//   useEffect(() => {
+//     const weightDocRef = doc(db, "getWeight", "LoadCell");
+
+//     const unsubscribe = onSnapshot(weightDocRef, (doc) => {
+//       if (doc.exists()) {
+//         const data = doc.data();
+//         setPetWeight(data.Weight);
+//         setWeight(data.Weight);
+//         setLoading(false);
+//       }
+//     });
+
+//     return () => {
+//       unsubscribe();
+//     };
+//   }, [setPetWeight]);
+
+//   return (
+//     <div className="flex items-center">
+//       <button onClick={handleClick} disabled={loading} className="border p-2">
+//         {loading ? "Fetching Weight..." : "Get Weight"}
+//       </button>
+//       {weight !== null && <p className="ml-4">Current Weight: {weight} kg</p>}
+//     </div>
+//   );
+// };
+
+// WeightComponent.propTypes = {
+//   setPetWeight: PropTypes.func.isRequired,
+// };
+
+// export default WeightComponent;
