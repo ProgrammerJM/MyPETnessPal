@@ -5,6 +5,7 @@ import {
   collection,
   addDoc,
   deleteDoc,
+  // setDoc,
   doc,
 } from "firebase/firestore";
 import {
@@ -15,18 +16,17 @@ import {
 } from "firebase/storage";
 import FeedAmountComponent from "./feedAmountComponent";
 import GetWeight from "./getWeight";
+import PropTypes from "prop-types";
 
-export default function PetProfile() {
+export default function PetProfile({ petFoodList }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [petList, setPetList] = useState([]);
   const [smartFeedingActivated, setSmartFeedingActivated] = useState(false);
 
   const [newPetName, setNewPetName] = useState("");
   const [newPetType, setNewPetType] = useState("Cat");
-  const [petWeight, setPetWeight] = useState(null);
-  const [newPetActivityLevel, setNewPetActivityLevel] = useState(
-    newPetType === "Cat" ? "Intact" : "Intact"
-  ); // Set default value based on pet type;
+  const [petWeight, setPetWeight] = useState(0);
+  const [newPetActivityLevel, setNewPetActivityLevel] = useState(0); // Set default value based on pet type;
 
   const [file, setFile] = useState(null);
   const [data, setData] = useState({});
@@ -91,11 +91,15 @@ export default function PetProfile() {
   // SAVE PET FUNCTION
   const onSavePet = async () => {
     try {
+      // Generate custom ID for the pet food item
+      const customId = "Pet " + (petList.length + 1); // Example: "Pet Food 1", "Pet Food 2", ...
+
       const docData = {
         name: newPetName,
         petType: newPetType,
         weight: petWeight,
         activityLevel: newPetActivityLevel,
+        id: customId,
         userId: auth?.currentUser?.uid,
       };
 
@@ -103,16 +107,16 @@ export default function PetProfile() {
         docData.imageURL = data.img;
       }
 
-      const docRef = await addDoc(petCollectionRef, docData);
+      // Use `addDoc` instead of `setDoc` to let Firestore generate a unique ID
+      await addDoc(petCollectionRef, docData);
 
-      getPetList();
-      console.log("Data saved to Firestore with ID: ", docRef.id);
+      await getPetList();
+      console.log("Data saved to Firestore with ID: ", customId);
     } catch (err) {
       console.error(err);
     }
     setNewPetName("");
     setNewPetType("Cat");
-    setFile(null);
     setIsModalOpen(!isModalOpen);
   };
 
@@ -121,6 +125,27 @@ export default function PetProfile() {
     alert("Are you sure you want to delete this pet?");
     const petDocument = doc(db, "pets", id);
     await deleteDoc(petDocument);
+  };
+
+  // Define mappings between numeric values and their corresponding labels for both cats and dogs
+  const activityLevelOptions = {
+    Cat: [
+      { value: 1.4, label: "Intact (Multiply RER by 1.4)" },
+      { value: 1.2, label: "Neutered (Multiply RER by 1.2)" },
+      { value: 1, label: "Obesity Prone (Multiply RER by 1)" },
+      { value: 0.8, label: "Weight Loss (Multiply RER by 0.8)" },
+      // Add more mappings for cats as needed
+    ],
+    Dog: [
+      { value: 1.8, label: "Intact (Multiply RER by 1.8)" },
+      { value: 1.6, label: "Neutered (Multiply RER by 1.6)" },
+      { value: 1.4, label: "Obesity Prone (Multiply RER by 1.4)" },
+      { value: 1, label: "Weight Loss (Multiply RER by 1)" },
+      { value: 2, label: "Light Work (Multiply RER by 2)" },
+      { value: 3, label: "Moderate Work (Multiply RER by 3)" },
+      { value: 4, label: "Heavy Work (Multiply RER by 4 to 8)" },
+      // Add more mappings for dogs as needed
+    ],
   };
 
   return (
@@ -154,7 +179,11 @@ export default function PetProfile() {
                   <p className="text-gray-600">Pet Type: {pet.petType}</p>
                   <p className="text-gray-600">Weight (KG): {pet.weight}</p>
                   <p className="text-gray-600">
-                    Pet Activity Level: {pet.activityLevel}
+                    Pet Activity Level:
+                    {activityLevelOptions[pet.petType] &&
+                      activityLevelOptions[pet.petType].find(
+                        (option) => option.value === pet.activityLevel
+                      )?.label}
                   </p>
                 </div>
               </div>
@@ -168,6 +197,7 @@ export default function PetProfile() {
                   weight={Number(pet.weight)}
                   activityLevel={Number(pet.activityLevel)}
                   smartFeedingActivated={Boolean(smartFeedingActivated)}
+                  petFoodList={petFoodList}
                 />
               </div>
             </div>
@@ -256,44 +286,39 @@ export default function PetProfile() {
                 id="activityLevel"
                 className="p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
                 value={newPetActivityLevel}
-                onChange={(e) => setNewPetActivityLevel(e.target.value)}
+                onChange={(e) =>
+                  setNewPetActivityLevel(parseFloat(e.target.value))
+                }
               >
-                {newPetType === "Cat" ? (
+                {activityLevelOptions[newPetType].map(({ value, label }) => (
+                  <option key={value} value={value}>
+                    {label}
+                  </option>
+                ))}
+                {/* {newPetType === "Cat" ? (
                   <>
-                    <option value="Intact">Intact (Multiply RER by 1.4)</option>
-                    <option value="Neutered">
-                      Neutered (Multiply RER by 1.2)
-                    </option>
-                    <option value="Obesity Prone">
-                      Obesity Prone (Multiply RER by 1)
-                    </option>
-                    <option value="Weight Loss">
+                    <option value={1.4}>Intact (Multiply RER by 1.4)</option>
+                    <option value={1.2}>Neutered (Multiply RER by 1.2)</option>
+                    <option value={1}>Obesity Prone (Multiply RER by 1)</option>
+                    <option value={0.8}>
                       Weight Loss (Multiply RER by 0.8)
                     </option>
                   </>
                 ) : (
                   <>
-                    <option value="Intact">Intact (Multiply RER by 1.8)</option>
-                    <option value="Neutered">
-                      Neutered (Multiply RER by 1.6)
-                    </option>
-                    <option value="Obesity Prone">
+                    <option value={1.8}>Intact (Multiply RER by 1.8)</option>
+                    <option value={1.6}>Neutered (Multiply RER by 1.6)</option>
+                    <option value={1.4}>
                       Obesity Prone (Multiply RER by 1.4)
                     </option>
-                    <option value="Weight Loss">
-                      Weight Loss (Multiply RER by 1)
-                    </option>
-                    <option value="Light Work">
-                      Light Work (Multiply RER by 2)
-                    </option>
-                    <option value="Moderate Work">
-                      Moderate Work (Multiply RER by 3)
-                    </option>
-                    <option value="Heavy Work">
+                    <option value={1}>Weight Loss (Multiply RER by 1)</option>
+                    <option value={2}>Light Work (Multiply RER by 2)</option>
+                    <option value={3}>Moderate Work (Multiply RER by 3)</option>
+                    <option value={4}>
                       Heavy Work (Multiply RER by 4 to 8)
                     </option>
                   </>
-                )}
+                )} */}
               </select>
             </div>
             {/* GET PET WEIGHT FROM FIRESTORE */}
@@ -318,3 +343,7 @@ export default function PetProfile() {
     </div>
   );
 }
+
+PetProfile.propTypes = {
+  petFoodList: PropTypes.array.isRequired,
+};
