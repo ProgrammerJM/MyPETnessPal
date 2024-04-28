@@ -66,8 +66,8 @@ export default function GetWeight({ setPetWeight }) {
     const unsubscribe = onSnapshot(weightDocRef, (doc) => {
       if (doc.exists()) {
         const data = doc.data();
-        setPetWeight(data.Weight);
-        setWeight(data.Weight);
+        setPetWeight(Number(data.Weight));
+        setWeight(Number(data.Weight));
         setLoading(false);
       }
     });
@@ -82,7 +82,7 @@ export default function GetWeight({ setPetWeight }) {
       <button onClick={handleClick} disabled={loading} className="border p-2">
         {loading ? "Fetching Weight..." : "Get Weight"}
       </button>
-      {weight !== null && <p>Current Weight: {weight} kg</p>}
+      {weight !== null && <p>Current Weight: {weight} grams</p>}
     </div>
   );
 }
