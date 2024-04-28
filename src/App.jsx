@@ -1,3 +1,6 @@
+import { useState, useEffect } from "react";
+import { db } from "./config/firebase";
+import { collection, getDocs } from "firebase/firestore";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Layout from "./components/Layout";
 import Home from "./pages/Home";
@@ -10,12 +13,33 @@ import PetsLayout from "./components/PetsLayout";
 import Dashboard from "./pages/profile/Dashboard";
 import PetProfile from "./pages/profile/PetProfile";
 import Notifications from "./pages/profile/Notifications";
-import TankManagement from "./pages/profile/Tank";
 import Help from "./pages/profile/Help";
 import Settings from "./pages/profile/Settings";
 import "./App.css";
+import Tank from "./pages/profile/Tank";
 
 function App() {
+  const [petFoodList, setPetFoodList] = useState([]);
+
+  useEffect(() => {
+    // Fetch pet food list from Firestore
+    const fetchPetFoodList = async () => {
+      try {
+        const petFoodCollectionRef = collection(db, "petFood");
+        const querySnapshot = await getDocs(petFoodCollectionRef);
+        const petFoodData = querySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setPetFoodList(petFoodData);
+      } catch (error) {
+        console.error("Error fetching pet food list:", error);
+      }
+    };
+
+    fetchPetFoodList();
+  }, []); // Empty dependency array ensures it runs only once on component mount
+
   return (
     <>
       <BrowserRouter>
@@ -30,10 +54,13 @@ function App() {
           </Route>
           <Route path="/profile" element={<PetsLayout />}>
             <Route index element={<Dashboard />} />
-            <Route path="petprofile" element={<PetProfile />} />
+            <Route
+              path="petprofile"
+              element={<PetProfile petFoodList={petFoodList} />}
+            />
             <Route path="notifications" element={<Notifications />} />
             <Route path="help" element={<Help />} />
-            <Route path="tank" element={<TankManagement />} />
+            <Route path="tank" element={<Tank petFoodList={petFoodList} />} />
             <Route path="settings" element={<Settings />} />
           </Route>
         </Routes>
