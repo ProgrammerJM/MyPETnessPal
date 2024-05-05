@@ -125,12 +125,18 @@ const FeedAmountComponent = ({
   activityLevel,
 }) => {
   // State variables for managing various aspects of feeding
-  const [scheduleFeedAmount, setScheduleFeedAmount] = useState(0);
+  const [scheduledFeedAmount, setScheduledFeedAmount] = useState(0);
+  const [scheduledFeedingActivated, setScheduledFeedingActivated] =
+    useState(false);
+
   const [error, setError] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
+
   const [feedingModeType, setFeedingModeType] = useState("");
   const [feedingModeOptions, setFeedingModeOptions] = useState([]);
+
   const [servings, setServings] = useState(0);
+
   const [selectedFood, setSelectedFood] = useState("");
   const [scheduledDate, setScheduledDate] = useState("");
   const [scheduledTime, setScheduledTime] = useState("");
@@ -168,7 +174,7 @@ const FeedAmountComponent = ({
       if (selectedModeId === "Smart") {
         setScheduledDate("");
         setScheduledTime("");
-        setScheduleFeedAmount("");
+        setScheduledFeedAmount("");
       }
 
       // If selected mode is "Scheduled", clear smart feeding data
@@ -223,35 +229,6 @@ const FeedAmountComponent = ({
     }
   };
 
-  // Function to calculate food to dispense per day for scheduled feeding
-  const calculateFoodToDispensePerDayForScheduledFeeding = (
-    weight,
-    activityLevel,
-    selectedFoodId,
-    petFoodList,
-    scheduledDate,
-    scheduledTime,
-    scheduleFeedAmount
-  ) => {
-    let RER = 70 * Math.pow(weight, 0.75);
-    const MER = RER * activityLevel;
-    const selectedFoodData = petFoodList.find(
-      (food) => food.id === selectedFoodId
-    );
-
-    if (!selectedFoodData) {
-      return 0;
-    }
-
-    const caloriesPerGram = selectedFoodData.caloriesPerGram;
-
-    if (selectedFoodId === "") {
-      return 0;
-    } else if (selectedFoodId === "Scheduled") {
-      return MER / caloriesPerGram / scheduleFeedAmount;
-    }
-  };
-
   // Function to handle submission of smart feeding data
   const handleSmartFeedingSubmit = async () => {
     try {
@@ -272,7 +249,7 @@ const FeedAmountComponent = ({
         petName: petName,
         petType: petType,
         feedingModeType: "Smart",
-        amountToDispensePerServing: foodToDispensePerDay,
+        amountToDispensePerServing: Number(foodToDispensePerDay),
         timestamp: Timestamp.now(),
         selectedFood: selectedFood,
       });
@@ -287,21 +264,18 @@ const FeedAmountComponent = ({
 
   // Function to handle submission of scheduled feeding data
   const handleScheduledFeedingSubmit = async () => {
-    try {
-      // Calculate food to dispense per day based on scheduled date and time
-      const foodToDispensePerDay =
-        calculateFoodToDispensePerDayForScheduledFeeding(
-          weight,
-          activityLevel,
-          selectedFood,
-          petFoodList,
-          scheduledDate,
-          scheduledTime
-        );
+    // Set scheduled feeding mode as activated
+    setScheduledFeedingActivated(true);
 
-      // Check if foodToDispensePerDay is a valid number
-      if (isNaN(foodToDispensePerDay) || foodToDispensePerDay <= 0) {
-        throw new Error("Invalid food amount");
+    try {
+      // Check if all required fields are filled
+      if (
+        !selectedFood ||
+        !scheduledDate ||
+        !scheduledTime ||
+        !scheduledFeedAmount
+      ) {
+        throw new Error("Please fill in all required fields");
       }
 
       // Save data to Firestore
@@ -310,19 +284,28 @@ const FeedAmountComponent = ({
         petName: petName,
         petType: petType,
         feedingModeType: "Scheduled",
-        amountToDispensePerServing: foodToDispensePerDay,
+        scheduledFeedingActivated: scheduledFeedingActivated,
         scheduledDate: scheduledDate,
         scheduledTime: scheduledTime,
-        timestamp: Timestamp.now(),
         selectedFood: selectedFood,
+        amountToFeed: Number(scheduledFeedAmount),
+        timestamp: Timestamp.now(),
       });
 
+      // Reset error state
+      setError(null);
+
       // Reset state and close modal
-      setFeedingModeType("");
       toggleModal();
       console.log("Scheduled Feeding Mode has been saved");
     } catch (error) {
-      console.error("Error handling scheduled feeding submission:", error);
+      // Check if it's a validation error
+      if (error.message === "Please fill in all required fields") {
+        setError(error.message);
+      } else {
+        // Handle other errors
+        console.error("Error handling scheduled feeding submission:", error);
+      }
     }
   };
 
@@ -418,8 +401,8 @@ const FeedAmountComponent = ({
                     <input
                       type="number"
                       id="scheduledAmount"
-                      value={scheduleFeedAmount}
-                      onChange={(e) => setScheduleFeedAmount(e.target.value)}
+                      value={scheduledFeedAmount}
+                      onChange={(e) => setScheduledFeedAmount(e.target.value)}
                       className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                     />
                     {/* Select food dropdown */}
@@ -437,6 +420,15 @@ const FeedAmountComponent = ({
                           </option>
                         ))}
                       </select>
+                      {/* Error message for required fields */}
+                      {(!selectedFood ||
+                        !scheduledDate ||
+                        !scheduledTime ||
+                        !scheduledFeedAmount) && (
+                        <p className="text-red-500">
+                          Please fill in all required fields
+                        </p>
+                      )}
                       {/* Submit button for scheduled feeding */}
                       <button
                         onClick={handleScheduledFeedingSubmit}
