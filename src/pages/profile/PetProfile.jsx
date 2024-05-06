@@ -17,6 +17,7 @@ import {
 import FeedAmountComponent from "./feedAmountComponent";
 import GetWeight from "./getWeight";
 import PropTypes from "prop-types";
+import Records from "./Records";
 
 export default function PetProfile({ petFoodList }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -92,7 +93,7 @@ export default function PetProfile({ petFoodList }) {
   const onSavePet = async () => {
     try {
       // Generate custom ID for the pet food item
-      const customId = "Pet " + (petList.length + 1); // Example: "Pet Food 1", "Pet Food 2", ...
+      const customId = "Pet " + (petList.length + 1); // Example: "Pet Name 1", "Pet Name 2", ...
 
       const docData = {
         name: newPetName,
@@ -162,7 +163,7 @@ export default function PetProfile({ petFoodList }) {
             key={pet.id}
             className="relative flex flex-col border border-gray-300 rounded-md p-4 mb-2"
           >
-            <div className="flex">
+            <div className="grid grid-cols-3 overflow-auto">
               <div>
                 <div className="w-40 h-40 rounded-xl overflow-hidden justify-center ml-4 mb-4">
                   <img
@@ -188,7 +189,7 @@ export default function PetProfile({ petFoodList }) {
                 </div>
               </div>
 
-              <div className="w-full flex justify-end mr-20">
+              <div className="w-full flex justify-end">
                 {/* SMART FEDING ACTIVATED  */}
                 <FeedAmountComponent
                   petId={String(pet.id)}
@@ -200,8 +201,8 @@ export default function PetProfile({ petFoodList }) {
                   petFoodList={petFoodList}
                 />
               </div>
+              <Records />
             </div>
-
             <div className="absolute top-0 right-0 m-2">
               <button
                 onClick={() => deletePet(pet.id)}
@@ -295,30 +296,6 @@ export default function PetProfile({ petFoodList }) {
                     {label}
                   </option>
                 ))}
-                {/* {newPetType === "Cat" ? (
-                  <>
-                    <option value={1.4}>Intact (Multiply RER by 1.4)</option>
-                    <option value={1.2}>Neutered (Multiply RER by 1.2)</option>
-                    <option value={1}>Obesity Prone (Multiply RER by 1)</option>
-                    <option value={0.8}>
-                      Weight Loss (Multiply RER by 0.8)
-                    </option>
-                  </>
-                ) : (
-                  <>
-                    <option value={1.8}>Intact (Multiply RER by 1.8)</option>
-                    <option value={1.6}>Neutered (Multiply RER by 1.6)</option>
-                    <option value={1.4}>
-                      Obesity Prone (Multiply RER by 1.4)
-                    </option>
-                    <option value={1}>Weight Loss (Multiply RER by 1)</option>
-                    <option value={2}>Light Work (Multiply RER by 2)</option>
-                    <option value={3}>Moderate Work (Multiply RER by 3)</option>
-                    <option value={4}>
-                      Heavy Work (Multiply RER by 4 to 8)
-                    </option>
-                  </>
-                )} */}
               </select>
             </div>
             {/* GET PET WEIGHT FROM FIRESTORE */}
