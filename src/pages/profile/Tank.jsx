@@ -16,7 +16,7 @@ export default function Tank() {
   const [newPetFoodName, setNewPetFoodName] = useState("");
   const [newFoodCaloriesPerGram, setNewFoodCaloriesPerGram] = useState(0);
 
-  const petFoodCollectionRef = useMemo(() => collection(db, "petFood"), []);
+  const petFoodCollectionRef = useMemo(() => collection(db, "petFoodList"), []);
 
   const getPetFoodList = async () => {
     try {
@@ -69,7 +69,7 @@ export default function Tank() {
 
   const deleteFood = async (id) => {
     alert("Are you sure you want to delete this pet?");
-    const petFoodDocument = doc(db, "petFood", id);
+    const petFoodDocument = doc(db, "petFoodList", id);
     await deleteDoc(petFoodDocument);
   };
 
