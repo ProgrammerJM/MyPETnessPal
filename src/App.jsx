@@ -25,7 +25,7 @@ function App() {
     // Fetch pet food list from Firestore
     const fetchPetFoodList = async () => {
       try {
-        const petFoodCollectionRef = collection(db, "petFood");
+        const petFoodCollectionRef = collection(db, "petFoodList");
         const querySnapshot = await getDocs(petFoodCollectionRef);
         const petFoodData = querySnapshot.docs.map((doc) => ({
           id: doc.id,
