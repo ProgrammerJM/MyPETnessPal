@@ -13,7 +13,7 @@ This is a React application for managing pets. It utilizes Firebase Realtime Dat
 1. Clone the repository: `git clone https://github.com/yourusername/yourrepository.git`
 2. Navigate into the directory: `cd yourrepository`
 3. Install the dependencies: `npm install`
-4. Start the application: `npm start`
+4. Start the application: `npm run dev`
 
 ## Usage
 
