@@ -13,6 +13,7 @@ import { collection, getDocs } from "firebase/firestore"; // Import collection a
 
 export default function Records() {
   const [data, setData] = useState([]);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
