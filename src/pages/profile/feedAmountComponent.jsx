@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
-import { ref, push, get, update } from "firebase/database";
+import { ref, push, get, set, remove, update } from "firebase/database";
 import { realtimeDatabase } from "../../config/firebase";
 import PropTypes from "prop-types";
 
 const FeedAmountComponent = ({
-  petId,
+  // petId,
   petName,
-  petType,
+  // petType,
   petFoodList,
   weight,
   activityLevel,
@@ -63,49 +63,6 @@ const FeedAmountComponent = ({
     setModalOpen(!modalOpen);
   };
 
-  // // Function to calculate the next feeding time based on the current time and servings
-  // const calculateNextFeedingTime = (servings) => {
-  //   const currentTime = new Date();
-  //   const nextFeedingTimes = [];
-
-  //   // Calculate next feeding times based on the current time and servings
-  //   for (let i = 0; i < servings; i++) {
-  //     const nextFeedingTime = new Date(currentTime);
-
-  //     // Logic for determining next feeding time based on the number of servings
-  //     if (servings === 1) {
-  //       nextFeedingTime.setHours(12, 0, 0, 0); // One serving per day at 12:00 PM
-  //     } else if (servings === 2) {
-  //       if (i === 0) {
-  //         nextFeedingTime.setHours(12, 0, 0, 0); // First serving at 12:00 PM
-  //       } else {
-  //         nextFeedingTime.setHours(18, 0, 0, 0); // Second serving at 6:00 PM
-  //       }
-  //     } else if (servings === 3) {
-  //       if (i === 0) {
-  //         nextFeedingTime.setHours(12, 0, 0, 0); // First serving at 12:00 PM
-  //       } else if (i === 1) {
-  //         nextFeedingTime.setHours(16, 0, 0, 0); // Second serving at 4:00 PM
-  //       } else {
-  //         nextFeedingTime.setHours(20, 0, 0, 0); // Third serving at 8:00 PM
-  //       }
-  //     }
-
-  //     nextFeedingTimes.push(nextFeedingTime);
-  //     console.log(nextFeedingTimes);
-  //   }
-  //   return nextFeedingTimes;
-  // };
-  // // Function to check if it's time for a serving
-  // const checkServingTime = (nextFeedingTimes) => {
-  //   const currentTime = new Date();
-
-  //   // Check if current time matches any of the next feeding times
-  //   return nextFeedingTimes.some(
-  //     (nextFeedingTime) => currentTime.getTime() === nextFeedingTime.getTime()
-  //   );
-  // };
-
   // Function to calculate food to dispense per day for smart feeding
   const calculateFoodToDispensePerDayForSmartFeeding = (
     weight,
@@ -148,54 +105,98 @@ const FeedAmountComponent = ({
         throw new Error("Invalid food amount");
       }
 
-      // Fetch the existing smart feeding data and set feedingStatus to false
-      const smartFeedingRef = ref(
-        realtimeDatabase,
-        `petFeedingSchedule/${petName}/smartFeeding`
-      );
-      const smartFeedingSnapshot = await get(smartFeedingRef);
-      if (smartFeedingSnapshot.exists()) {
-        smartFeedingSnapshot.forEach((childSnapshot) => {
-          update(childSnapshot.ref, { feedingStatus: false });
-        });
-      }
-
-      // Fetch the scheduled feeding data and set feedingStatus to false
-      const scheduledFeedingRef = ref(
-        realtimeDatabase,
-        `petFeedingSchedule/${petName}/scheduledFeeding`
-      );
-      const scheduledFeedingSnapshot = await get(scheduledFeedingRef);
-      if (scheduledFeedingSnapshot.exists()) {
-        scheduledFeedingSnapshot.forEach((childSnapshot) => {
-          update(childSnapshot.ref, { feedingStatus: false });
-        });
-      }
-
-      // Construct the smart feeding schedule data
-      const feedingSchedule = Array(Number(servings))
-        .fill()
-        .map((_, i) => ({
-          feedingStatus: true,
-          petId: petId,
-          petName: petName,
-          petType: petType,
-          feedingModeType: "Smart",
-          servings: Number(servings),
-          amountToDispensePerServingPerDay: Number(foodToDispensePerDay),
-          selectedFood: selectedFood,
-          timestamp: Date.now() + i * 1000, // Use the current time as the timestamp and add i seconds to create different timestamps
-        }));
-
-      // Push the data to the Realtime Database
+      // Construct the smart feeding schedule data and push it directly
       const petRef = ref(
         realtimeDatabase,
         `petFeedingSchedule/${petName}/smartFeeding`
       );
 
-      // Push each object in the feedingSchedule array individually
-      for (const schedule of feedingSchedule) {
-        await push(petRef, schedule);
+      // Fetch the existing scheduled feeding data and set scheduledFeedingStatus to false
+      const scheduledFeedingStatusRef = ref(
+        realtimeDatabase,
+        `petFeedingSchedule/${petName}/scheduledFeeding/scheduledFeedingStatus`
+      );
+      const scheduledFeedingStatusSnapshot = await get(
+        scheduledFeedingStatusRef
+      );
+      if (scheduledFeedingStatusSnapshot.exists()) {
+        await set(scheduledFeedingStatusRef, false);
+      }
+
+      // Get the current data
+      const snapshot = await get(petRef);
+
+      if (snapshot.exists()) {
+        // Data exists, update it
+        const data = snapshot.val();
+        const keys = Object.keys(data);
+
+        for (let i = 0; i < keys.length; i++) {
+          const smartFeeding = {
+            petName: petName,
+            feedingModeType: "Smart",
+            servings: Number(servings),
+            amountToDispensePerServingPerDay: Number(foodToDispensePerDay),
+          };
+
+          if (i < Number(servings)) {
+            // Update existing data
+            await update(
+              ref(
+                realtimeDatabase,
+                `petFeedingSchedule/${petName}/smartFeeding/${keys[i]}`
+              ),
+              smartFeeding
+            );
+          } else {
+            // Delete extra data
+            await remove(
+              ref(
+                realtimeDatabase,
+                `petFeedingSchedule/${petName}/smartFeeding/${keys[i]}`
+              )
+            );
+          }
+        }
+
+        // If the number of servings is greater than the number of existing data, push new data
+        for (let i = keys.length; i < Number(servings); i++) {
+          const smartFeeding = {
+            petName: petName,
+            feedingModeType: "Smart",
+            servings: Number(servings),
+            amountToDispensePerServingPerDay: Number(foodToDispensePerDay),
+          };
+
+          await push(petRef, smartFeeding);
+        }
+
+        // Update feedingStatus under smartFeeding
+        const feedingStatusRef = ref(
+          realtimeDatabase,
+          `petFeedingSchedule/${petName}/smartFeeding/smartFeedingStatus`
+        );
+        await set(feedingStatusRef, true);
+      } else {
+        // Data does not exist, push new data
+        for (let i = 0; i < Number(servings); i++) {
+          const smartFeeding = {
+            petName: petName,
+            feedingModeType: "Smart",
+            servings: Number(servings),
+            amountToDispensePerServingPerDay: Number(foodToDispensePerDay),
+          };
+
+          // Push the data to the Realtime Database
+          await push(petRef, smartFeeding);
+        }
+
+        // Set feedingStatus under smartFeeding
+        const feedingStatusRef = ref(
+          realtimeDatabase,
+          `petFeedingSchedule/${petName}/smartFeeding/smartFeedingStatus`
+        );
+        await set(feedingStatusRef, true);
       }
 
       // Close modal and reset state
@@ -222,40 +223,12 @@ const FeedAmountComponent = ({
         throw new Error("Please fill in all required fields");
       }
 
-      // Fetch the existing scheduled feeding data and set feedingStatus to false
-      const scheduledFeedingRef = ref(
-        realtimeDatabase,
-        `petFeedingSchedule/${petName}/scheduledFeeding`
-      );
-      const scheduledFeedingSnapshot = await get(scheduledFeedingRef);
-      if (scheduledFeedingSnapshot.exists()) {
-        scheduledFeedingSnapshot.forEach((childSnapshot) => {
-          update(childSnapshot.ref, { feedingStatus: false });
-        });
-      }
-
-      // Fetch the smart feeding data and set feedingStatus to false
-      const smartFeedingRef = ref(
-        realtimeDatabase,
-        `petFeedingSchedule/${petName}/smartFeeding`
-      );
-      const smartFeedingSnapshot = await get(smartFeedingRef);
-      if (smartFeedingSnapshot.exists()) {
-        smartFeedingSnapshot.forEach((childSnapshot) => {
-          update(childSnapshot.ref, { feedingStatus: false });
-        });
-      }
-
       // Construct the scheduled feeding data
       const scheduledFeedingData = {
-        feedingStatus: true,
-        petId: petId,
         petName: petName,
-        petType: petType,
         feedingModeType: "Scheduled",
         scheduledDate: scheduledDate,
         scheduledTime: scheduledTime,
-        selectedFood: selectedFood,
         amountToFeed: Number(scheduledFeedAmount),
       };
 
@@ -265,6 +238,25 @@ const FeedAmountComponent = ({
         `petFeedingSchedule/${petName}/scheduledFeeding`
       );
       await push(petRef, scheduledFeedingData);
+
+      // Fetch the existing scheduled feeding data and set smartFeedingStatus to false
+      const scheduledFeedingStatusRef = ref(
+        realtimeDatabase,
+        `petFeedingSchedule/${petName}/smartFeeding/smartFeedingStatus`
+      );
+      const scheduledFeedingStatusSnapshot = await get(
+        scheduledFeedingStatusRef
+      );
+      if (scheduledFeedingStatusSnapshot.exists()) {
+        await set(scheduledFeedingStatusRef, false);
+      }
+
+      // Set the feeding status to true
+      const feedingStatusRef = ref(
+        realtimeDatabase,
+        `petFeedingSchedule/${petName}/scheduledFeeding/scheduledFeedingStatus`
+      );
+      await set(feedingStatusRef, true);
 
       // Reset state and close modal
       toggleModal();
@@ -289,30 +281,35 @@ const FeedAmountComponent = ({
 
   useEffect(() => {
     const fetchFeedingMode = async () => {
-      const smartFeedingRef = ref(
+      const smartFeedingStatusRef = ref(
         realtimeDatabase,
-        `petFeedingSchedule/${petName}/smartFeeding`
+        `petFeedingSchedule/${petName}/smartFeeding/smartFeedingStatus`
       );
-      const scheduledFeedingRef = ref(
+      const scheduledFeedingStatusRef = ref(
         realtimeDatabase,
-        `petFeedingSchedule/${petName}/scheduledFeeding`
+        `petFeedingSchedule/${petName}/scheduledFeeding/scheduledFeedingStatus`
       );
 
-      const [smartFeedingSnapshot, scheduledFeedingSnapshot] =
-        await Promise.all([get(smartFeedingRef), get(scheduledFeedingRef)]);
+      const [smartFeedingStatusSnapshot, scheduledFeedingStatusSnapshot] =
+        await Promise.all([
+          get(smartFeedingStatusRef),
+          get(scheduledFeedingStatusRef),
+        ]);
 
       let lastFeedingModeType = "None";
 
-      if (smartFeedingSnapshot.exists()) {
-        const data = smartFeedingSnapshot.val();
-        const lastKey = Object.keys(data).sort().pop();
-        lastFeedingModeType = data[lastKey].feedingModeType;
+      if (
+        smartFeedingStatusSnapshot.exists() &&
+        smartFeedingStatusSnapshot.val() === true
+      ) {
+        lastFeedingModeType = "Smart";
       }
 
-      if (scheduledFeedingSnapshot.exists()) {
-        const data = scheduledFeedingSnapshot.val();
-        const lastKey = Object.keys(data).sort().pop();
-        lastFeedingModeType = data[lastKey].feedingModeType;
+      if (
+        scheduledFeedingStatusSnapshot.exists() &&
+        scheduledFeedingStatusSnapshot.val() === true
+      ) {
+        lastFeedingModeType = "Scheduled";
       }
 
       setFeedingModeType(lastFeedingModeType);
