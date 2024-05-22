@@ -17,4 +17,4 @@ This is a React application for managing pets. It utilizes Firebase Realtime Dat
 
 ## Usage
 
-Open [http://localhost:3000](http://localhost:5173) to view it in the browser.
+Open [http://localhost:5173] to view it in the browser.
