@@ -22,51 +22,43 @@ export default function Footer() {
 
           <ul className="flex justify-center mt-5 space-x-5">
             <li>
-              <a href="#" className="text-gray-400 hover:text-indigo-200 ">
-                <Link
-                  to="https://www.facebook.com/johnmarkt00"
-                  target="_blank"
-                  className="m-1 ml-5 w-fit"
-                >
-                  Facebook{" "}
-                </Link>
-              </a>
+              <Link
+                to="https://www.facebook.com/johnmarkt00"
+                target="_blank"
+                className="m-1 ml-5 w-fit text-gray-400 hover:text-indigo-200 "
+              >
+                Facebook{" "}
+              </Link>
             </li>
 
             <li>
-              <a href="#" className="text-gray-400 hover:text-indigo-200 ">
-                <Link
-                  to="https://www.instagram.com/jmjtiz"
-                  target="_blank"
-                  className="m-1 ml-5 w-fit"
-                >
-                  Instagram{" "}
-                </Link>
-              </a>
+              <Link
+                to="https://www.instagram.com/jmjtiz"
+                target="_blank"
+                className="m-1 ml-5 w-fit text-gray-400 hover:text-indigo-200 "
+              >
+                Instagram{" "}
+              </Link>
             </li>
 
             <li>
-              <a href="#" className="text-gray-400 hover:text-indigo-200 ">
-                <Link
-                  to="https://www.linkedin.com/johnmarktizado"
-                  target="_blank"
-                  className="m-1 ml-5 w-fit"
-                >
-                  Instagram{" "}
-                </Link>
-              </a>
+              <Link
+                to="https://www.linkedin.com/johnmarktizado"
+                target="_blank"
+                className="m-1 ml-5 w-fit text-gray-400 hover:text-indigo-200 "
+              >
+                Instagram{" "}
+              </Link>
             </li>
 
             <li>
-              <a href="#" className="text-gray-400 hover:text-indigo-200 ">
-                <Link
-                  to="https://www.twitter.com/jmjtiz"
-                  target="_blank"
-                  className="m-1 ml-5 w-fit"
-                >
-                  Twitter{" "}
-                </Link>
-              </a>
+              <Link
+                to="https://www.twitter.com/jmjtiz"
+                target="_blank"
+                className="m-1 ml-5 w-fit text-gray-400 hover:text-indigo-200 "
+              >
+                Twitter{" "}
+              </Link>
             </li>
           </ul>
         </div>
