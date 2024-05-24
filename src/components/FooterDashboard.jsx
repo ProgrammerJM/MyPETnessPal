@@ -7,13 +7,13 @@ export default function FooterDashboard() {
             href="#"
             className="flex items-center justify-center m-3 text-xl font-semibold text-whiteViolet"
           >
-            <img
-              src="../src/assets/petness-logo-icon.png"
-              className="h-6 mr-3 sm:h-9"
-              alt="PETness"
-            />
             Anytime PETness
           </a>
+          <img
+            src="../src/assets/petness-logo-icon.png"
+            className="h-6 mr-3 sm:h-9"
+            alt="PETness"
+          />
           <div className="text-sm text-center text-white m-2">
             © 2023-2324 PETNESS™. All Rights Reserved.
           </div>
