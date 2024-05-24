@@ -1,7 +1,6 @@
 import { NavLink } from "react-router-dom";
 import { useState } from "react";
 import { BiLeftArrowAlt } from "react-icons/bi";
-import("tailwindcss").Config;
 import { TbLayoutDashboardFilled } from "react-icons/tb";
 import { MdOutlinePets } from "react-icons/md";
 import { IoNotifications } from "react-icons/io5";
