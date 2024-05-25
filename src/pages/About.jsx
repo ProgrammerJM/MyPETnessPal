@@ -1,10 +1,10 @@
 export default function About() {
   return (
-    <>
+    <div className="h-full my-20">
       <h1 className="text-5xl flex justify-center p-10">
         Learn About US: <span className="font-bold">Anytime PETness</span>
       </h1>
-      <div className="flex justify-center h-dvh">
+      <div className="flex justify-center">
         <img
           src="./src/assets/aboutus.png"
           className="w-auto h-auto max-w-[50%] max-h-[75%] mx-10"
@@ -35,6 +35,6 @@ export default function About() {
           </p>
         </div>
       </div>
-    </>
+    </div>
   );
 }
