@@ -321,15 +321,18 @@ const FeedAmountComponent = ({
   // JSX for rendering the component
   return (
     <div>
-      <div className="m-4">
+      <div className="flex flex-col items-center mx-4 py-2 px-4 ">
         {/* Button to toggle the modal */}
+        <p className="text-bold font-medium">
+          Selected Mode: {feedingModeType}
+        </p>
         <button
           onClick={toggleModal}
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          className="text-white inline-flex items-center justify-center gap-2.5 rounded-md bg-mainColor  py-2 px-3 
+          text-bold font-medium hover:bg-darkViolet mb-4 rounded "
         >
-          Feeding Mode
+          Change Feeding Mode
         </button>
-        <p>Current mode: {feedingModeType}</p>
 
         {/* Modal for selecting feeding mode and entering data */}
         {modalOpen && (

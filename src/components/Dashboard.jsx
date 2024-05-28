@@ -34,7 +34,8 @@ export default function Dashboard() {
         transition duration-300 ease-in-out relative `}
         >
           <BiLeftArrowAlt
-            className={`bg-white mt-16 text-subColor rounded-full text-2xl absolute -right-3 top-12 cursor-pointer duration-500 shadow-md 
+            className={`bg-white mt-16 text-subColor rounded-full text-2xl absolute -right-3 top-12 cursor-pointer 
+            duration-500 shadow-md 
          ${!open && "rotate-180 mt-12"}`}
             onClick={() => setOpen(!open)}
           />
@@ -193,7 +194,7 @@ export default function Dashboard() {
 
               <NavLink
                 className={`${navBarText}, ${!open && "hidden"}`}
-                to="help"
+                to="SinglePetProfile"
                 end
                 activestyle={activestyle}
               >

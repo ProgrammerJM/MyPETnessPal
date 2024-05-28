@@ -7,11 +7,11 @@ export default function PetsLayout() {
   return (
     <div className="flex h-screen overflow-active ">
       <Dashboard />
-      <div className="Header flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col">
         <HeaderDashboard />
         <main className="flex-1 overflow-y-auto bg-backdrop">
-          <div className="container max-w-full mx-auto px-6 py-6">
-            <div className="Outlet bg-white rounded-2xl p-4">
+          <div className="container max-w-full mx-auto p-8">
+            <div className="Outlet">
               <Outlet />
             </div>
           </div>
