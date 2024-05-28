@@ -4,7 +4,7 @@ import { CiLogout } from "react-icons/ci";
 export default function HeaderDashboard() {
   return (
     <>
-      <div className="Header flex bg-violetBG h-16 w-full z-30 backdrop-blur-sm shadow-md border-b-4 border-darkViolet">
+      <div className="Header flex bg-violetBG h-16 w-full backdrop-blur-sm shadow-md border-b-4 border-darkViolet">
         <NavLink
           to="/"
           className={"flex flex-row-reverse content-center size-full"}

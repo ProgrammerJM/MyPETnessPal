@@ -1,15 +1,13 @@
 import { useEffect, useState, useMemo } from "react";
 import { db, auth, storage } from "../../config/firebase";
 import { IoAddCircle } from "react-icons/io5";
-import { TiDelete } from "react-icons/ti";
-import { LuView } from "react-icons/lu";
 
 import {
   getDocs,
   collection,
-  // addDoc,
+  addDoc,
   deleteDoc,
-  setDoc,
+  // setDoc,
   doc,
 } from "firebase/firestore";
 import {
@@ -21,7 +19,7 @@ import {
 import FeedAmountComponent from "./feedAmountComponent";
 import GetWeight from "./getWeight";
 import PropTypes from "prop-types";
-// import Records from "./Records";
+import Records from "./Records";
 
 export default function PetProfile({ petFoodList }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -96,14 +94,15 @@ export default function PetProfile({ petFoodList }) {
   // SAVE PET FUNCTION
   const onSavePet = async () => {
     try {
-      const customId = newPetName;
+      // Generate custom ID for the pet food item
+      const customId = "Pet " + (petList.length + 1); // Example: "Pet Name 1", "Pet Name 2", ...
 
       const docData = {
         name: newPetName,
         petType: newPetType,
         weight: petWeight,
         activityLevel: newPetActivityLevel,
-        id: newPetName,
+        id: customId,
         userId: auth?.currentUser?.uid,
       };
 
@@ -111,8 +110,8 @@ export default function PetProfile({ petFoodList }) {
         docData.imageURL = data.img;
       }
 
-      // Use `setDoc` to specify a custom ID
-      await setDoc(doc(petCollectionRef, customId), docData);
+      // Use `addDoc` instead of `setDoc` to let Firestore generate a unique ID
+      await addDoc(petCollectionRef, docData);
 
       await getPetList();
       console.log("Data saved to Firestore with ID: ", customId);
@@ -155,7 +154,7 @@ export default function PetProfile({ petFoodList }) {
   return (
     <div>
       <button
-        className="text-white inline-flex items-center justify-center gap-2.5 rounded-md bg-darkViolet py-3 px-6 
+        className="text-white inline-flex items-center justify-center gap-2.5 rounded-md bg-darkViolet py-3 px-7 
         text-center font-medium hover:bg-opacity-90 mb-4"
         onClick={toggleModal}
       >
@@ -163,17 +162,15 @@ export default function PetProfile({ petFoodList }) {
         Add Pet
       </button>
 
-      <div className="grid grid-cols-3 place-content-center	bg-white rounded-2xl p-2 ">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-white rounded-2xl p-4">
         {petList.map((pet) => (
           <div
             key={pet.id}
-            className="relative flex flex-col border border-gray-300 rounded-md
-            max-w-sm mt-6 m-4 overflow-hidden
-            bg-white rounded shadow-xl"
+            className="relative flex flex-col border border-gray-300 rounded-md p-4 mb-2"
           >
-            <div className="grid overflow-auto ">
+            <div className="grid grid-cols-3 overflow-auto">
               <div>
-                <div className="h-52">
+                <div className="w-40 h-40 rounded-xl overflow-hidden justify-center ml-4 mb-4">
                   <img
                     src={
                       pet.imageURL ||
@@ -183,27 +180,21 @@ export default function PetProfile({ petFoodList }) {
                     className="w-full h-full object-cover"
                   />
                 </div>
-                <div className="px-6 py-4">
-                  <div className="mb-2 text-xl font-bold text-gray-900">
-                    <h1 className="font-bold">{pet.name}</h1>
-                  </div>
-
-                  <p className="text-base text-gray-600">age: {pet.petAge}</p>
-                  <p className="text-base text-gray-600">
-                    Weight (KG): {pet.weight}
-                  </p>
-                  <p className="text-base text-gray-600">
+                <div className="ml-4">
+                  <h1 className="font-bold">{pet.name}</h1>
+                  <p className="text-gray-600">Pet Type: {pet.petType}</p>
+                  <p className="text-gray-600">Weight (KG): {pet.weight}</p>
+                  <p className="text-gray-600">
                     Pet Activity Level:
                     {activityLevelOptions[pet.petType] &&
                       activityLevelOptions[pet.petType].find(
                         (option) => option.value === pet.activityLevel
                       )?.label}
                   </p>
-                  <p className="text-base text-gray-600">Food Selected:</p>
                 </div>
               </div>
 
-              <div className="flex item-center justify-center ">
+              <div className="w-full flex justify-end">
                 {/* SMART FEEDING ACTIVATED  */}
                 <FeedAmountComponent
                   petId={String(pet.id)}
@@ -217,52 +208,21 @@ export default function PetProfile({ petFoodList }) {
               </div>
               <Records />
             </div>
-            <div className="flex flex-col gap-2 absolute top-0 right-0 m-2 cursor-pointer">
-              <button
-                // onClick={() => VIEW(pet.id)} VIEW SELECTED PET PROFILE
-                className="text-white font-bold flex items-center justify-center size-fit relative"
-              >
-                <div className="relative bg-mainColor hover:bg-darkViolet py-1 px-2 transition-all duration-300 rounded flex items-center">
-                  <LuView className="size-6" />
-                </div>
-                <span className="absolute top-0 bg-darkViolet text-white px-2 mr-4 py-1 rounded opacity-0 transition-opacity duration-300 hover:opacity-100">
-                  View
-                </span>
-              </button>
-
+            <div className="absolute top-0 right-0 m-2">
               <button
                 onClick={() => deletePet(pet.id)}
-                className="text-white font-bold flex items-center justify-center size-fit relative"
+                className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-3 rounded"
               >
-                <div className="relative bg-mainColor hover:bg-darkViolet py-1 px-2 transition-all duration-300 rounded flex items-center">
-                  <TiDelete className="size-6" />
-                </div>
-                <span className="absolute top-0 bg-darkViolet text-white px-2 mr-5 py-1 rounded opacity-0 transition-opacity duration-300 hover:opacity-100">
-                  Delete
-                </span>
+                &times;
               </button>
             </div>
           </div>
         ))}
-
-        {/* {petRecords.map((record) => (
-          <div
-            key={record.id}
-            className="border border-gray-300 rounded-md p-4"
-          >
-            <div className="grid grid-cols-3">
-              <div>
-                <h1 className="font-bold">Date: {record.amountDispensed}</h1>
-                <p className="text-gray-600">Weight: {record.weight} KG</p>
-              </div>
-            </div>
-          </div>
-        ))} */}
       </div>
 
       {/* FOR ADD PET MODAL  */}
       {isModalOpen && (
-        <div className="z-50 fixed w-full h-full top-0 left-0 flex items-center justify-center bg-black bg-opacity-50">
+        <div className="fixed inset-0 z-10 flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white p-8 rounded-md flex flex-col max-h-full overflow-auto">
             <h1 className="text-xl font-semibold mb-4">CREATE PROFILE</h1>
             <hr />
@@ -369,4 +329,3 @@ export default function PetProfile({ petFoodList }) {
 PetProfile.propTypes = {
   petFoodList: PropTypes.array.isRequired,
 };
-PetProfile.js;
