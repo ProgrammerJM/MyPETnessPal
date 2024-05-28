@@ -33,7 +33,6 @@ export default function PetUser({ petList, petFoodList }) {
               <p className="dark:text-indigo-200">Hi its me, {petId}!</p>
             </div>
           </div>
-
           <div className=" grid grid-cols-12 md:mt-6 md:gap-4 2xl:mt-7.5 2xl:gap-7.5 w-full">
             {/* PET PROFILE DEETS */}
             <div className="flex items-center col-span-12 border border-stroke bg-white p-10 shadow-default dark:border-strokedark sm:px-7.5 xl:col-span-7 rounded-xl shadow-md">
@@ -93,31 +92,7 @@ export default function PetUser({ petList, petFoodList }) {
                 <button className="flex-1 py-2 px-4 bg-darkViolet text-white rounded-r-full font-semibold focus:outline-none focus:ring-2 focus:ring-darkViolet">
                   Scheduled Feeding
                 </button>
-          <div className="grid grid-cols-3 gap-2 bg-white rounded-b-xl h-screen">
-            <div className="mt-4 grid grid-cols-12 md:mt-6 md:gap-4 2xl:mt-7.5 2xl:gap-7.5">
-              <div className="col-span-12 border border-stroke bg-white px-5 pt-7.5 pb-5 shadow-default dark:border-strokedark sm:px-7.5 xl:col-span-8 rounded-xl shadow-md">
-                {/* PET PROFILE */}
-                PET PROFILE
-                <p>Id {petData.id}</p>
-                <p>Weight {petData.weight}</p>
-                <p>Activity Level {petData.activityLevel}</p>
               </div>
-              <div
-                className="col-span-12 border border-stroke bg-white p-7.5 shadow-default
-        dark:border-strokedark dark:bg-boxdark xl:col-span-4 rounded-xl shadow-md"
-              >
-                {/* FEEDING MODE SELECTION */}
-                FEEDING MODE SELECTION
-                <div className="flex item-center justify-center">
-                  <FeedAmountComponent
-                    petId={id}
-                    petName={name}
-                    petType={petType}
-                    weight={Number(weight)}
-                    activityLevel={Number(activityLevel)}
-                    petFoodList={petFoodList}
-                  />
-                </div>
 
               <p className="text text-gray-600">
                 Descriptive Analytics Enter Here Descriptive Analytics Enter
@@ -147,6 +122,28 @@ export default function PetUser({ petList, petFoodList }) {
               <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
                 <div className="border border-stroke bg-white p-5 shadow-default dark:border-strokedark rounded-lg shadow-sm xl:col-span-1 flex justify-center items-center">
                   <p className="text-center">GRAPH HERE</p>
+                  {/* PET PROFILE */}
+                  PET PROFILE
+                  <p>Id {petData.id}</p>
+                  <p>Weight {petData.weight}</p>
+                  <p>Activity Level {petData.activityLevel}</p>
+                </div>
+                <div
+                  className="col-span-12 border border-stroke bg-white p-7.5 shadow-default
+        dark:border-strokedark dark:bg-boxdark xl:col-span-4 rounded-xl shadow-md"
+                >
+                  {/* FEEDING MODE SELECTION */}
+                  FEEDING MODE SELECTION
+                  <div className="flex item-center justify-center">
+                    <FeedAmountComponent
+                      petId={id}
+                      petName={name}
+                      petType={petType}
+                      weight={Number(weight)}
+                      activityLevel={Number(activityLevel)}
+                      petFoodList={petFoodList}
+                    />
+                  </div>
                 </div>
                 <div className="border border-stroke bg-white p-5 shadow-default dark:border-strokedark rounded-lg shadow-sm xl:col-span-2 overflow-auto">
                   <p className="text-center">TABLE HERE</p>
