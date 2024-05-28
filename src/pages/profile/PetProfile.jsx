@@ -3,9 +3,9 @@ import { db, auth, storage } from "../../config/firebase";
 import {
   getDocs,
   collection,
-  addDoc,
+  // addDoc,
   deleteDoc,
-  // setDoc,
+  setDoc,
   doc,
 } from "firebase/firestore";
 import {
@@ -92,15 +92,14 @@ export default function PetProfile({ petFoodList }) {
   // SAVE PET FUNCTION
   const onSavePet = async () => {
     try {
-      // Generate custom ID for the pet food item
-      const customId = "Pet " + (petList.length + 1); // Example: "Pet Name 1", "Pet Name 2", ...
+      const customId = newPetName;
 
       const docData = {
         name: newPetName,
         petType: newPetType,
         weight: petWeight,
         activityLevel: newPetActivityLevel,
-        id: customId,
+        id: newPetName,
         userId: auth?.currentUser?.uid,
       };
 
@@ -108,8 +107,8 @@ export default function PetProfile({ petFoodList }) {
         docData.imageURL = data.img;
       }
 
-      // Use `addDoc` instead of `setDoc` to let Firestore generate a unique ID
-      await addDoc(petCollectionRef, docData);
+      // Use `setDoc` to specify a custom ID
+      await setDoc(doc(petCollectionRef, customId), docData);
 
       await getPetList();
       console.log("Data saved to Firestore with ID: ", customId);
@@ -201,7 +200,7 @@ export default function PetProfile({ petFoodList }) {
                   petFoodList={petFoodList}
                 />
               </div>
-              <Records />
+              <Records customId={pet.id} />
             </div>
             <div className="absolute top-0 right-0 m-2">
               <button
@@ -213,6 +212,20 @@ export default function PetProfile({ petFoodList }) {
             </div>
           </div>
         ))}
+
+        {/* {petRecords.map((record) => (
+          <div
+            key={record.id}
+            className="border border-gray-300 rounded-md p-4"
+          >
+            <div className="grid grid-cols-3">
+              <div>
+                <h1 className="font-bold">Date: {record.amountDispensed}</h1>
+                <p className="text-gray-600">Weight: {record.weight} KG</p>
+              </div>
+            </div>
+          </div>
+        ))} */}
       </div>
 
       {/* FOR ADD PET MODAL  */}
@@ -324,3 +337,4 @@ export default function PetProfile({ petFoodList }) {
 PetProfile.propTypes = {
   petFoodList: PropTypes.array.isRequired,
 };
+PetProfile.js;
