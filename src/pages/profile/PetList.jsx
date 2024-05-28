@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import PropTypes from "prop-types";
 import { TiDelete } from "react-icons/ti";
 import { LuView } from "react-icons/lu";
@@ -9,6 +10,7 @@ const PetList = ({
   smartFeedingActivated,
   petFoodList,
 }) => {
+  const navigate = useNavigate();
   const activityLevelOptions = {
     Cat: [
       { value: 1.4, label: "Intact (Multiply RER by 1.4)" },
@@ -25,6 +27,10 @@ const PetList = ({
       { value: 3, label: "Moderate Work (Multiply RER by 3)" },
       { value: 4, label: "Heavy Work (Multiply RER by 4 to 8)" },
     ],
+  };
+
+  const handleViewClick = (petId) => {
+    navigate(`/profile/petprofile/${petId}`);
   };
 
   return (
@@ -79,7 +85,10 @@ const PetList = ({
             </div>
           </div>
           <div className="flex flex-col gap-2 absolute top-0 right-0 m-2 cursor-pointer">
-            <button className="text-white font-bold flex items-center justify-center size-fit relative">
+            <button
+              onClick={() => handleViewClick(pet.id)}
+              className="text-white font-bold flex items-center justify-center size-fit relative"
+            >
               <div className="relative bg-mainColor hover:bg-darkViolet py-1 px-2 transition-all duration-300 rounded flex items-center">
                 <LuView className="size-6" />
               </div>
