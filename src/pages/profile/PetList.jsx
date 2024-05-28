@@ -2,13 +2,13 @@ import { useNavigate } from "react-router-dom";
 import PropTypes from "prop-types";
 import { TiDelete } from "react-icons/ti";
 import { LuView } from "react-icons/lu";
-import FeedAmountComponent from "./feedAmountComponent";
+// import FeedAmountComponent from "./feedAmountComponent";
 
 const PetList = ({
   petList,
   deletePet,
-  smartFeedingActivated,
-  petFoodList,
+  //   smartFeedingActivated,
+  //   petFoodList,
 }) => {
   const navigate = useNavigate();
   const activityLevelOptions = {
@@ -72,7 +72,7 @@ const PetList = ({
                 <p className="text-base text-gray-600">Food Selected:</p>
               </div>
             </div>
-            <div className="flex item-center justify-center">
+            {/* <div className="flex item-center justify-center">
               <FeedAmountComponent
                 petId={String(pet.id)}
                 petName={String(pet.name)}
@@ -82,7 +82,7 @@ const PetList = ({
                 smartFeedingActivated={Boolean(smartFeedingActivated)}
                 petFoodList={petFoodList}
               />
-            </div>
+            </div> */}
           </div>
           <div className="flex flex-col gap-2 absolute top-0 right-0 m-2 cursor-pointer">
             <button
