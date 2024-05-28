@@ -19,6 +19,8 @@ export default function PetUser({ petList, petFoodList }) {
   const { name, id, weight, activityLevel, petType } = petData;
 
   console.log(petName);
+  console.log(petData.imageURL);
+  console.log(petFoodList.map((food) => food.name));
 
   return (
     <>
@@ -41,7 +43,10 @@ export default function PetUser({ petList, petFoodList }) {
                   <div className="rounded-full bg-white p-1 overflow-hidden size-48">
                     {/* Insert Here Selected Pet Profile Picture */}
                     <img
-                      src="../../src/assets/bgViolet.jpg"
+                      src={
+                        petData.imageURL ||
+                        "https://icon-library.com/images/no-image-icon/no-image-icon-0.jpg"
+                      }
                       alt="Pet User Image : Selected Pet Profile Picture"
                       className="w-full h-full object-cover rounded-full"
                     />
@@ -51,16 +56,17 @@ export default function PetUser({ petList, petFoodList }) {
 
               <div className="flex flex-col text-left ml-10">
                 <h2 className="text-2xl my-4 font-semibold text-gray-900">
-                  MINGMING
+                  {petName}
                 </h2>
 
                 <p className="text-lg text-gray-600">
                   {/* PET'S TYPE */}
-                  <span className="font-semibold">Pet Type:</span> Cat
+                  <span className="font-semibold">Pet Type:</span> {petType}
                 </p>
                 <p className="text-lg text-gray-600">
                   {/* PET'S CURRENT WEIGHT */}
-                  <span className="font-semibold">Current Weight:</span> 8lbs
+                  <span className="font-semibold">Current Weight:</span>{" "}
+                  {weight}g
                 </p>
                 <p className="text-lg text-gray-600">
                   {/* PET'S AGE */}
@@ -68,13 +74,12 @@ export default function PetUser({ petList, petFoodList }) {
                 </p>
                 <p className="text-lg text-gray-600">
                   {/* PET'S ACTIVITY LEVEL */}
-                  <span className="font-semibold">Activity Level:</span>{" "}
-                  Neutered Adult
+                  <span className="font-semibold">Activity Level:</span>
+                  {activityLevel}
                 </p>
                 <p className="text-lg text-gray-600">
                   {/* FOOD SELECTED */}
-                  <span className="font-semibold">Food Selected:</span> Food
-                  Selected
+                  <span className="font-semibold">Food Selected:</span>
                 </p>
               </div>
             </div>
