@@ -133,6 +133,7 @@ const FeedAmountComponent = ({
 
         for (let i = 0; i < keys.length; i++) {
           const smartFeeding = {
+            selectedFood: selectedFood,
             petName: petName,
             feedingModeType: "Smart",
             servings: Number(servings),
@@ -162,6 +163,7 @@ const FeedAmountComponent = ({
         // If the number of servings is greater than the number of existing data, push new data
         for (let i = keys.length; i < Number(servings); i++) {
           const smartFeeding = {
+            selectedFood: selectedFood,
             petName: petName,
             feedingModeType: "Smart",
             servings: Number(servings),
@@ -181,6 +183,7 @@ const FeedAmountComponent = ({
         // Data does not exist, push new data
         for (let i = 0; i < Number(servings); i++) {
           const smartFeeding = {
+            selectedFood: selectedFood,
             petName: petName,
             feedingModeType: "Smart",
             servings: Number(servings),
@@ -225,6 +228,7 @@ const FeedAmountComponent = ({
 
       // Construct the scheduled feeding data
       const scheduledFeedingData = {
+        selectedFood: selectedFood,
         petName: petName,
         feedingModeType: "Scheduled",
         scheduledDate: scheduledDate,
@@ -425,7 +429,7 @@ const FeedAmountComponent = ({
                         >
                           <option value="">Select a food</option>
                           {petFoodList.map((food) => (
-                            <option key={food.id} value={food.id}>
+                            <option key={food.id} value={food.name}>
                               {food.name} - {food.caloriesPerGram} Calories Per
                               g
                             </option>
