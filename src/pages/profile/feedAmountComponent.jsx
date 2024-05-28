@@ -328,7 +328,7 @@ const FeedAmountComponent = ({
         </p>
         <button
           onClick={toggleModal}
-          className="text-white inline-flex items-center justify-center gap-2.5 bg-mainColor  py-2 px-3 
+          className="text-white inline-flex items-center justify-center gap-2.5 bg-mainColor  py-2 px-3
           text-bold font-medium hover:bg-darkViolet mb-4 "
         >
           Change Feeding Mode
