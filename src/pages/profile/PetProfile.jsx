@@ -6,7 +6,7 @@ import PropTypes from "prop-types"; // Import PropTypes
 import PetList from "./PetList";
 import AddPetModal from "./AddPetModal";
 
-export default function PetProfile({ petFoodList }) {
+export default function PetProfile({ petFoodList, onPetListChange }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [petList, setPetList] = useState([]);
   const [smartFeedingActivated, setSmartFeedingActivated] = useState(false);
@@ -20,6 +20,7 @@ export default function PetProfile({ petFoodList }) {
         ...doc.data(),
         id: doc.id,
       }));
+      onPetListChange(filteredData); // Pass the petList to the parent component
       setPetList(filteredData);
     } catch (err) {
       console.error(err);
@@ -51,9 +52,9 @@ export default function PetProfile({ petFoodList }) {
   };
 
   return (
-    <div>
+    <>
       <button
-        className="text-white inline-flex items-center justify-center gap-2.5 rounded-md bg-darkViolet py-3 px-6 
+        className="text-white inline-flex items-center justify-center gap-2.5 rounded-md bg-darkViolet py-3 px-6
         text-center font-medium hover:bg-opacity-90 mb-4"
         onClick={toggleModal}
       >
@@ -74,11 +75,12 @@ export default function PetProfile({ petFoodList }) {
         getPetList={getPetList}
         petCollectionRef={petCollectionRef}
       />
-    </div>
+    </>
   );
 }
 
 // Add prop validation for petFoodList
 PetProfile.propTypes = {
   petFoodList: PropTypes.array.isRequired,
+  onPetListChange: PropTypes.func.isRequired,
 };
