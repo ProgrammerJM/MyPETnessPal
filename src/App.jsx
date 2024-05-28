@@ -21,6 +21,7 @@ import PetUser from "./pages/profile/PetUser";
 
 function App() {
   const [petFoodList, setPetFoodList] = useState([]);
+  const [petList, setPetList] = useState([]);
 
   useEffect(() => {
     // Fetch pet food list from Firestore
@@ -41,6 +42,13 @@ function App() {
     fetchPetFoodList();
   }, []); // Empty dependency array ensures it runs only once on component mount
 
+  const handlePetListChange = (petData) => {
+    setPetList(petData); // Update the petList in the parent component
+
+    // Store the petList data in localStorage
+    localStorage.setItem("petList", JSON.stringify(petData));
+  };
+
   return (
     <>
       <BrowserRouter>
@@ -57,9 +65,17 @@ function App() {
             <Route index element={<Dashboard />} />
             <Route
               path="petprofile"
-              element={<PetProfile petFoodList={petFoodList} />}
+              element={
+                <PetProfile
+                  petFoodList={petFoodList}
+                  onPetListChange={handlePetListChange}
+                />
+              }
             />
-            <Route path="petprofile/:petId" element={<PetUser />} />
+            <Route
+              path="petprofile/:petId"
+              element={<PetUser petList={petList} petFoodList={petFoodList} />}
+            />
             <Route path="notifications" element={<Notifications />} />
             <Route path="SinglePetProfile" element={<SinglePetProfile />} />
             <Route path="tank" element={<Tank petFoodList={petFoodList} />} />
