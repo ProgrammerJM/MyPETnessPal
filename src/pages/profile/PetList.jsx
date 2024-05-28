@@ -1,13 +1,13 @@
-// PetList.jsx
 import PropTypes from "prop-types";
+import { TiDelete } from "react-icons/ti";
+import { LuView } from "react-icons/lu";
 import FeedAmountComponent from "./feedAmountComponent";
-import Records from "./Records";
 
 const PetList = ({
   petList,
-  petFoodList,
-  smartFeedingActivated,
   deletePet,
+  smartFeedingActivated,
+  petFoodList,
 }) => {
   const activityLevelOptions = {
     Cat: [
@@ -28,15 +28,17 @@ const PetList = ({
   };
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+    <div className="grid grid-cols-3 place-content-center bg-white rounded-2xl p-2">
       {petList.map((pet) => (
         <div
           key={pet.id}
-          className="relative flex flex-col border border-gray-300 rounded-md p-4 mb-2"
+          className="relative flex flex-col border border-gray-300
+            max-w-sm mt-6 m-4 overflow-hidden
+            bg-white rounded shadow-xl"
         >
-          <div className="grid grid-cols-3 overflow-auto">
+          <div className="grid overflow-auto">
             <div>
-              <div className="w-40 h-40 rounded-xl overflow-hidden justify-center ml-4 mb-4">
+              <div className="h-52">
                 <img
                   src={
                     pet.imageURL ||
@@ -46,20 +48,25 @@ const PetList = ({
                   className="w-full h-full object-cover"
                 />
               </div>
-              <div className="ml-4">
-                <h1 className="font-bold">{pet.name}</h1>
-                <p className="text-gray-600">Pet Type: {pet.petType}</p>
-                <p className="text-gray-600">Weight (KG): {pet.weight}</p>
-                <p className="text-gray-600">
+              <div className="px-6 py-4">
+                <div className="mb-2 text-xl font-bold text-gray-900">
+                  <h1 className="font-bold">{pet.name}</h1>
+                </div>
+                <p className="text-base text-gray-600">age: {pet.petAge}</p>
+                <p className="text-base text-gray-600">
+                  Weight (KG): {pet.weight}
+                </p>
+                <p className="text-base text-gray-600">
                   Pet Activity Level:
                   {activityLevelOptions[pet.petType] &&
                     activityLevelOptions[pet.petType].find(
                       (option) => option.value === pet.activityLevel
                     )?.label}
                 </p>
+                <p className="text-base text-gray-600">Food Selected:</p>
               </div>
             </div>
-            <div className="w-full flex justify-end">
+            <div className="flex item-center justify-center">
               <FeedAmountComponent
                 petId={String(pet.id)}
                 petName={String(pet.name)}
@@ -70,14 +77,26 @@ const PetList = ({
                 petFoodList={petFoodList}
               />
             </div>
-            <Records customId={pet.id} />
           </div>
-          <div className="absolute top-0 right-0 m-2">
+          <div className="flex flex-col gap-2 absolute top-0 right-0 m-2 cursor-pointer">
+            <button className="text-white font-bold flex items-center justify-center size-fit relative">
+              <div className="relative bg-mainColor hover:bg-darkViolet py-1 px-2 transition-all duration-300 rounded flex items-center">
+                <LuView className="size-6" />
+              </div>
+              <span className="absolute top-0 bg-darkViolet text-white px-2 mr-4 py-1 rounded opacity-0 transition-opacity duration-300 hover:opacity-100">
+                View
+              </span>
+            </button>
             <button
               onClick={() => deletePet(pet.id)}
-              className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-3 rounded"
+              className="text-white font-bold flex items-center justify-center size-fit relative"
             >
-              &times;
+              <div className="relative bg-mainColor hover:bg-darkViolet py-1 px-2 transition-all duration-300 rounded flex items-center">
+                <TiDelete className="size-6" />
+              </div>
+              <span className="absolute top-0 bg-darkViolet text-white px-2 mr-5 py-1 rounded opacity-0 transition-opacity duration-300 hover:opacity-100">
+                Delete
+              </span>
             </button>
           </div>
         </div>
@@ -87,26 +106,10 @@ const PetList = ({
 };
 
 PetList.propTypes = {
-  petList: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired,
-      petType: PropTypes.string.isRequired,
-      weight: PropTypes.number.isRequired,
-      activityLevel: PropTypes.number.isRequired,
-      imageURL: PropTypes.string,
-    })
-  ).isRequired,
-  petFoodList: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired,
-      brand: PropTypes.string,
-      weight: PropTypes.number,
-    })
-  ).isRequired,
-  smartFeedingActivated: PropTypes.bool.isRequired,
+  petList: PropTypes.array.isRequired,
   deletePet: PropTypes.func.isRequired,
+  smartFeedingActivated: PropTypes.bool.isRequired,
+  petFoodList: PropTypes.array.isRequired,
 };
 
 export default PetList;
