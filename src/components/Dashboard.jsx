@@ -43,7 +43,7 @@ export default function Dashboard() {
           {/*Navbar Header */}
           <div className="inline-flex border-b-2 border-subColor-500 shadow-s  p-5 ">
             <img
-              src="../src/assets/petness-logo-icon.png"
+              src="../../src/assets/petness-logo-icon.png"
               alt="Petness"
               className={
                 'logo float-left w-10 h-10 mt-4 duration-500 ease-in-out ${open && "ml-2 rotate-[360deg]"} '
@@ -56,7 +56,7 @@ export default function Dashboard() {
            ${!open && "scale-0"}`}
             >
               <img
-                src="../src/assets/petness-logo-name.png"
+                src="../../src/assets/petness-logo-name.png"
                 className="w-75 mt-75 ml-3"
               />
             </div>
