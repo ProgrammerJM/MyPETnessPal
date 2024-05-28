@@ -34,60 +34,56 @@ const PetList = ({
   };
 
   return (
-    <div className="grid grid-cols-3 place-content-center bg-white rounded-2xl p-2">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-6 bg-white rounded-2xl">
       {petList.map((pet) => (
         <div
           key={pet.id}
-          className="relative flex flex-col border border-gray-300
-            max-w-sm mt-6 m-4 overflow-hidden
-            bg-white rounded shadow-xl"
+          className="relative flex flex-col border border-gray-300 bg-white rounded-xl shadow-md overflow-hidden"
         >
-          <div className="grid overflow-auto">
+          <div className="h-52">
+            <img
+              src={
+                pet.imageURL ||
+                "https://icon-library.com/images/no-image-icon/no-image-icon-0.jpg"
+              }
+              alt="Pet"
+              className="w-full h-full object-cover"
+            />
+          </div>
+          <div className="flex flex-col flex-grow px-6 py-4">
             <div>
-              <div className="h-52">
-                <img
-                  src={
-                    pet.imageURL ||
-                    "https://icon-library.com/images/no-image-icon/no-image-icon-0.jpg"
-                  }
-                  alt="Pet"
-                  className="w-full h-full object-cover"
-                />
+              <div className="mb-2 text-xl font-bold text-gray-900">
+                <h1 className="font-bold">{pet.name}</h1>
               </div>
-              <div className="px-6 py-4">
-                <div className="mb-2 text-xl font-bold text-gray-900">
-                  <h1 className="font-bold">{pet.name}</h1>
-                </div>
-                <p className="text-base text-gray-600">age: {pet.petAge}</p>
-                <p className="text-base text-gray-600">
-                  Weight (KG): {pet.weight}
-                </p>
-                <p className="text-base text-gray-600">
-                  Pet Activity Level:
-                  {activityLevelOptions[pet.petType] &&
-                    activityLevelOptions[pet.petType].find(
-                      (option) => option.value === pet.activityLevel
-                    )?.label}
-                </p>
-                <p className="text-base text-gray-600">Food Selected:</p>
-              </div>
+              <p className="text-base text-gray-600">Age: {pet.petAge}</p>
+              <p className="text-base text-gray-600">
+                Weight (KG): {pet.weight}
+              </p>
+              <p className="text-base text-gray-600">
+                Pet Activity Level:
+                {activityLevelOptions[pet.petType] &&
+                  activityLevelOptions[pet.petType].find(
+                    (option) => option.value === pet.activityLevel
+                  )?.label}
+              </p>
+              <p className="text-base text-gray-600">Food Selected:</p>
             </div>
-            <div className="flex item-center justify-center">
-              <FeedAmountComponent
-                petId={String(pet.id)}
-                petName={String(pet.name)}
-                petType={pet.petType}
-                weight={Number(pet.weight)}
-                activityLevel={Number(pet.activityLevel)}
-                smartFeedingActivated={Boolean(smartFeedingActivated)}
-                petFoodList={petFoodList}
-              />
-            </div>
+          </div>
+          <div className="feedingMode flex items-center justify-center mt-auto p-4">
+            <FeedAmountComponent
+              petId={String(pet.id)}
+              petName={String(pet.name)}
+              petType={pet.petType}
+              weight={Number(pet.weight)}
+              activityLevel={Number(pet.activityLevel)}
+              smartFeedingActivated={Boolean(smartFeedingActivated)}
+              petFoodList={petFoodList}
+            />
           </div>
           <div className="flex flex-col gap-2 absolute top-0 right-0 m-2 cursor-pointer">
             <button
               onClick={() => handleViewClick(pet.id)}
-              className="text-white font-bold flex items-center justify-center size-fit relative"
+              className="text-white font-bold flex items-center justify-center relative"
             >
               <div className="relative bg-mainColor hover:bg-darkViolet py-1 px-2 transition-all duration-300 rounded flex items-center">
                 <LuView className="size-6" />
@@ -98,7 +94,7 @@ const PetList = ({
             </button>
             <button
               onClick={() => deletePet(pet.id)}
-              className="text-white font-bold flex items-center justify-center size-fit relative"
+              className="text-white font-bold flex items-center justify-center relative"
             >
               <div className="relative bg-mainColor hover:bg-darkViolet py-1 px-2 transition-all duration-300 rounded flex items-center">
                 <TiDelete className="size-6" />
