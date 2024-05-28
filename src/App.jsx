@@ -17,6 +17,7 @@ import SinglePetProfile from "./pages/profile/SinglePetProfile";
 import Settings from "./pages/profile/Settings";
 import "./App.css";
 import Tank from "./pages/profile/Tank";
+import PetUser from "./pages/profile/PetUser";
 
 function App() {
   const [petFoodList, setPetFoodList] = useState([]);
@@ -58,6 +59,7 @@ function App() {
               path="petprofile"
               element={<PetProfile petFoodList={petFoodList} />}
             />
+            <Route path="petprofile/:petId" element={<PetUser />} />
             <Route path="notifications" element={<Notifications />} />
             <Route path="SinglePetProfile" element={<SinglePetProfile />} />
             <Route path="tank" element={<Tank petFoodList={petFoodList} />} />
