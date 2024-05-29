@@ -16,6 +16,7 @@ const AddPetModal = ({
   const [newPetType, setNewPetType] = useState("");
   const [petWeight, setPetWeight] = useState(0);
   const [newPetActivityLevel, setNewPetActivityLevel] = useState(0);
+  const [addPetError, setAddPetError] = useState("");
   const [file, setFile] = useState(null);
   const [data, setData] = useState({});
 
@@ -38,8 +39,13 @@ const AddPetModal = ({
   }, [file]);
 
   const onSavePet = async () => {
-    if (!newPetName || !newPetType || !newPetActivityLevel) {
-      window.alert("Error adding document ");
+    if (
+      !newPetName ||
+      !newPetType ||
+      newPetActivityLevel === null ||
+      newPetActivityLevel === undefined
+    ) {
+      setAddPetError("Please fill in all required fields");
       return;
     }
 
@@ -72,6 +78,17 @@ const AddPetModal = ({
     setPetWeight(0);
     toggleModal();
   };
+
+  useEffect(() => {
+    // Check if there are activity level options for the selected pet type
+    if (
+      activityLevelOptions[newPetType] &&
+      activityLevelOptions[newPetType].length > 0
+    ) {
+      // Set the activity level to the first option for the selected pet type
+      setNewPetActivityLevel(activityLevelOptions[newPetType][0].value);
+    }
+  }, [newPetType]);
 
   const activityLevelOptions = {
     "": [{ value: 0, label: "Select Pet Type" }], // Add an empty option for the "Select an option" message
@@ -134,7 +151,7 @@ const AddPetModal = ({
                 <option value="Dog">Dog</option>
               </select>
             </div>
-            <div className="flex flex-col mb-4">
+            <div className="flex flex-col mb-auto">
               <label
                 htmlFor="activityLevel"
                 className="text-sm font-medium text-gray-700 mb-1"
@@ -155,6 +172,9 @@ const AddPetModal = ({
                   </option>
                 ))}
               </select>
+              {addPetError && (
+                <p className="text-red-500 mt-2">{addPetError}</p>
+              )}
             </div>
             <GetWeight setPetWeight={setPetWeight} />
             {/* {(!newPetName || !newPetType || !newPetActivityLevel) && (
