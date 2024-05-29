@@ -1,6 +1,6 @@
 export default function About() {
   return (
-    <div className="h-full my-20">
+    <div className="h-full my-10">
       <h1 className="text-5xl flex justify-center p-10">
         Learn About US: <span className="font-bold">Anytime PETness</span>
       </h1>
