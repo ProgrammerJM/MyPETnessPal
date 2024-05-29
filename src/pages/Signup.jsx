@@ -6,10 +6,30 @@ import { createUserWithEmailAndPassword } from "firebase/auth";
 export default function Signup() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const navigate = useNavigate();
+
+  const validateEmail = (email) => {
+    let regExOfEmail = /\S+@\S+\.\S+/;
+    return regExOfEmail.test(email);
+  };
+
+  const validatePassword = (password) => {
+    return password.length >= 6;
+  };
 
   const handleSignup = async (e) => {
     e.preventDefault();
+
+    if (!validateEmail(email)) {
+      setError("Invalid email format");
+      return;
+    }
+
+    if (!validatePassword(password)) {
+      setError("Password must be at least 6 characters long");
+      return;
+    }
 
     try {
       await createUserWithEmailAndPassword(auth, email, password);
@@ -22,6 +42,7 @@ export default function Signup() {
     // Clear input fields after signup
     setEmail("");
     setPassword("");
+    setError("");
   };
 
   return (
@@ -86,6 +107,7 @@ export default function Signup() {
               Sign up
             </button>
           </div>
+          {error && <p className="text-red-500 text-center">{error}</p>}
         </form>
 
         <p className="mt-10 text-center text-sm text-gray-500">

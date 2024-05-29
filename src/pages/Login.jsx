@@ -6,6 +6,7 @@ import { signInWithEmailAndPassword } from "firebase/auth";
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loginError, setLoginError] = useState(""); // Add this line
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
@@ -15,7 +16,7 @@ export default function Login() {
       navigate("/profile");
     } catch (err) {
       console.error(err);
-
+      setLoginError("Failed to login. Please check your email and password."); // Update this line
       setEmail("");
       setPassword("");
     }
@@ -59,7 +60,6 @@ export default function Login() {
               />
             </div>
           </div>
-
           <div>
             <div className="flex items-center justify-between">
               <label
@@ -90,7 +90,6 @@ export default function Login() {
               />
             </div>
           </div>
-
           <div>
             <button
               type="submit"
@@ -99,6 +98,10 @@ export default function Login() {
               Sign in
             </button>
           </div>
+          {/* Add this line */}
+          {loginError && (
+            <p className="text-red-500 text-center">{loginError}</p>
+          )}
         </form>
 
         <p className="mt-10 text-center text-sm text-gray-500">
