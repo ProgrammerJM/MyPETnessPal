@@ -2,6 +2,7 @@ import { useEffect, useState, useMemo } from "react";
 import { db } from "../../config/firebase";
 import { IoAddCircle } from "react-icons/io5";
 import { collection, getDocs, deleteDoc, doc } from "firebase/firestore";
+import { query, orderBy } from "firebase/firestore";
 import PropTypes from "prop-types"; // Import PropTypes
 import PetList from "./PetList";
 import AddPetModal from "./AddPetModal";
@@ -15,12 +16,13 @@ export default function PetProfile({ petFoodList, onPetListChange }) {
 
   const getPetList = async () => {
     try {
-      const data = await getDocs(petCollectionRef);
+      const inOrderPetList = query(petCollectionRef, orderBy("createdAt"));
+      const data = await getDocs(inOrderPetList);
       const filteredData = data.docs.map((doc) => ({
         ...doc.data(),
         id: doc.id,
       }));
-      onPetListChange(filteredData); // Pass the petList to the parent component
+      onPetListChange(filteredData); // Pass the petList to the parent App component
       setPetList(filteredData);
     } catch (err) {
       console.error(err);
@@ -45,10 +47,14 @@ export default function PetProfile({ petFoodList, onPetListChange }) {
   };
 
   const deletePet = async (id) => {
-    alert("Are you sure you want to delete this pet?");
-    const petDocument = doc(db, "pets", id);
-    await deleteDoc(petDocument);
-    getPetList(); // Refresh the pet list after deletion
+    const confirmation = window.confirm(
+      "Are you sure you want to delete this pet?"
+    );
+    if (confirmation) {
+      const petDocument = doc(db, "pets", id);
+      await deleteDoc(petDocument);
+      getPetList(); // Refresh the pet list after deletion
+    }
   };
 
   return (
