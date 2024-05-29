@@ -50,40 +50,38 @@ function App() {
   };
 
   return (
-    <>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Layout />}>
-            <Route index element={<Home />} />
-            <Route path="about" element={<About />} />
-            <Route path="contact" element={<Contact />} />
-            <Route path="signup" element={<Signup />} />
-            <Route path="login" element={<Login />} />
-            <Route path="forgot-password" element={<ForgotPassword />} />
-          </Route>
-          <Route path="/profile" element={<PetsLayout />}>
-            <Route index element={<Dashboard />} />
-            <Route
-              path="petprofile"
-              element={
-                <PetProfile
-                  petFoodList={petFoodList}
-                  onPetListChange={handlePetListChange}
-                />
-              }
-            />
-            <Route
-              path="petprofile/:petId"
-              element={<PetUser petList={petList} petFoodList={petFoodList} />}
-            />
-            <Route path="notifications" element={<Notifications />} />
-            <Route path="SinglePetProfile" element={<SinglePetProfile />} />
-            <Route path="tank" element={<Tank petFoodList={petFoodList} />} />
-            <Route path="settings" element={<Settings />} />
-          </Route>
-        </Routes>
-      </BrowserRouter>
-    </>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Layout />}>
+          <Route index element={<Home />} />
+          <Route path="about" element={<About />} />
+          <Route path="contact" element={<Contact />} />
+          <Route path="signup" element={<Signup />} />
+          <Route path="login" element={<Login />} />
+          <Route path="forgot-password" element={<ForgotPassword />} />
+        </Route>
+        <Route path="/profile" element={<PetsLayout />}>
+          <Route index element={<Dashboard />} />
+          <Route
+            path="petprofile"
+            element={
+              <PetProfile
+                petFoodList={petFoodList}
+                onPetListChange={handlePetListChange}
+              />
+            }
+          />
+          <Route
+            path="petprofile/:petId"
+            element={<PetUser petList={petList} petFoodList={petFoodList} />}
+          />
+          <Route path="notifications" element={<Notifications />} />
+          <Route path="SinglePetProfile" element={<SinglePetProfile />} />
+          <Route path="tank" element={<Tank petFoodList={petFoodList} />} />
+          <Route path="settings" element={<Settings />} />
+        </Route>
+      </Routes>
+    </BrowserRouter>
   );
 }
 
