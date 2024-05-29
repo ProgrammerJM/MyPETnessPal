@@ -14,7 +14,7 @@ const FeedAmountComponent = ({
   // State variables for managing various aspects of feeding
   const [scheduledFeedAmount, setScheduledFeedAmount] = useState(0);
 
-  // const [error, setError] = useState(null);
+  // State for modal open/close
   const [modalOpen, setModalOpen] = useState(false);
 
   // State for Feeding ModeType
@@ -27,34 +27,18 @@ const FeedAmountComponent = ({
   const [scheduledTime, setScheduledTime] = useState("");
 
   // Function to handle feeding mode change
-  const handleFeedingModeChange = async (selectedModeId) => {
-    try {
-      // Update feeding mode type
-      setFeedingModeType(selectedModeId);
+  const handleFeedingModeChange = (selectedModeId) => {
+    // Update feeding mode type for display purposes
+    setFeedingModeType(selectedModeId);
 
-      // If selected mode is "Smart", clear scheduled feeding data
-      if (selectedModeId === "Smart") {
-        setServings(0);
-        setSelectedFood("");
-      }
-
-      // If selected mode is "Scheduled", clear smart feeding data
-      if (selectedModeId === "Scheduled") {
-        setSelectedFood("");
-        setScheduledDate("");
-        setScheduledTime("");
-        setScheduledFeedAmount("");
-      }
-
-      // If a mode is selected, submit the form
-      if (selectedModeId !== "") {
-        // If it's a scheduled feeding, submit the form immediately
-        if (selectedModeId === "Scheduled") {
-          await handleScheduledFeedingSubmit();
-        }
-      }
-    } catch (error) {
-      console.error("Error handling feeding mode change:", error);
+    // Clear data based on selected mode
+    if (selectedModeId === "Smart") {
+      setServings(0);
+      setSelectedFood("");
+    } else if (selectedModeId === "Scheduled") {
+      setScheduledDate("");
+      setScheduledTime("");
+      setScheduledFeedAmount("");
     }
   };
 
@@ -202,9 +186,11 @@ const FeedAmountComponent = ({
         await set(feedingStatusRef, true);
       }
 
+      // Set feeding mode type after successful submission
+      setFeedingModeType("Smart");
+
       // Close modal and reset state
       toggleModal();
-      // Reset state
       setServings(0);
       setSelectedFood("");
       console.log("Smart Feeding Mode has been saved");
@@ -262,6 +248,9 @@ const FeedAmountComponent = ({
       );
       await set(feedingStatusRef, true);
 
+      // Set feeding mode type after successful submission
+      setFeedingModeType("Scheduled");
+
       // Reset state and close modal
       toggleModal();
 
@@ -273,13 +262,7 @@ const FeedAmountComponent = ({
       setScheduledTime("");
       setScheduledFeedAmount(0);
     } catch (error) {
-      // Check if it's a validation error
-      if (error.message === "Please fill in all required fields") {
-        // setError(error.message);
-      } else {
-        // Handle other errors
-        console.error("Error handling scheduled feeding submission:", error);
-      }
+      console.error("Error handling scheduled feeding submission:", error);
     }
   };
 
@@ -320,20 +303,18 @@ const FeedAmountComponent = ({
     };
 
     fetchFeedingMode();
-  }, []);
+  }, [petName]);
 
   // JSX for rendering the component
   return (
     <div>
-      <div className="flex flex-col items-center mx-4 py-2 px-4 ">
-        {/* Button to toggle the modal */}
+      <div className="flex flex-col items-center mx-4 py-2 px-4">
         <p className="text-bold font-medium">
           Selected Mode: {feedingModeType}
         </p>
         <button
           onClick={toggleModal}
-          className="text-white inline-flex items-center justify-center gap-2.5 bg-mainColor  py-2 px-3
-          text-bold font-medium hover:bg-darkViolet mb-4 "
+          className="text-white inline-flex items-center justify-center gap-2.5 bg-mainColor py-2 px-3 font-bold hover:bg-darkViolet mb-4"
         >
           Change Feeding Mode
         </button>
@@ -353,6 +334,7 @@ const FeedAmountComponent = ({
                   <button
                     onClick={toggleModal}
                     className="absolute top-0 right-0 m-4 text-gray-400 hover:text-gray-800"
+                    aria-label="Close"
                   >
                     &#x2715;
                   </button>
@@ -390,6 +372,7 @@ const FeedAmountComponent = ({
                         value={scheduledDate}
                         onChange={(e) => setScheduledDate(e.target.value)}
                         className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                        aria-required="true"
                       />
                       {/* Scheduled time input */}
                       <label
@@ -404,6 +387,7 @@ const FeedAmountComponent = ({
                         value={scheduledTime}
                         onChange={(e) => setScheduledTime(e.target.value)}
                         className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                        aria-required="true"
                       />
                       {/* Scheduled amount input */}
                       <label
@@ -418,14 +402,22 @@ const FeedAmountComponent = ({
                         value={scheduledFeedAmount}
                         onChange={(e) => setScheduledFeedAmount(e.target.value)}
                         className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                        aria-required="true"
                       />
                       {/* Select food dropdown */}
                       <div className="flex flex-col mt-4">
-                        <label htmlFor="foodSelect">Select Food:</label>
+                        <label
+                          htmlFor="foodSelect"
+                          className="block text-sm font-medium text-gray-700"
+                        >
+                          Select Food:
+                        </label>
                         <select
                           id="foodSelect"
                           value={selectedFood}
                           onChange={(e) => setSelectedFood(e.target.value)}
+                          className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                          aria-required="true"
                         >
                           <option value="">Select a food</option>
                           {petFoodList.map((food) => (
@@ -440,7 +432,7 @@ const FeedAmountComponent = ({
                           !scheduledDate ||
                           !scheduledTime ||
                           !scheduledFeedAmount) && (
-                          <p className="text-red-500">
+                          <p className="text-red-500 mt-2">
                             Please fill in all required fields
                           </p>
                         )}
@@ -470,14 +462,23 @@ const FeedAmountComponent = ({
                         value={servings}
                         onChange={(e) => setServings(e.target.value)}
                         className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                        aria-required="true"
                       />
                       {/* Select food dropdown */}
                       <div className="flex flex-col mt-4">
-                        <label htmlFor="foodSelect">Select Food:</label>
+                        {/* Select a food dropdown */}
+                        <label
+                          htmlFor="foodSelect"
+                          className="block text-sm font-medium text-gray-700"
+                        >
+                          Select Food:
+                        </label>
                         <select
                           id="foodSelect"
                           value={selectedFood}
                           onChange={(e) => setSelectedFood(e.target.value)}
+                          className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                          aria-required="true"
                         >
                           <option value="">Select a food</option>
                           {petFoodList.map((food) => (
