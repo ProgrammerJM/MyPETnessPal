@@ -1,7 +1,7 @@
 export default function FooterDashboard() {
   return (
     <>
-      <footer className="footer bg-gray-700	 flex text-center">
+      <footer className="footer bg-gray-700	p-6 flex text-center">
         <div className="border-gray-200 sm:mx-auto dark:border-gray-700 lg:my-3">
           <div className="flex flex-row-reverse justify-center items-center">
             <a
