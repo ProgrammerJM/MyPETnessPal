@@ -33,11 +33,21 @@ export default function GetWeight({ setPetWeight }) {
   }, [setPetWeight]);
 
   return (
-    <div>
-      <button onClick={handleClick} disabled={loading} className="border p-2">
+    <div className="flex items-center">
+      <button
+        onClick={handleClick}
+        disabled={loading}
+        className="border p-2 rounded bg-mainColor text-white hover:bg-darkViolet transition-colors duration-300"
+      >
         {loading ? "Fetching Weight..." : "Get Weight"}
       </button>
-      {weight !== null && <p>Current Weight: {weight} grams</p>}
+      {weight !== null && (
+        <p className="ml-2">
+          {/* Current Weight: {setPetWeight}
+          grams */}
+          Current Weight: {weight} grams
+        </p>
+      )}
     </div>
   );
 }
