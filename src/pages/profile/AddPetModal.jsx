@@ -96,37 +96,13 @@ const AddPetModal = ({
     isModalOpen && (
       <div className="z-50 fixed w-full h-full top-0 left-0 flex items-center justify-center bg-black bg-opacity-50">
         <div className="bg-white p-10 rounded-md flex max-h-full overflow-auto">
-          <div className="flex flex-col mr-10">
-            <h1 className="text-xl font-semibold">CREATE PET PROFILE</h1>
-            <hr />
-            <div className="flex justify-center items-center my-6">
-              <label
-                htmlFor="fileInput"
-                className="relative w-48 h-48 overflow-hidden rounded-full cursor-pointer"
-              >
-                <img
-                  src={
-                    file
-                      ? URL.createObjectURL(file)
-                      : "https://icon-library.com/images/no-image-icon/no-image-icon-0.jpg"
-                  }
-                  alt=""
-                  className="w-full h-full object-cover items-center"
-                />
-                <input
-                  id="fileInput"
-                  type="file"
-                  onChange={(e) => setFile(e.target.files[0])}
-                  className="absolute inset-0 opacity-0 cursor-pointer"
-                />
-              </label>
-            </div>
-          </div>
           <div className="flex flex-col">
             <div className="flex flex-col mb-4">
+              <h1 className="text-xl font-semibold">CREATE PET PROFILE</h1>
+              <hr />
               <label
                 htmlFor="petName"
-                className="text-sm font-medium text-gray-700 mb-1"
+                className="text-sm font-medium text-gray-700 mt-4 mb-1"
               >
                 Pet Name:
               </label>
@@ -184,7 +160,31 @@ const AddPetModal = ({
             {/* {(!newPetName || !newPetType || !newPetActivityLevel) && (
               <p className="text-red-500">Please fill in all required fields</p>
             )} */}
-            <div className="flex mt-2 justify-between">
+          </div>
+          <div className="flex flex-col ml-10 justify-center">
+            <div className="flex justify-center items-center mt-16">
+              <label
+                htmlFor="fileInput"
+                className="relative w-48 h-48 overflow-hidden rounded-full cursor-pointer"
+              >
+                <img
+                  src={
+                    file
+                      ? URL.createObjectURL(file)
+                      : "https://icon-library.com/images/no-image-icon/no-image-icon-0.jpg"
+                  }
+                  alt=""
+                  className="w-full h-full object-cover items-center"
+                />
+                <input
+                  id="fileInput"
+                  type="file"
+                  onChange={(e) => setFile(e.target.files[0])}
+                  className="absolute inset-0 opacity-0 cursor-pointer"
+                />
+              </label>
+            </div>
+            <div className="flex mt-16 justify-evenly">
               <button
                 className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded h-fit"
                 onClick={onSavePet}
