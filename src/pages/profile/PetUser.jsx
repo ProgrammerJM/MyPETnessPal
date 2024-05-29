@@ -74,7 +74,7 @@ export default function PetUser({ petList, petFoodList }) {
                 </p>
                 <p className="text-lg text-gray-600">
                   {/* PET'S ACTIVITY LEVEL */}
-                  <span className="font-semibold">Activity Level:</span>
+                  <span className="font-semibold">Activity Level: </span>
                   {activityLevel}
                 </p>
                 <p className="text-lg text-gray-600">
