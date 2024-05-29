@@ -3,7 +3,7 @@ import { Link, NavLink } from "react-router-dom";
 export default function Header() {
   return (
     <>
-      <header className="header bg-violetBG backdrop-blur-sm shadow-lg fixed w-full z-30 md:bg-opacity-90 transition duration-300 ease-in-out">
+      <header className="header bg-violetBG backdrop-blur-sm shadow-lg w-full z-30 md:bg-opacity-90 transition duration-300 ease-in-out">
         <div className="nav-content flex items-center md:h-16">
           <img
             src="../src/assets/petness-logo-icon.png"
