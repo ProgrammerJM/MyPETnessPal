@@ -56,18 +56,19 @@ const PetList = ({
                 <div className="mb-2 text-xl font-bold text-gray-900">
                   <h1 className="font-bold">{pet.name}</h1>
                 </div>
-                <p className="text-base text-gray-600">age: {pet.petAge}</p>
+                <p className="text-base text-gray-600">
+                  Pet Type: {pet.petType}
+                </p>
                 <p className="text-base text-gray-600">
                   Weight (KG): {pet.weight}
                 </p>
                 <p className="text-base text-gray-600">
-                  Pet Activity Level:
+                  Pet Activity Level: {""}
                   {activityLevelOptions[pet.petType] &&
                     activityLevelOptions[pet.petType].find(
                       (option) => option.value === pet.activityLevel
                     )?.label}
                 </p>
-                <p className="text-base text-gray-600">Food Selected:</p>
               </div>
             </div>
             {/* <div className="flex item-center justify-center">
