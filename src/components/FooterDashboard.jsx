@@ -4,12 +4,9 @@ export default function FooterDashboard() {
       <footer className="footer bg-gray-700	p-6 flex text-center">
         <div className="border-gray-200 sm:mx-auto dark:border-gray-700 lg:my-3">
           <div className="flex flex-row-reverse justify-center items-center">
-            <a
-              href="#"
-              className="flex items-center justify-center m-3 text-xl font-semibold text-whiteViolet"
-            >
+            <div className="flex items-center justify-center m-3 text-xl font-semibold text-whiteViolet">
               Anytime PETness
-            </a>
+            </div>
             <img
               src="../src/assets/petness-logo-icon.png"
               className="h-6 mr-3 sm:h-9"

@@ -4,17 +4,14 @@ export default function Footer() {
   return (
     <footer className="footer bg-neutral-800 flex flex-col sm:flex-row text-center lg:w-full">
       <div className="my-6 border-gray-200 sm:mx-auto dark:border-gray-700 lg:my-8">
-        <a
-          href="#"
-          className="flex items-center justify-center mb-5 text-2xl font-semibold text-indigo-300"
-        >
+        <div className="flex items-center justify-center mb-5 text-2xl font-semibold text-indigo-300">
           <img
             src="../src/assets/petness-logo-icon.png"
             className="h-6 mr-3 sm:h-9"
             alt="PETness"
           />
           Anytime PETness
-        </a>
+        </div>
         <span className="block text-sm text-center text-gray-300">
           © 2023-2324 PETNESS™. All Rights Reserved.
         </span>
