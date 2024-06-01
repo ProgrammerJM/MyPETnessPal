@@ -18,6 +18,7 @@ import Settings from "./pages/profile/Settings";
 import "./App.css";
 import Tank from "./pages/profile/Tank";
 import PetUser from "./pages/profile/PetUser";
+import NotFound from "./pages/NotFound";
 
 function App() {
   const [petFoodList, setPetFoodList] = useState([]);
@@ -80,6 +81,7 @@ function App() {
           <Route path="tank" element={<Tank petFoodList={petFoodList} />} />
           <Route path="settings" element={<Settings />} />
         </Route>
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
   );
