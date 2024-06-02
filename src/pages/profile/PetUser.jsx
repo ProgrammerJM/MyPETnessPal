@@ -1,9 +1,10 @@
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import PropTypes from "prop-types";
 import FeedAmountComponent from "./feedAmountComponent";
 
 export default function PetUser({ petList, petFoodList }) {
   const { petId } = useParams();
+  const navigate = useNavigate();
 
   // Get the petList data from localStorage if petList prop is empty
   const persistedPetList = petList.length
@@ -26,6 +27,13 @@ export default function PetUser({ petList, petFoodList }) {
     <>
       <div className="relative flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
         <main>
+          <button
+            className="text-white inline-flex items-center justify-center gap-2.5 rounded-md bg-darkViolet py-3 px-6
+        text-center font-medium hover:bg-opacity-90 mb-4"
+            onClick={() => navigate(-1)}
+          >
+            Go Back
+          </button>
           {/* Welcome Banner */}
           <div className="relative bg-profileBG bg-no-repeat p-4 sm:p-6 rounded-t-xl overflow-hidden mb-4 shadow-md bg-cover">
             <div className="relative">
