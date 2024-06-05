@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { doc, setDoc, onSnapshot } from "firebase/firestore";
-import { db } from "../../config/firebase";
+import { ref, onValue, set } from "firebase/database";
+import { realtimeDatabase } from "../../config/firebase";
 import PropTypes from "prop-types";
 
 export default function GetWeight({ setPetWeight }) {
@@ -10,26 +10,24 @@ export default function GetWeight({ setPetWeight }) {
   const handleClick = async () => {
     setLoading(true);
 
-    // Update Firestore document to trigger ESP32 to send weight data
-    const triggerDocRef = doc(db, "trigger", "getPetWeight");
-    await setDoc(triggerDocRef, { status: true });
+    // Update Realtime Database to trigger ESP32 weight data send
+    const triggerRef = ref(realtimeDatabase, "trigger/getPetWeight");
+    await set(triggerRef, { status: true });
   };
 
   useEffect(() => {
-    const weightDocRef = doc(db, "getWeight", "LoadCell");
+    const weightRef = ref(realtimeDatabase, "getWeight/loadCell/weight");
 
-    const unsubscribe = onSnapshot(weightDocRef, (doc) => {
-      if (doc.exists()) {
-        const data = doc.data();
-        setPetWeight(Number(data.Weight));
-        setWeight(Number(data.Weight)); // Convert the weight to a number here
+    const unsubscribe = onValue(weightRef, (snapshot) => {
+      const data = snapshot.val();
+      if (data !== null) {
+        setPetWeight(Number(data));
+        setWeight(Number(data));
         setLoading(false);
       }
     });
 
-    return () => {
-      unsubscribe();
-    };
+    return () => unsubscribe();
   }, [setPetWeight]);
 
   return (
@@ -42,11 +40,7 @@ export default function GetWeight({ setPetWeight }) {
         {loading ? "Fetching Weight..." : "Get Weight"}
       </button>
       {weight !== null && (
-        <p className="ml-2">
-          {/* Current Weight: {setPetWeight}
-          grams */}
-          Current Weight: {weight} grams
-        </p>
+        <p className="ml-2">Current Weight: {weight} grams</p>
       )}
     </div>
   );
