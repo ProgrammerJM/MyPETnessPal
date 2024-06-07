@@ -85,7 +85,7 @@ export default function Home() {
           </div>
           <div className="hidden lg:mt-0 lg:col-span-5 lg:flex">
             <img
-              src="../src/assets/petness-logo-icon.png"
+              src="images/petness-logo-icon.png"
               alt="hero image"
               className="object-contain max-w-md mx-auto lg:max-w-none"
             ></img>

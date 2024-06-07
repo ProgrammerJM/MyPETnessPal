@@ -6,7 +6,7 @@ export default function Header() {
       <header className="header bg-violetBG backdrop-blur-sm shadow-lg w-full z-30 md:bg-opacity-90 transition duration-300 ease-in-out">
         <div className="nav-content flex items-center md:h-16">
           <img
-            src="../src/assets/petness-logo-icon.png"
+            src="images/petness-logo-icon.png"
             alt="Petness"
             className="logo pl-10"
           />

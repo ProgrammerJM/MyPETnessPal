@@ -8,7 +8,7 @@ export default function FooterDashboard() {
               Anytime PETness
             </div>
             <img
-              src="../src/assets/petness-logo-icon.png"
+              src="images/petness-logo-icon.png"
               className="h-6 mr-3 sm:h-9"
               alt="PETness"
             />
