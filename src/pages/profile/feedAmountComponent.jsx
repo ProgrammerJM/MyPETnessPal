@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import { ref, push, get, set, remove, update } from "firebase/database";
+import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { db } from "../../config/firebase";
 import { realtimeDatabase } from "../../config/firebase";
 import PropTypes from "prop-types";
 
@@ -10,28 +12,25 @@ const FeedAmountComponent = ({
   petFoodList,
   weight,
   activityLevel,
+  latestFeedingInfo,
 }) => {
-  // State variables for managing various aspects of feeding
   const [scheduledFeedAmount, setScheduledFeedAmount] = useState(0);
-
-  // State for modal open/close
   const [modalOpen, setModalOpen] = useState(false);
-
-  // State for Feeding ModeType
   const [feedingModeType, setFeedingModeType] = useState("");
-
   const [servings, setServings] = useState(0);
-
   const [selectedFood, setSelectedFood] = useState("");
   const [scheduledDate, setScheduledDate] = useState("");
   const [scheduledTime, setScheduledTime] = useState("");
+  const [scheduledSubmitError, setScheduledSubmitError] = useState("");
 
-  // Function to handle feeding mode change
+  const feedingInformationsCollection = collection(
+    db,
+    `pets/${petName}/feedingInformations`
+  );
+
   const handleFeedingModeChange = (selectedModeId) => {
-    // Update feeding mode type for display purposes
     setFeedingModeType(selectedModeId);
 
-    // Clear data based on selected mode
     if (selectedModeId === "Smart") {
       setServings(0);
       setSelectedFood("");
@@ -42,12 +41,10 @@ const FeedAmountComponent = ({
     }
   };
 
-  // Function to toggle the modal
   const toggleModal = () => {
     setModalOpen(!modalOpen);
   };
 
-  // Function to calculate food to dispense per day for smart feeding
   const calculateFoodToDispensePerDayForSmartFeeding = (
     weight,
     activityLevel,
@@ -62,40 +59,40 @@ const FeedAmountComponent = ({
     );
 
     if (!selectedFoodData) {
-      return 0;
+      return { foodToDispensePerDay: 0 };
     }
 
     const caloriesPerGram = selectedFoodData.caloriesPerGram;
 
     if (selectedFoodId === "") {
-      return 0;
+      return { foodToDispensePerDay: 0 };
     }
 
-    return MER / caloriesPerGram / servings;
+    const foodToDispensePerDay = MER / caloriesPerGram / servings;
+
+    return { RER, MER, servings, selectedFoodData, foodToDispensePerDay };
   };
 
-  // Function to handle submission of smart feeding data
   const handleSmartFeedingSubmit = async () => {
     try {
-      const foodToDispensePerDay = calculateFoodToDispensePerDayForSmartFeeding(
-        weight,
-        activityLevel,
-        selectedFood,
-        petFoodList,
-        servings
-      );
+      const { RER, MER, selectedFoodData, foodToDispensePerDay } =
+        calculateFoodToDispensePerDayForSmartFeeding(
+          weight,
+          activityLevel,
+          selectedFood,
+          petFoodList,
+          servings
+        );
 
       if (isNaN(foodToDispensePerDay) || foodToDispensePerDay === 0) {
         throw new Error("Invalid food amount");
       }
 
-      // Construct the smart feeding schedule data and push it directly
       const petRef = ref(
         realtimeDatabase,
         `petFeedingSchedule/${petName}/smartFeeding`
       );
 
-      // Fetch the existing scheduled feeding data and set scheduledFeedingStatus to false
       const scheduledFeedingStatusRef = ref(
         realtimeDatabase,
         `petFeedingSchedule/${petName}/scheduledFeeding/scheduledFeedingStatus`
@@ -107,11 +104,9 @@ const FeedAmountComponent = ({
         await set(scheduledFeedingStatusRef, false);
       }
 
-      // Get the current data
       const snapshot = await get(petRef);
 
       if (snapshot.exists()) {
-        // Data exists, update it
         const data = snapshot.val();
         const keys = Object.keys(data);
 
@@ -125,7 +120,6 @@ const FeedAmountComponent = ({
           };
 
           if (i < Number(servings)) {
-            // Update existing data
             await update(
               ref(
                 realtimeDatabase,
@@ -134,7 +128,6 @@ const FeedAmountComponent = ({
               smartFeeding
             );
           } else {
-            // Delete extra data
             await remove(
               ref(
                 realtimeDatabase,
@@ -144,7 +137,6 @@ const FeedAmountComponent = ({
           }
         }
 
-        // If the number of servings is greater than the number of existing data, push new data
         for (let i = keys.length; i < Number(servings); i++) {
           const smartFeeding = {
             selectedFood: selectedFood,
@@ -157,14 +149,12 @@ const FeedAmountComponent = ({
           await push(petRef, smartFeeding);
         }
 
-        // Update feedingStatus under smartFeeding
         const feedingStatusRef = ref(
           realtimeDatabase,
           `petFeedingSchedule/${petName}/smartFeeding/smartFeedingStatus`
         );
         await set(feedingStatusRef, true);
       } else {
-        // Data does not exist, push new data
         for (let i = 0; i < Number(servings); i++) {
           const smartFeeding = {
             selectedFood: selectedFood,
@@ -174,11 +164,9 @@ const FeedAmountComponent = ({
             amountToDispensePerServingPerDay: Number(foodToDispensePerDay),
           };
 
-          // Push the data to the Realtime Database
           await push(petRef, smartFeeding);
         }
 
-        // Set feedingStatus under smartFeeding
         const feedingStatusRef = ref(
           realtimeDatabase,
           `petFeedingSchedule/${petName}/smartFeeding/smartFeedingStatus`
@@ -186,10 +174,19 @@ const FeedAmountComponent = ({
         await set(feedingStatusRef, true);
       }
 
-      // Set feeding mode type after successful submission
+      // Save the feeding information to Firestore (SMART FEEDING)
+      await addDoc(feedingInformationsCollection, {
+        RER: RER,
+        MER: MER,
+        caloriesPerGram: selectedFoodData.caloriesPerGram,
+        foodSelectedName: selectedFoodData.name,
+        createdAt: serverTimestamp(),
+        feedingMode: "Smart",
+        amountToFeed: foodToDispensePerDay,
+      });
+
       setFeedingModeType("Smart");
 
-      // Close modal and reset state
       toggleModal();
       setServings(0);
       setSelectedFood("");
@@ -199,20 +196,35 @@ const FeedAmountComponent = ({
     }
   };
 
-  // Function to handle submission of scheduled feeding data
   const handleScheduledFeedingSubmit = async () => {
     try {
-      // Check if all required fields are filled
+      const { RER, MER, selectedFoodData } =
+        calculateFoodToDispensePerDayForSmartFeeding(
+          weight,
+          activityLevel,
+          selectedFood,
+          petFoodList
+        );
+
       if (
-        !selectedFood ||
         !scheduledDate ||
         !scheduledTime ||
-        !scheduledFeedAmount
+        !scheduledFeedAmount ||
+        !selectedFood
       ) {
         throw new Error("Please fill in all required fields");
       }
 
-      // Construct the scheduled feeding data
+      // Save the feeding information to Firestore (SCHEDULED FEEDING)
+      await addDoc(feedingInformationsCollection, {
+        RER: RER,
+        MER: MER,
+        caloriesPerGram: selectedFoodData.caloriesPerGram,
+        foodSelectedName: selectedFoodData.name,
+        createdAt: serverTimestamp(),
+        feedingMode: "Scheduled",
+      });
+
       const scheduledFeedingData = {
         selectedFood: selectedFood,
         petName: petName,
@@ -222,14 +234,12 @@ const FeedAmountComponent = ({
         amountToFeed: Number(scheduledFeedAmount),
       };
 
-      // Push the data to the Realtime Database
       const petRef = ref(
         realtimeDatabase,
         `petFeedingSchedule/${petName}/scheduledFeeding`
       );
       await push(petRef, scheduledFeedingData);
 
-      // Fetch the existing scheduled feeding data and set smartFeedingStatus to false
       const scheduledFeedingStatusRef = ref(
         realtimeDatabase,
         `petFeedingSchedule/${petName}/smartFeeding/smartFeedingStatus`
@@ -241,28 +251,25 @@ const FeedAmountComponent = ({
         await set(scheduledFeedingStatusRef, false);
       }
 
-      // Set the feeding status to true
       const feedingStatusRef = ref(
         realtimeDatabase,
         `petFeedingSchedule/${petName}/scheduledFeeding/scheduledFeedingStatus`
       );
       await set(feedingStatusRef, true);
 
-      // Set feeding mode type after successful submission
       setFeedingModeType("Scheduled");
 
-      // Reset state and close modal
       toggleModal();
 
       console.log("Scheduled Feeding Mode has been saved");
 
-      // Reset all of options after successful saved
       setSelectedFood("");
       setScheduledDate("");
       setScheduledTime("");
       setScheduledFeedAmount(0);
     } catch (error) {
       console.error("Error handling scheduled feeding submission:", error);
+      setScheduledSubmitError("Please fill in all required fields");
     }
   };
 
@@ -305,12 +312,11 @@ const FeedAmountComponent = ({
     fetchFeedingMode();
   }, [petName]);
 
-  // JSX for rendering the component
   return (
     <div>
       <div className="flex flex-col items-center mx-4 py-2 px-4">
         <p className="text-bold font-medium">
-          Selected Mode: {feedingModeType}
+          Current Feeding Mode: {feedingModeType}
         </p>
         <button
           onClick={toggleModal}
@@ -319,7 +325,6 @@ const FeedAmountComponent = ({
           Change Feeding Mode
         </button>
 
-        {/* Modal for selecting feeding mode and entering data */}
         {modalOpen && (
           <div className="fixed z-10 inset-0 overflow-y-auto">
             <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
@@ -330,7 +335,6 @@ const FeedAmountComponent = ({
               &#8203;
               <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
                 <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                  {/* Close button for the modal */}
                   <button
                     onClick={toggleModal}
                     className="absolute top-0 right-0 m-4 text-gray-400 hover:text-gray-800"
@@ -338,7 +342,6 @@ const FeedAmountComponent = ({
                   >
                     &#x2715;
                   </button>
-                  {/* Select feeding mode dropdown */}
                   <label
                     htmlFor="feedingModeSelect"
                     className="block text-sm font-medium text-gray-700"
@@ -355,11 +358,9 @@ const FeedAmountComponent = ({
                     <option value="Smart">Smart Feeding</option>
                     <option value="Scheduled">Scheduled Feeding</option>
                   </select>
-                  {/* Feeding mode options */}
-                  {/* Inputs for scheduled feeding */}
+
                   {feedingModeType === "Scheduled" && (
                     <div className="mt-4">
-                      {/* Scheduled date input */}
                       <label
                         htmlFor="scheduledDate"
                         className="block text-sm font-medium text-gray-700"
@@ -374,7 +375,6 @@ const FeedAmountComponent = ({
                         className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                         aria-required="true"
                       />
-                      {/* Scheduled time input */}
                       <label
                         htmlFor="scheduledTime"
                         className="block text-sm font-medium text-gray-700 mt-2"
@@ -389,7 +389,6 @@ const FeedAmountComponent = ({
                         className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                         aria-required="true"
                       />
-                      {/* Scheduled amount input */}
                       <label
                         htmlFor="scheduledAmount"
                         className="block text-sm font-medium text-gray-700 mt-2"
@@ -404,7 +403,6 @@ const FeedAmountComponent = ({
                         className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                         aria-required="true"
                       />
-                      {/* Select food dropdown */}
                       <div className="flex flex-col mt-4">
                         <label
                           htmlFor="foodSelect"
@@ -427,16 +425,11 @@ const FeedAmountComponent = ({
                             </option>
                           ))}
                         </select>
-                        {/* Error message for required fields */}
-                        {(!selectedFood ||
-                          !scheduledDate ||
-                          !scheduledTime ||
-                          !scheduledFeedAmount) && (
+                        {scheduledSubmitError && (
                           <p className="text-red-500 mt-2">
                             Please fill in all required fields
                           </p>
                         )}
-                        {/* Submit button for scheduled feeding */}
                         <button
                           onClick={handleScheduledFeedingSubmit}
                           className="mt-4 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
@@ -446,10 +439,9 @@ const FeedAmountComponent = ({
                       </div>
                     </div>
                   )}
-                  {/* Inputs for smart feeding */}
+
                   {feedingModeType === "Smart" && (
                     <div className="mt-4">
-                      {/* Servings input */}
                       <label
                         htmlFor="servings"
                         className="block text-sm font-medium text-gray-700"
@@ -464,9 +456,7 @@ const FeedAmountComponent = ({
                         className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                         aria-required="true"
                       />
-                      {/* Select food dropdown */}
                       <div className="flex flex-col mt-4">
-                        {/* Select a food dropdown */}
                         <label
                           htmlFor="foodSelect"
                           className="block text-sm font-medium text-gray-700"
@@ -488,7 +478,6 @@ const FeedAmountComponent = ({
                             </option>
                           ))}
                         </select>
-                        {/* Submit button for smart feeding */}
                         <button
                           onClick={handleSmartFeedingSubmit}
                           className="mt-4 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
@@ -503,19 +492,79 @@ const FeedAmountComponent = ({
             </div>
           </div>
         )}
+        {latestFeedingInfo && latestFeedingInfo.createdAt && (
+          <div className="feeding-information">
+            {/* Render the latest feeding information here */}
+            <p className="text text-gray-600 mt-2 font-semibold">
+              Resting Energy Requirement (RER):{" "}
+              <span className="text-darkViolet">
+                {latestFeedingInfo.RER.toFixed(2)} kcal/day
+              </span>
+            </p>
+            <p className="text text-gray-600 mt-2 font-semibold">
+              Maintenance Energy Requirement (MER):{" "}
+              <span className="text-darkViolet">
+                {latestFeedingInfo.MER.toFixed(2)} kcal/day
+              </span>
+            </p>
+            <p className="text text-gray-600 mt-2 font-semibold">
+              Date Started Feeding:{" "}
+              <span className="text-darkViolet">
+                {latestFeedingInfo.createdAt &&
+                typeof latestFeedingInfo.createdAt.toDate === "function"
+                  ? latestFeedingInfo.createdAt
+                      .toDate()
+                      .toLocaleDateString(undefined, {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                        hour12: true,
+                      })
+                  : "N/A"}
+              </span>
+            </p>
+            <p className="text text-gray-600 mt-2 font-semibold">
+              Selected Food:{" "}
+              <span className="text-darkViolet">
+                {latestFeedingInfo.foodSelectedName}
+              </span>
+            </p>
+            <p className="text text-gray-600 mt-2 font-semibold">
+              Food{`'`}s Calories Per Gram:{" "}
+              <span className="text-darkViolet">
+                {latestFeedingInfo.caloriesPerGram} kcal/g
+              </span>
+            </p>
+          </div>
+        )}
+        {(!latestFeedingInfo || !latestFeedingInfo.createdAt) && (
+          <p>No feeding information available</p>
+        )}
       </div>
     </div>
   );
 };
 
-// PropTypes for type-checking
 FeedAmountComponent.propTypes = {
-  petId: PropTypes.string.isRequired,
   petName: PropTypes.string.isRequired,
-  petType: PropTypes.string.isRequired,
-  petFoodList: PropTypes.array.isRequired,
+  petFoodList: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.string.isRequired,
+      name: PropTypes.string.isRequired,
+      caloriesPerGram: PropTypes.number.isRequired,
+    })
+  ).isRequired,
   weight: PropTypes.number.isRequired,
   activityLevel: PropTypes.number.isRequired,
+  latestFeedingInfo: PropTypes.shape({
+    RER: PropTypes.number,
+    MER: PropTypes.number,
+    caloriesPerGram: PropTypes.number,
+    foodSelectedName: PropTypes.string,
+    createdAt: PropTypes.object,
+  }),
 };
 
 export default FeedAmountComponent;
