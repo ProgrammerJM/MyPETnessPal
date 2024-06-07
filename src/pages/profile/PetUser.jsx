@@ -1,10 +1,15 @@
+import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { collection, getDocs, limit, orderBy, query } from "firebase/firestore";
+import { db } from "../../config/firebase";
 import PropTypes from "prop-types";
 import FeedAmountComponent from "./feedAmountComponent";
 
 export default function PetUser({ petList, petFoodList }) {
   const { petId } = useParams();
   const navigate = useNavigate();
+  // const [feedingInfo, setFeedingInfo] = useState([]);
+  const [latestFeedingInfo, setLatestFeedingInfo] = useState({});
 
   // Get the petList data from localStorage if petList prop is empty
   const persistedPetList = petList.length
@@ -19,9 +24,34 @@ export default function PetUser({ petList, petFoodList }) {
 
   const { name, id, weight, activityLevel, petType } = petData;
 
-  console.log(petName);
-  console.log(petData.imageURL);
-  console.log(petFoodList.map((food) => food.name));
+  useEffect(() => {
+    const fetchLatestFeedingInfo = async () => {
+      try {
+        const q = query(
+          collection(db, `pets/${petName}/feedingInformations/`),
+          orderBy("createdAt", "desc"),
+          limit(1)
+        );
+        const querySnapshot = await getDocs(q);
+
+        if (!querySnapshot.empty) {
+          const doc = querySnapshot.docs[0];
+          setLatestFeedingInfo(doc.data());
+        } else {
+          console.log("No documents found in the collection.");
+        }
+      } catch (error) {
+        console.error("Error fetching latest feeding info:", error);
+      }
+    };
+    fetchLatestFeedingInfo();
+  }, [petName]);
+
+  console.log(latestFeedingInfo);
+
+  // console.log(petName);
+  // console.log(petData.imageURL);
+  // console.log(petFoodList.map((food) => food.name));
 
   return (
     <>
@@ -45,8 +75,8 @@ export default function PetUser({ petList, petFoodList }) {
           </div>
           <div className=" grid grid-cols-12 md:mt-6 md:gap-4 2xl:mt-7.5 2xl:gap-7.5 w-full">
             {/* PET PROFILE DEETS */}
-            <div className="flex items-center col-span-12 border border-stroke bg-white p-10 shadow-default dark:border-strokedark sm:px-7.5 xl:col-span-7 rounded-xl shadow-md">
-              <div className="flex items-center ml-10 ">
+            <div className="flex max-sm:flex-col max-sm:p-5 items-center col-span-12 border border-stroke bg-white p-10 shadow-default dark:border-strokedark sm:px-7.5 xl:col-span-7 rounded-xl shadow-md">
+              <div className="flex items-center ml-10 max-sm:m-0">
                 <div className="rounded-full bg-darkViolet/80 backdrop-blur p-1">
                   <div className="rounded-full bg-white p-1 overflow-hidden size-48">
                     {/* Insert Here Selected Pet Profile Picture */}
@@ -56,13 +86,13 @@ export default function PetUser({ petList, petFoodList }) {
                         "https://icon-library.com/images/no-image-icon/no-image-icon-0.jpg"
                       }
                       alt="Pet User Image : Selected Pet Profile Picture"
-                      className="w-full h-full object-cover rounded-full"
+                      className="w-full h-full object-cover rounded-full max-sm:w-fit-content max-sm:h-fit-content "
                     />
                   </div>
                 </div>
               </div>
 
-              <div className="flex flex-col text-left ml-10">
+              <div className="flex flex-col text-left ml-10 max-sm:m-0">
                 <h2 className="text-2xl my-4 font-semibold text-gray-900">
                   {petName}
                 </h2>
@@ -74,7 +104,7 @@ export default function PetUser({ petList, petFoodList }) {
                 <p className="text-lg text-gray-600">
                   {/* PET'S CURRENT WEIGHT */}
                   <span className="font-semibold">Current Weight:</span>{" "}
-                  {weight}g
+                  {weight} kg
                 </p>
                 <p className="text-lg text-gray-600">
                   {/* PET'S AGE */}
@@ -87,7 +117,9 @@ export default function PetUser({ petList, petFoodList }) {
                 </p>
                 <p className="text-lg text-gray-600">
                   {/* FOOD SELECTED */}
-                  <span className="font-semibold">Food Selected:</span>
+                  <span className="font-semibold">
+                    Food Selected: {latestFeedingInfo.foodSelectedName || "N/A"}
+                  </span>
                 </p>
               </div>
             </div>
@@ -155,8 +187,10 @@ export default function PetUser({ petList, petFoodList }) {
                       weight={Number(weight)}
                       activityLevel={Number(activityLevel)}
                       petFoodList={petFoodList}
+                      latestFeedingInfo={latestFeedingInfo}
                     />
                   </div>
+                  {/* Yung Niremove */}
                 </div>
                 <div className="border border-stroke bg-white p-5 shadow-default dark:border-strokedark rounded-lg shadow-sm xl:col-span-2 overflow-auto">
                   <p className="text-center">TABLE HERE</p>
