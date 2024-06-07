@@ -49,10 +49,10 @@ export default function Tank() {
         caloriesPerGram: Number(newFoodCaloriesPerGram),
         userId: auth?.currentUser?.uid,
         date: new Date(),
-        id: customId,
+        id: newPetFoodName,
       };
 
-      const docRef = doc(petFoodCollectionRef, customId); // Create document reference with custom ID
+      const docRef = doc(petFoodCollectionRef, newPetFoodName); // Create document reference with custom ID
 
       await setDoc(docRef, docData);
 
