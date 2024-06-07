@@ -1,6 +1,6 @@
 import { NavLink } from "react-router-dom";
 import { useState } from "react";
-import { BiLeftArrowAlt } from "react-icons/bi";
+import { BiLeftArrowAlt, BiMenu } from "react-icons/bi";
 import { TbLayoutDashboardFilled } from "react-icons/tb";
 import { MdOutlinePets } from "react-icons/md";
 import { IoNotifications } from "react-icons/io5";
@@ -24,14 +24,25 @@ export default function Dashboard() {
   };
 
   const [open, setOpen] = useState(true);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  const handleNavLinkClick = () => {
+    setIsMobileMenuOpen(false);
+  };
 
   return (
     <>
       <div className="flex bg-whiteViolet">
         <div
+          className="lg:hidden block"
+          onClick={() => setIsMobileMenuOpen(true)}
+        >
+          <BiMenu className="text-2xl" />
+        </div>
+        <div
           className={`h-screen text-black pt-3 overflow-visible
         ${open ? "w-64" : "w-20"}
-        transition duration-300 ease-in-out relative `}
+        transition duration-300 ease-in-out relative hidden lg:block`}
         >
           <BiLeftArrowAlt
             className={`bg-white mt-16 text-subColor rounded-full text-2xl absolute -right-3 top-12 cursor-pointer 
@@ -43,20 +54,17 @@ export default function Dashboard() {
           {/*Navbar Header */}
           <div className="inline-flex border-b-2 border-subColor-500 shadow-s  p-5 ">
             <img
-              src="../../src/assets/petness-logo-icon.png"
+              src="images/petness-logo-icon.png"
               alt="Petness"
-              className={
-                'logo float-left w-10 h-10 mt-4 duration-500 ease-in-out ${open && "ml-2 rotate-[360deg]"} '
-              }
+              className={`logo float-left w-10 h-10 mt-4 duration-500 ease-in-out ${
+                open && "ml-2 rotate-[360deg]"
+              }`}
               onClick={() => setOpen(!open)}
             />
 
-            <div
-              className={`duration-300
-           ${!open && "scale-0"}`}
-            >
+            <div className={`duration-300 ${!open && "scale-0"}`}>
               <img
-                src="../../src/assets/petness-logo-name.png"
+                src="images/petness-logo-name.png"
                 className="w-75 mt-75 ml-3"
               />
             </div>
@@ -73,12 +81,11 @@ export default function Dashboard() {
             }`}
             >
               <TbLayoutDashboardFilled
-                className={`${navBarIcon_Close}, ${open && "mr-2"}`}
-                onClick={() => setOpen(!open)}
+                className={`${navBarIcon_Close} ${open && "mr-2"}`}
               />
 
               <NavLink
-                className={`${navBarText}, ${!open && "hidden"}`}
+                className={`${navBarText} ${!open && "hidden"}`}
                 to="."
                 end
                 activestyle={activestyle}
@@ -96,12 +103,11 @@ export default function Dashboard() {
             }`}
             >
               <MdOutlinePets
-                className={`${navBarIcon_Close}, ${open && "mr-2"}`}
-                onClick={() => setOpen(!open)}
+                className={`${navBarIcon_Close} ${open && "mr-2"}`}
               />
 
               <NavLink
-                className={`${navBarText}, ${!open && "hidden"}`}
+                className={`${navBarText} ${!open && "hidden"}`}
                 to="petprofile"
                 end
                 activestyle={activestyle}
@@ -119,12 +125,11 @@ export default function Dashboard() {
             }`}
             >
               <IoMdAnalytics
-                className={`${navBarIcon_Close}, ${open && "mr-2"}`}
-                onClick={() => setOpen(!open)}
+                className={`${navBarIcon_Close} ${open && "mr-2"}`}
               />
 
               <NavLink
-                className={`${navBarText}, ${!open && "hidden"}`}
+                className={`${navBarText} ${!open && "hidden"}`}
                 to="."
                 end
                 activestyle={activestyle}
@@ -142,12 +147,11 @@ export default function Dashboard() {
             }`}
             >
               <IoNotifications
-                className={`${navBarIcon_Close}, ${open && "mr-2"}`}
-                onClick={() => setOpen(!open)}
+                className={`${navBarIcon_Close} ${open && "mr-2"}`}
               />
 
               <NavLink
-                className={`${navBarText}, ${!open && "hidden"}`}
+                className={`${navBarText} ${!open && "hidden"}`}
                 to="notifications"
                 end
                 activestyle={activestyle}
@@ -165,12 +169,11 @@ export default function Dashboard() {
             }`}
             >
               <GiChemicalTank
-                className={`${navBarIcon_Close}, ${open && "mr-2"}`}
-                onClick={() => setOpen(!open)}
+                className={`${navBarIcon_Close} ${open && "mr-2"}`}
               />
 
               <NavLink
-                className={`${navBarText}, ${!open && "hidden"}`}
+                className={`${navBarText} ${!open && "hidden"}`}
                 to="tank"
                 end
                 activestyle={activestyle}
@@ -187,13 +190,10 @@ export default function Dashboard() {
                 : "px-4 shadow-none"
             }`}
             >
-              <MdHelp
-                className={`${navBarIcon_Close}, ${open && "mr-2"}`}
-                onClick={() => setOpen(!open)}
-              />
+              <MdHelp className={`${navBarIcon_Close} ${open && "mr-2"}`} />
 
               <NavLink
-                className={`${navBarText}, ${!open && "hidden"}`}
+                className={`${navBarText} ${!open && "hidden"}`}
                 to="SinglePetProfile"
                 end
                 activestyle={activestyle}
@@ -211,12 +211,115 @@ export default function Dashboard() {
             }`}
             >
               <IoMdSettings
-                className={`${navBarIcon_Close}, ${open && "mr-2"}`}
-                onClick={() => setOpen(!open)}
+                className={`${navBarIcon_Close} ${open && "mr-2"}`}
               />
 
               <NavLink
-                className={`${navBarText}, ${!open && "hidden"}`}
+                className={`${navBarText} ${!open && "hidden"}`}
+                to="settings"
+                end
+                activestyle={activestyle}
+              >
+                Settings
+              </NavLink>
+            </div>
+          </div>
+        </div>
+
+        {/* Mobile Menu */}
+        <div
+          className={`fixed top-0 left-0 w-64 h-full bg-whiteViolet transform transition-transform duration-200 ease-in-out z-50 lg:hidden ${
+            isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"
+          }`}
+        >
+          <div className="p-4 flex justify-between items-center border-b-2 border-subColor-500 shadow-s">
+            <img
+              src="images/petness-logo-icon.png"
+              alt="Petness"
+              className="logo w-10 h-10"
+            />
+            <BiLeftArrowAlt
+              className="text-2xl cursor-pointer"
+              onClick={() => setIsMobileMenuOpen(false)}
+            />
+          </div>
+          <div className="flex flex-col content-center mt-7">
+            <div className={`${navBar_Open}`} onClick={handleNavLinkClick}>
+              <TbLayoutDashboardFilled className={`${navBarIcon_Close}`} />
+              <NavLink
+                className={`${navBarText}`}
+                to="."
+                end
+                activestyle={activestyle}
+              >
+                Dashboard
+              </NavLink>
+            </div>
+
+            <div className={`${navBar_Open}`} onClick={handleNavLinkClick}>
+              <MdOutlinePets className={`${navBarIcon_Close}`} />
+              <NavLink
+                className={`${navBarText}`}
+                to="petprofile"
+                end
+                activestyle={activestyle}
+              >
+                Pet Profile
+              </NavLink>
+            </div>
+
+            <div className={`${navBar_Open}`} onClick={handleNavLinkClick}>
+              <IoMdAnalytics className={`${navBarIcon_Close}`} />
+              <NavLink
+                className={`${navBarText}`}
+                to="."
+                end
+                activestyle={activestyle}
+              >
+                Analytics
+              </NavLink>
+            </div>
+
+            <div className={`${navBar_Open}`} onClick={handleNavLinkClick}>
+              <IoNotifications className={`${navBarIcon_Close}`} />
+              <NavLink
+                className={`${navBarText}`}
+                to="notifications"
+                end
+                activestyle={activestyle}
+              >
+                Notifications
+              </NavLink>
+            </div>
+
+            <div className={`${navBar_Open}`} onClick={handleNavLinkClick}>
+              <GiChemicalTank className={`${navBarIcon_Close}`} />
+              <NavLink
+                className={`${navBarText}`}
+                to="tank"
+                end
+                activestyle={activestyle}
+              >
+                Tank Management
+              </NavLink>
+            </div>
+
+            <div className={`${navBar_Open}`} onClick={handleNavLinkClick}>
+              <MdHelp className={`${navBarIcon_Close}`} />
+              <NavLink
+                className={`${navBarText}`}
+                to="SinglePetProfile"
+                end
+                activestyle={activestyle}
+              >
+                Guidelines
+              </NavLink>
+            </div>
+
+            <div className={`${navBar_Open}`} onClick={handleNavLinkClick}>
+              <IoMdSettings className={`${navBarIcon_Close}`} />
+              <NavLink
+                className={`${navBarText}`}
                 to="settings"
                 end
                 activestyle={activestyle}
