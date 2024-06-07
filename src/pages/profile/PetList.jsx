@@ -2,7 +2,6 @@ import { useNavigate } from "react-router-dom";
 import PropTypes from "prop-types";
 import { TiDelete } from "react-icons/ti";
 import { LuView } from "react-icons/lu";
-// import FeedAmountComponent from "./feedAmountComponent";
 
 const PetList = ({
   petList,
