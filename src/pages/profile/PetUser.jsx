@@ -2,10 +2,21 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { collection, getDocs, limit, orderBy, query } from "firebase/firestore";
 import { db } from "../../config/firebase";
+import {
+  BarChart,
+  Bar,
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+} from "recharts";
 import PropTypes from "prop-types";
 import FeedAmountComponent from "./feedAmountComponent";
 
-export default function PetUser({ petList, petFoodList }) {
+export default function PetUser({ petList, petFoodList, petRecords }) {
   const { petId } = useParams();
   const navigate = useNavigate();
   // const [feedingInfo, setFeedingInfo] = useState([]);
@@ -18,10 +29,8 @@ export default function PetUser({ petList, petFoodList }) {
 
   // Find the pet data for the current petId
   const petData = persistedPetList.find((pet) => pet.id === petId);
-
   //   const petName = petData ? petData.name : "Unknown";
   const petName = petData ? petData.name : "Unknown";
-
   const { name, id, weight, activityLevel, petType } = petData;
 
   useEffect(() => {
@@ -47,11 +56,15 @@ export default function PetUser({ petList, petFoodList }) {
     fetchLatestFeedingInfo();
   }, [petName]);
 
-  console.log(latestFeedingInfo);
+  // console.log(latestFeedingInfo);
 
   // console.log(petName);
   // console.log(petData.imageURL);
   // console.log(petFoodList.map((food) => food.name));
+  // console.log(petRecords);
+
+  // Extract the pet records for the current petName from petRecords
+  const currentRecords = petRecords[petName] || [];
 
   return (
     <>
@@ -198,6 +211,52 @@ export default function PetUser({ petList, petFoodList }) {
               </div>
             </div>
           </div>
+
+          {/* PET RECORDS CHART */}
+          <div className="col-span-12 border border-stroke bg-white p-10 shadow-default dark:border-strokedark dark:bg-boxdark rounded-xl shadow-md">
+            <h1 className="text-xl font-semibold mb-4">Pet Records</h1>
+            {currentRecords.length > 0 ? (
+              <>
+                <h2 className="text-l font-semibold mb-4 text-center">
+                  Amount Dispensed (Bar Chart)
+                </h2>
+                <BarChart
+                  width={800}
+                  height={400}
+                  data={currentRecords}
+                  margin={{ top: 5, right: 20, bottom: 5, left: 0 }}
+                >
+                  <CartesianGrid stroke="#f5f5f5" />
+                  <XAxis dataKey="date" />
+                  <YAxis />
+                  <Tooltip />
+                  <Legend />
+                  <Bar dataKey="amount" fill="#8884d8" />
+                </BarChart>
+                <br />
+                <h2 className="text-l font-semibold mb-4 text-center">
+                  Amount Dispensed (Line Chart)
+                </h2>
+                <LineChart
+                  width={800}
+                  height={400}
+                  data={currentRecords}
+                  margin={{ top: 5, right: 20, bottom: 5, left: 0 }}
+                >
+                  <CartesianGrid stroke="#f5f5f5" />
+                  <XAxis dataKey="time" />
+                  <YAxis />
+                  <Tooltip />
+                  <Legend />
+                  <Line type="monotone" dataKey="amount" stroke="#8884d8" />
+                </LineChart>
+              </>
+            ) : (
+              <p className="text-center text-gray-500">
+                No record information available
+              </p>
+            )}
+          </div>
         </main>
       </div>
     </>
@@ -224,6 +283,16 @@ PetUser.propTypes = {
       //   kcalPerCup: PropTypes.number.isRequired,
       //   cupsPerDay: PropTypes.number.isRequired,
       //   weight: PropTypes.number.isRequired,
+    })
+  ).isRequired,
+  petRecords: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.string.isRequired,
+      date: PropTypes.instanceOf(Date).isRequired,
+      time: PropTypes.string.isRequired,
+      amount: PropTypes.number.isRequired,
+      mode: PropTypes.string.isRequired,
+      // Add other properties of pet records here
     })
   ).isRequired,
 };

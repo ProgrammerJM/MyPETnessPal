@@ -19,10 +19,12 @@ import "./App.css";
 import Tank from "./pages/profile/Tank";
 import PetUser from "./pages/profile/PetUser";
 import NotFound from "./pages/NotFound";
+import fetchPetRecords from "./pages/function/PetRecords";
 
 function App() {
   const [petFoodList, setPetFoodList] = useState([]);
   const [petList, setPetList] = useState([]);
+  const [petRecords, setPetRecords] = useState([]);
 
   useEffect(() => {
     // Fetch pet food list from Firestore
@@ -50,6 +52,23 @@ function App() {
     localStorage.setItem("petList", JSON.stringify(petData));
   };
 
+  const petNames = petList.map((pet) => pet.name);
+
+  useEffect(() => {
+    const getPetRecords = async () => {
+      const recordsMap = [];
+      for (const petName of petNames) {
+        const records = await fetchPetRecords(petName);
+        recordsMap[petName] = records;
+      }
+      setPetRecords(recordsMap);
+    };
+
+    if (petNames.length) {
+      getPetRecords();
+    }
+  }, [petNames]);
+
   return (
     <BrowserRouter>
       <Routes>
@@ -74,7 +93,13 @@ function App() {
           />
           <Route
             path="petprofile/:petId"
-            element={<PetUser petList={petList} petFoodList={petFoodList} />}
+            element={
+              <PetUser
+                petList={petList}
+                petFoodList={petFoodList}
+                petRecords={petRecords}
+              />
+            }
           />
           <Route path="notifications" element={<Notifications />} />
           <Route path="SinglePetProfile" element={<SinglePetProfile />} />
