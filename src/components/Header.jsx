@@ -8,7 +8,7 @@ export default function Header() {
           <img
             src="/images/petness-logo-icon.png"
             alt="Petness"
-            className="logo pl-10"
+            className="logo size-11/12 w-auto pl-10"
           />
 
           <div className="nav-content-text flex-row items-center h-10 md:h-16 flex gap-10 m-auto">

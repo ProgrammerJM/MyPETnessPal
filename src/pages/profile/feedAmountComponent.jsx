@@ -314,16 +314,41 @@ const FeedAmountComponent = ({
 
   return (
     <div>
-      <div className="flex flex-col items-center mx-4 py-2 px-4">
-        <p className="text-bold font-medium">
-          Current Feeding Mode: {feedingModeType}
-        </p>
-        <button
+      <div className="flex items-center justify-center mb-4">
+        <button onClick={toggleModal}>
+          <div className="flex items-center justify-center mb-4">
+            <button
+              className={` h-12 px-4 font-semibold items-center  border border-white justify-center rounded-l-full focus:outline-none focus:ring-2 ${
+                feedingModeType === "Smart"
+                  ? "bg-darkViolet text-white "
+                  : "bg-gray-200 text-gray-600 "
+              }`}
+            >
+              Smart Feeding
+            </button>
+            <button
+              className={` h-12 px-4 font-semibold items-center  border border-white justify-center rounded-r-full focus:outline-none focus:ring-2 ${
+                feedingModeType === "Scheduled"
+                  ? "bg-darkViolet text-white "
+                  : "bg-gray-200 text-gray-600 "
+              }`}
+            >
+              Scheduled Feeding
+            </button>
+          </div>{" "}
+          <div className="text-sm font-normal italic ">
+            toggle to setup feeding mode
+          </div>
+        </button>
+      </div>
+
+      <div className="flex flex-col items-center mx-4 px-4">
+        {/* <button
           onClick={toggleModal}
           className="text-white inline-flex items-center justify-center gap-2.5 bg-mainColor py-2 px-3 font-bold hover:bg-darkViolet mb-4"
         >
           Change Feeding Mode
-        </button>
+        </button> */}
 
         {modalOpen && (
           <div className="fixed z-10 inset-0 overflow-y-auto">
@@ -492,9 +517,16 @@ const FeedAmountComponent = ({
             </div>
           </div>
         )}
+
         {latestFeedingInfo && latestFeedingInfo.createdAt && (
           <div className="feeding-information">
             {/* Render the latest feeding information here */}
+            <p className="text text-gray-600 mt-2 font-semibold">
+              Current Feeding Mode:{" "}
+              <span className="text-darkViolet">
+                {feedingModeType} Feeding Mode
+              </span>
+            </p>
             <p className="text text-gray-600 mt-2 font-semibold">
               Resting Energy Requirement (RER):{" "}
               <span className="text-darkViolet">

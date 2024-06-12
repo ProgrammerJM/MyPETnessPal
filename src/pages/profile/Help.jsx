@@ -17,7 +17,7 @@ export default function Help() {
 
               <table className="min-w-full bg-white border border-gray-200 mb-8">
                 <thead>
-                  <tr className="bg-lavender">
+                  <tr className="">
                     <th className="py-2 px-4 border-b text-center text-lavender-dark">
                       Activity Level
                     </th>
