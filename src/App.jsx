@@ -95,7 +95,7 @@ function App() {
             }
           />
           <Route path="notifications" element={<Notifications />} />
-          <Route path="Help" element={<Help />} />
+          <Route path="help" element={<Help />} />
           <Route path="tank" element={<Tank petFoodList={petFoodList} />} />
           <Route path="settings" element={<Settings />} />
         </Route>
