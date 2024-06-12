@@ -14,6 +14,7 @@ export default {
       backgroundImage: {
         violetBG: "url('/images/bgViolet.jpg')",
         profileBG: "url('/images/profilebg.jpg')",
+        homeBG: "url('/images/bg-petness.png')",
       },
     },
   },
