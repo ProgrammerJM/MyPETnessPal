@@ -21,12 +21,13 @@ export default function PetUser({ petList, petFoodList, petRecords }) {
   const { petId } = useParams();
   const navigate = useNavigate();
   const [latestFeedingInfo, setLatestFeedingInfo] = useState({});
+  const [persistedPetList, setPersistedPetList] = useState([]);
 
-  const persistedPetList = useMemo(
-    () =>
-      petList.length ? petList : JSON.parse(localStorage.getItem("petList")),
-    [petList]
-  );
+  useEffect(() => {
+    if (petList.length) {
+      setPersistedPetList(petList);
+    }
+  }, [petList]);
 
   const petData = useMemo(
     () => persistedPetList.find((pet) => pet.id === petId),
