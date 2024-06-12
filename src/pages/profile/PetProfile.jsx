@@ -1,9 +1,17 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import { db } from "../../config/firebase";
 import { IoAddCircle } from "react-icons/io5";
-import { collection, getDocs, deleteDoc, doc } from "firebase/firestore";
-import { query, orderBy } from "firebase/firestore";
-import PropTypes from "prop-types"; // Import PropTypes
+import {
+  collection,
+  deleteDoc,
+  doc,
+  query,
+  orderBy,
+  onSnapshot,
+} from "firebase/firestore";
+import { ref, remove } from "firebase/database";
+import { realtimeDatabase } from "../../config/firebase";
+import PropTypes from "prop-types";
 import PetList from "./PetList";
 import AddPetModal from "./AddPetModal";
 
@@ -14,24 +22,29 @@ export default function PetProfile({ petFoodList, onPetListChange }) {
 
   const petCollectionRef = useMemo(() => collection(db, "pets"), []);
 
-  const getPetList = async () => {
-    try {
-      const inOrderPetList = query(petCollectionRef, orderBy("createdAt"));
-      const data = await getDocs(inOrderPetList);
-      const filteredData = data.docs.map((doc) => ({
-        ...doc.data(),
-        id: doc.id,
-      }));
-      onPetListChange(filteredData); // Pass the petList to the parent App component
-      setPetList(filteredData);
-    } catch (err) {
-      console.error(err);
-    }
-  };
+  const getPetList = useCallback(() => {
+    const inOrderPetList = query(petCollectionRef, orderBy("createdAt"));
+    const unsubscribe = onSnapshot(
+      inOrderPetList,
+      (snapshot) => {
+        const updatedPetList = snapshot.docs.map((doc) => ({
+          ...doc.data(),
+          id: doc.id,
+        }));
+        onPetListChange(updatedPetList);
+        setPetList(updatedPetList);
+      },
+      (error) => {
+        console.error(error);
+      }
+    );
+    return unsubscribe;
+  }, [petCollectionRef, onPetListChange]);
 
   useEffect(() => {
-    getPetList();
-  }, []);
+    const unsubscribe = getPetList();
+    return () => unsubscribe();
+  }, [getPetList]);
 
   useEffect(() => {
     const savedSmartFeedingState = localStorage.getItem(
@@ -43,19 +56,27 @@ export default function PetProfile({ petFoodList, onPetListChange }) {
   }, []);
 
   const toggleModal = () => {
-    setIsModalOpen(!isModalOpen);
+    setIsModalOpen((prev) => !prev);
   };
 
-  const deletePet = async (id) => {
+  const deletePet = useCallback(async (id) => {
     const confirmation = window.confirm(
       "Are you sure you want to delete this pet?"
     );
     if (confirmation) {
-      const petDocument = doc(db, "pets", id);
-      await deleteDoc(petDocument);
-      getPetList(); // Refresh the pet list after deletion
+      try {
+        const petDocument = doc(db, "pets", id);
+        const petFeedingSchedule = ref(
+          realtimeDatabase,
+          `petFeedingSchedule/${id}`
+        );
+        await deleteDoc(petDocument);
+        await remove(petFeedingSchedule);
+      } catch (error) {
+        console.error("Error deleting pet:", error);
+      }
     }
-  };
+  }, []);
 
   return (
     <>
@@ -85,7 +106,6 @@ export default function PetProfile({ petFoodList, onPetListChange }) {
   );
 }
 
-// Add prop validation for petFoodList
 PetProfile.propTypes = {
   petFoodList: PropTypes.array.isRequired,
   onPetListChange: PropTypes.func.isRequired,
