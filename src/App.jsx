@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { db } from "./config/firebase";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, onSnapshot } from "firebase/firestore";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Layout from "./components/Layout";
 import Home from "./pages/Home";
@@ -24,50 +24,43 @@ import fetchPetRecords from "./pages/function/PetRecords";
 function App() {
   const [petFoodList, setPetFoodList] = useState([]);
   const [petList, setPetList] = useState([]);
-  const [petRecords, setPetRecords] = useState([]);
+  const [petRecords, setPetRecords] = useState({});
+  const petFoodCollectionRef = useMemo(() => collection(db, "petFoodList"), []);
 
   useEffect(() => {
-    // Fetch pet food list from Firestore
-    const fetchPetFoodList = async () => {
-      try {
-        const petFoodCollectionRef = collection(db, "petFoodList");
-        const querySnapshot = await getDocs(petFoodCollectionRef);
-        const petFoodData = querySnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-        setPetFoodList(petFoodData);
-      } catch (error) {
-        console.error("Error fetching pet food list:", error);
-      }
-    };
+    const unsubscribe = onSnapshot(petFoodCollectionRef, (snapshot) => {
+      const petFoodData = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setPetFoodList(petFoodData);
+    });
 
-    fetchPetFoodList();
-  }, []); // Empty dependency array ensures it runs only once on component mount
+    return () => unsubscribe();
+  }, [petFoodCollectionRef]);
 
-  const handlePetListChange = (petData) => {
-    setPetList(petData); // Update the petList in the parent component
-
-    // Store the petList data in localStorage
+  const handlePetListChange = useCallback((petData) => {
+    setPetList(petData);
     localStorage.setItem("petList", JSON.stringify(petData));
-  };
-
-  const petNames = petList.map((pet) => pet.name);
+  }, []);
 
   useEffect(() => {
     const getPetRecords = async () => {
-      const recordsMap = [];
-      for (const petName of petNames) {
-        const records = await fetchPetRecords(petName);
-        recordsMap[petName] = records;
-      }
-      setPetRecords(recordsMap);
+      const recordsMap = await Promise.all(
+        petList.map(async (pet) => {
+          const records = await fetchPetRecords(pet.name);
+          return { [pet.name]: records };
+        })
+      );
+      setPetRecords(Object.assign({}, ...recordsMap));
     };
 
-    if (petNames.length) {
+    if (petList.length) {
       getPetRecords();
     }
-  }, [petNames]);
+  }, [petList]);
+
+  console.log(petRecords);
 
   return (
     <BrowserRouter>
