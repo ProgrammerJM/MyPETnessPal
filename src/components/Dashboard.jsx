@@ -194,7 +194,7 @@ export default function Dashboard() {
 
               <NavLink
                 className={`${navBarText} ${!open && "hidden"}`}
-                to="SinglePetProfile"
+                to="Help"
                 end
                 activestyle={activestyle}
               >
@@ -308,7 +308,7 @@ export default function Dashboard() {
               <MdHelp className={`${navBarIcon_Close}`} />
               <NavLink
                 className={`${navBarText}`}
-                to="SinglePetProfile"
+                to="Help"
                 end
                 activestyle={activestyle}
               >
