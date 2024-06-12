@@ -13,7 +13,7 @@ import PetsLayout from "./components/PetsLayout";
 import Dashboard from "./pages/profile/Dashboard";
 import PetProfile from "./pages/profile/PetProfile";
 import Notifications from "./pages/profile/Notifications";
-import SinglePetProfile from "./pages/profile/SinglePetProfile";
+import Help from "./pages/profile/Help";
 import Settings from "./pages/profile/Settings";
 import "./App.css";
 import Tank from "./pages/profile/Tank";
@@ -102,7 +102,7 @@ function App() {
             }
           />
           <Route path="notifications" element={<Notifications />} />
-          <Route path="SinglePetProfile" element={<SinglePetProfile />} />
+          <Route path="Help" element={<Help />} />
           <Route path="tank" element={<Tank petFoodList={petFoodList} />} />
           <Route path="settings" element={<Settings />} />
         </Route>
