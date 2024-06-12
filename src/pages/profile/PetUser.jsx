@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { collection, getDocs, limit, orderBy, query } from "firebase/firestore";
 import { db } from "../../config/firebase";
@@ -15,23 +15,24 @@ import {
 } from "recharts";
 import PropTypes from "prop-types";
 import FeedAmountComponent from "./feedAmountComponent";
+import PetAnalytics from "../analytics/PetAnalytics";
 
 export default function PetUser({ petList, petFoodList, petRecords }) {
   const { petId } = useParams();
   const navigate = useNavigate();
-  // const [feedingInfo, setFeedingInfo] = useState([]);
   const [latestFeedingInfo, setLatestFeedingInfo] = useState({});
 
-  // Get the petList data from localStorage if petList prop is empty
-  const persistedPetList = petList.length
-    ? petList
-    : JSON.parse(localStorage.getItem("petList"));
+  const persistedPetList = useMemo(
+    () =>
+      petList.length ? petList : JSON.parse(localStorage.getItem("petList")),
+    [petList]
+  );
 
-  // Find the pet data for the current petId
-  const petData = persistedPetList.find((pet) => pet.id === petId);
-  //   const petName = petData ? petData.name : "Unknown";
+  const petData = useMemo(
+    () => persistedPetList.find((pet) => pet.id === petId),
+    [persistedPetList, petId]
+  );
   const petName = petData ? petData.name : "Unknown";
-  const { name, id, weight, activityLevel, petType } = petData;
 
   useEffect(() => {
     const fetchLatestFeedingInfo = async () => {
@@ -53,18 +54,19 @@ export default function PetUser({ petList, petFoodList, petRecords }) {
         console.error("Error fetching latest feeding info:", error);
       }
     };
-    fetchLatestFeedingInfo();
+    if (petName !== "Unknown") {
+      fetchLatestFeedingInfo();
+    }
   }, [petName]);
 
-  // console.log(latestFeedingInfo);
+  const currentRecords = useMemo(
+    () => petRecords[petName] || [],
+    [petRecords, petName]
+  );
 
-  // console.log(petName);
-  // console.log(petData.imageURL);
-  // console.log(petFoodList.map((food) => food.name));
-  // console.log(petRecords);
-
-  // Extract the pet records for the current petName from petRecords
-  const currentRecords = petRecords[petName] || [];
+  if (!petData) {
+    return <p>Loading...</p>;
+  }
 
   return (
     <>
@@ -112,12 +114,13 @@ export default function PetUser({ petList, petFoodList, petRecords }) {
 
                 <p className="text-lg text-gray-600">
                   {/* PET'S TYPE */}
-                  <span className="font-semibold">Pet Type:</span> {petType}
+                  <span className="font-semibold">Pet Type:</span>{" "}
+                  {petData.petType}
                 </p>
                 <p className="text-lg text-gray-600">
                   {/* PET'S CURRENT WEIGHT */}
                   <span className="font-semibold">Current Weight:</span>{" "}
-                  {weight} kg
+                  {petData.weight} kg
                 </p>
                 <p className="text-lg text-gray-600">
                   {/* PET'S AGE */}
@@ -126,7 +129,7 @@ export default function PetUser({ petList, petFoodList, petRecords }) {
                 <p className="text-lg text-gray-600">
                   {/* PET'S ACTIVITY LEVEL */}
                   <span className="font-semibold">Activity Level: </span>
-                  {activityLevel}
+                  {petData.activityLevel}
                 </p>
                 <p className="text-lg text-gray-600">
                   {/* FOOD SELECTED */}
@@ -139,10 +142,9 @@ export default function PetUser({ petList, petFoodList, petRecords }) {
 
             {/* <!-- FEEDING MODE SELECTION --> */}
             <div className="col-span-12 border border-stroke bg-white p-10 shadow-default dark:border-strokedark dark:bg-boxdark xl:col-span-5 rounded-xl shadow-md">
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">
+              {/* <h2 className="text-xl font-semibold text-gray-900 mb-4">
                 Feeding Mode
               </h2>
-
               <div className="flex items-center mb-4">
                 <button className="flex-1 py-2 px-4 bg-gray-200 rounded-l-full text-gray-600 font-semibold focus:outline-none focus:ring-2 focus:ring-darkViolet">
                   Smart Feeding
@@ -161,62 +163,70 @@ export default function PetUser({ petList, petFoodList, petRecords }) {
                   Maintenance Energy Requirement (MER):
                 </span>
                 <a href="#" className="text-darkViolet underline">
-                  {/* Maintenance Energy Requirement*/}
                   1556.70 kilocalories/day
                 </a>
               </p>
               <p className="text text-gray-600 mt-2">
-                <span className="font-semibold">Calculated Food Needed:</span>{" "}
-                {/* Amount To Dispensed Per Day*/}
+                <span className="font-semibold">Calculated Food Needed:</span>
                 242.44 g per meal / 484.88 g per day
-              </p>
+              </p> */}
+              <div className="flex item-center justify-center">
+                <FeedAmountComponent
+                  petId={petData.id}
+                  petName={petData.name}
+                  petType={petData.petType}
+                  weight={Number(petData.weight)}
+                  activityLevel={Number(petData.activityLevel)}
+                  petFoodList={petFoodList}
+                  latestFeedingInfo={latestFeedingInfo}
+                />
+              </div>
             </div>
-
-            {/* <!-- DATA ANALYTICS SECTION --> */}
-            <div className="col-span-12 border border-stroke bg-white p-10 shadow-default dark:border-strokedark dark:bg-boxdark rounded-xl shadow-md">
+            {/* <div className="col-span-12 border border-stroke bg-white p-10 shadow-default dark:border-strokedark dark:bg-boxdark rounded-xl shadow-md">
               <h2 className="text-xl font-semibold mb-4">
                 Mingming Weight Trend
               </h2>
               <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
                 <div className="border border-stroke bg-white p-5 shadow-default dark:border-strokedark rounded-lg shadow-sm xl:col-span-1 flex justify-center items-center">
                   <p className="text-center">GRAPH HERE</p>
-                  {/* PET PROFILE */}
                   PET PROFILE
                   <p>Id {petData.id}</p>
                   <p>Weight {petData.weight}</p>
                   <p>Activity Level {petData.activityLevel}</p>
                 </div>
-                <div
-                  className="col-span-12 border border-stroke bg-white p-7.5 shadow-default
-        dark:border-strokedark dark:bg-boxdark xl:col-span-4 rounded-xl shadow-md"
-                >
-                  {/* FEEDING MODE SELECTION */}
-                  FEEDING MODE SELECTION
-                  <div className="flex item-center justify-center">
-                    <FeedAmountComponent
-                      petId={id}
-                      petName={name}
-                      petType={petType}
-                      weight={Number(weight)}
-                      activityLevel={Number(activityLevel)}
-                      petFoodList={petFoodList}
-                      latestFeedingInfo={latestFeedingInfo}
-                    />
-                  </div>
-                  {/* Yung Niremove */}
-                </div>
-                <div className="border border-stroke bg-white p-5 shadow-default dark:border-strokedark rounded-lg shadow-sm xl:col-span-2 overflow-auto">
-                  <p className="text-center">TABLE HERE</p>
-                </div>
               </div>
-            </div>
+            </div> */}
           </div>
 
           {/* PET RECORDS CHART */}
-          <div className="col-span-12 border border-stroke bg-white p-10 shadow-default dark:border-strokedark dark:bg-boxdark rounded-xl shadow-md">
+          <div className="mt-5 col-span-12 border  border-stroke bg-white p-10 shadow-default dark:border-strokedark dark:bg-boxdark rounded-xl shadow-md">
             <h1 className="text-xl font-semibold mb-4">Pet Records</h1>
             {currentRecords.length > 0 ? (
               <>
+                <table className="text-left w-full m-10">
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Mode</th>
+                      <th>Date</th>
+                      <th>Time</th>
+                      <th>Amount Dispensed (g)</th>
+                      <th>Amount Remain (g)</th>
+                    </tr>
+                  </thead>
+                  <tbody className="text-left">
+                    {currentRecords.map((record) => (
+                      <tr key={record.id}>
+                        <td>{record.id}</td>
+                        <td>{record.mode}</td>
+                        <td>{record.date}</td>
+                        <td>{record.time}</td>
+                        <td>{record.amount} g</td>
+                        <td>{record.amountRemain} g</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
                 <h2 className="text-l font-semibold mb-4 text-center">
                   Amount Dispensed (Bar Chart)
                 </h2>
@@ -257,6 +267,11 @@ export default function PetUser({ petList, petFoodList, petRecords }) {
               </p>
             )}
           </div>
+          {/* PetAnalytics here */}
+          <div className="mt-5 col-span-12 border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark rounded-xl shadow-md">
+            <h1 className="text-xl font-bold m-10">PET {petId} Analytics</h1>
+            <PetAnalytics data={currentRecords} petId={petId} />
+          </div>
         </main>
       </div>
     </>
@@ -285,14 +300,16 @@ PetUser.propTypes = {
       //   weight: PropTypes.number.isRequired,
     })
   ).isRequired,
-  petRecords: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      date: PropTypes.instanceOf(Date).isRequired,
-      time: PropTypes.string.isRequired,
-      amount: PropTypes.number.isRequired,
-      mode: PropTypes.string.isRequired,
-      // Add other properties of pet records here
-    })
+  petRecords: PropTypes.objectOf(
+    PropTypes.arrayOf(
+      PropTypes.shape({
+        id: PropTypes.string.isRequired,
+        date: PropTypes.string.isRequired,
+        time: PropTypes.string.isRequired,
+        amount: PropTypes.number.isRequired,
+        mode: PropTypes.string.isRequired,
+        // Add other properties of pet records here
+      })
+    )
   ).isRequired,
 };
