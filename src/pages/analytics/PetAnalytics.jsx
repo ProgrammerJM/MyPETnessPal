@@ -168,13 +168,16 @@ const PetAnalytics = ({ petId, data }) => {
       <div className="mx-10 flex">
         <p>
           <span className="font-bold">Total Food Consumed: </span>
-          {Number.isNaN(totalFoodConsumed) ? "N/A" : totalFoodConsumed}
+          {Number.isNaN(totalFoodConsumed) ? "N/A" : totalFoodConsumed} g
         </p>
       </div>
       <div className="mx-10 flex">
         <p>
           <span className="font-bold">Average Food Consumed Per Day: </span>
-          {Number.isNaN(avgFoodConsumedPerDay) ? "N/A" : avgFoodConsumedPerDay}
+          {Number.isNaN(avgFoodConsumedPerDay)
+            ? "N/A"
+            : avgFoodConsumedPerDay}{" "}
+          g
         </p>
       </div>
       <div className="mx-10 flex">
@@ -189,7 +192,7 @@ const PetAnalytics = ({ petId, data }) => {
         <h3 className="font-bold">Consumption by User: </h3>
         {Object.entries(consumptionByUser).map(([user, amount]) => (
           <p key={user}>
-            {user}: {amount}
+            {user}: {amount} g
           </p>
         ))}
       </div>
@@ -211,28 +214,28 @@ const PetAnalytics = ({ petId, data }) => {
 VisualizeAmountRecords.propTypes = {
   records: PropTypes.arrayOf(
     PropTypes.shape({
-      date: PropTypes.string.isRequired,
-      amount: PropTypes.number.isRequired,
+      date: PropTypes.string,
+      amount: PropTypes.number,
     })
   ).isRequired,
 };
 PetAnalytics.propTypes = {
-  petId: PropTypes.string.isRequired,
-  data: PropTypes.array.isRequired,
+  petId: PropTypes.string,
+  data: PropTypes.array,
 };
 VisualizeWeightTrend.propTypes = {
   records: PropTypes.arrayOf(
     PropTypes.shape({
-      date: PropTypes.string.isRequired,
-      weight: PropTypes.number.isRequired,
+      date: PropTypes.string,
+      weight: PropTypes.number,
     })
   ).isRequired,
 };
 VisualizeAmountRemainRecords.propTypes = {
   records: PropTypes.arrayOf(
     PropTypes.shape({
-      date: PropTypes.string.isRequired,
-      amountRemain: PropTypes.number.isRequired,
+      date: PropTypes.string,
+      amountRemain: PropTypes.number,
     })
   ).isRequired,
 };

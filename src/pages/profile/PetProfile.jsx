@@ -1,50 +1,17 @@
-import { useEffect, useState, useMemo, useCallback } from "react";
+import { useState, useEffect, useContext } from "react";
 import { db } from "../../config/firebase";
 import { IoAddCircle } from "react-icons/io5";
-import {
-  collection,
-  deleteDoc,
-  doc,
-  query,
-  orderBy,
-  onSnapshot,
-} from "firebase/firestore";
+import { doc, deleteDoc } from "firebase/firestore";
 import { ref, remove } from "firebase/database";
 import { realtimeDatabase } from "../../config/firebase";
-import PropTypes from "prop-types";
+import { PetContext } from "../function/PetContext";
 import PetList from "./PetList";
 import AddPetModal from "./AddPetModal";
 
-export default function PetProfile({ petFoodList, onPetListChange }) {
+export default function PetProfile() {
+  const { petList } = useContext(PetContext);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [petList, setPetList] = useState([]);
   const [smartFeedingActivated, setSmartFeedingActivated] = useState(false);
-
-  const petCollectionRef = useMemo(() => collection(db, "pets"), []);
-
-  const getPetList = useCallback(() => {
-    const inOrderPetList = query(petCollectionRef, orderBy("createdAt"));
-    const unsubscribe = onSnapshot(
-      inOrderPetList,
-      (snapshot) => {
-        const updatedPetList = snapshot.docs.map((doc) => ({
-          ...doc.data(),
-          id: doc.id,
-        }));
-        onPetListChange(updatedPetList);
-        setPetList(updatedPetList);
-      },
-      (error) => {
-        console.error(error);
-      }
-    );
-    return unsubscribe;
-  }, [petCollectionRef, onPetListChange]);
-
-  useEffect(() => {
-    const unsubscribe = getPetList();
-    return () => unsubscribe();
-  }, [getPetList]);
 
   useEffect(() => {
     const savedSmartFeedingState = localStorage.getItem(
@@ -59,7 +26,7 @@ export default function PetProfile({ petFoodList, onPetListChange }) {
     setIsModalOpen((prev) => !prev);
   };
 
-  const deletePet = useCallback(async (id) => {
+  const deletePet = async (id) => {
     const confirmation = window.confirm(
       "Are you sure you want to delete this pet?"
     );
@@ -76,7 +43,7 @@ export default function PetProfile({ petFoodList, onPetListChange }) {
         console.error("Error deleting pet:", error);
       }
     }
-  }, []);
+  };
 
   return (
     <>
@@ -93,20 +60,9 @@ export default function PetProfile({ petFoodList, onPetListChange }) {
         petList={petList}
         deletePet={deletePet}
         smartFeedingActivated={smartFeedingActivated}
-        petFoodList={petFoodList}
       />
 
-      <AddPetModal
-        isModalOpen={isModalOpen}
-        toggleModal={toggleModal}
-        getPetList={getPetList}
-        petCollectionRef={petCollectionRef}
-      />
+      <AddPetModal isModalOpen={isModalOpen} toggleModal={toggleModal} />
     </>
   );
 }
-
-PetProfile.propTypes = {
-  petFoodList: PropTypes.array.isRequired,
-  onPetListChange: PropTypes.func.isRequired,
-};

@@ -1,19 +1,30 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { ref, push, get, set, remove, update } from "firebase/database";
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import {
+  collection,
+  addDoc,
+  serverTimestamp,
+  query,
+  orderBy,
+  limit,
+  getDocs,
+} from "firebase/firestore";
 import { db } from "../../config/firebase";
 import { realtimeDatabase } from "../../config/firebase";
+import { PetContext } from "../function/PetContext";
 import PropTypes from "prop-types";
 
 const FeedAmountComponent = ({
-  // petId,
+  petId,
   petName,
   // petType,
-  petFoodList,
   weight,
   activityLevel,
-  latestFeedingInfo,
+  cageID,
+  closeModal,
 }) => {
+  const { petFoodList } = useContext(PetContext);
+
   const [scheduledFeedAmount, setScheduledFeedAmount] = useState(0);
   const [modalOpen, setModalOpen] = useState(false);
   const [feedingModeType, setFeedingModeType] = useState("");
@@ -22,6 +33,32 @@ const FeedAmountComponent = ({
   const [scheduledDate, setScheduledDate] = useState("");
   const [scheduledTime, setScheduledTime] = useState("");
   const [scheduledSubmitError, setScheduledSubmitError] = useState("");
+  const [latestFeedingInfo, setLatestFeedingInfo] = useState({});
+
+  useEffect(() => {
+    const fetchLatestFeedingInfo = async () => {
+      try {
+        const q = query(
+          collection(db, `pets/${petName}/feedingInformations/`),
+          orderBy("createdAt", "desc"),
+          limit(1)
+        );
+        const querySnapshot = await getDocs(q);
+
+        if (!querySnapshot.empty) {
+          const doc = querySnapshot.docs[0];
+          setLatestFeedingInfo(doc.data());
+        } else {
+          console.log("No documents found in the collection.");
+        }
+      } catch (error) {
+        console.error("Error fetching latest feeding info:", error);
+      }
+    };
+    if (petName !== "Unknown") {
+      fetchLatestFeedingInfo();
+    }
+  }, [petName, cageID, petId]);
 
   const feedingInformationsCollection = collection(
     db,
@@ -52,30 +89,52 @@ const FeedAmountComponent = ({
     petFoodList,
     servings
   ) => {
-    const RER = 70 * Math.pow(weight, 0.75);
-    const MER = RER * activityLevel;
+    console.log(
+      `weight: ${weight}, activityLevel: ${activityLevel}, selectedFoodId: ${selectedFoodId}, servings: ${servings}`
+    );
+
+    const RER = 70 * Math.pow(weight, 0.75); // Calculate Resting Energy Requirement
+    console.log(`Calculated RER: ${RER}`);
+
+    const MER = RER * activityLevel; // Calculate Maintenance Energy Requirement
+    console.log(`Calculated MER: ${MER}`);
+
     const selectedFoodData = petFoodList.find(
       (food) => food.id === selectedFoodId
     );
+    console.log(`Selected food data: ${JSON.stringify(selectedFoodData)}`);
 
     if (!selectedFoodData) {
-      return { foodToDispensePerDay: 0 };
+      console.error("Selected food data not found");
+      return { RER, MER, foodToDispensePerDay: 0 };
     }
 
     const caloriesPerGram = selectedFoodData.caloriesPerGram;
+    console.log(`Calories per Gram: ${caloriesPerGram}`);
 
-    if (selectedFoodId === "") {
-      return { foodToDispensePerDay: 0 };
+    if (selectedFoodId === "" || isNaN(caloriesPerGram) || servings <= 0) {
+      console.error("Invalid food ID, calories per gram, or servings");
+      return { RER, MER, foodToDispensePerDay: 0 };
     }
 
-    const foodToDispensePerDay = MER / caloriesPerGram / servings;
+    // Calculate the amount of food to dispense per day
+    const foodToDispensePerDay = MER / (caloriesPerGram * servings);
+    console.log(`Food to Dispense per Day: ${foodToDispensePerDay}`);
 
-    return { RER, MER, servings, selectedFoodData, foodToDispensePerDay };
+    return {
+      RER,
+      MER,
+      servings,
+      selectedFoodData,
+      foodToDispensePerDay,
+      caloriesPerGram,
+    };
   };
 
   const handleSmartFeedingSubmit = async () => {
     try {
-      const { RER, MER, selectedFoodData, foodToDispensePerDay } =
+      // Calculate the food to dispense per day for smart feeding
+      const { RER, MER, foodToDispensePerDay } =
         calculateFoodToDispensePerDayForSmartFeeding(
           weight,
           activityLevel,
@@ -84,7 +143,25 @@ const FeedAmountComponent = ({
           servings
         );
 
-      if (isNaN(foodToDispensePerDay) || foodToDispensePerDay === 0) {
+      // Check if servings is a valid number and greater than 0
+      if (isNaN(servings) || servings <= 0) {
+        throw new Error("Invalid number of servings");
+      }
+
+      // Find the selected food data from the pet food list
+      console.log("Pet food list:", petFoodList);
+      const selectedFoodData = petFoodList.find(
+        (food) => food.id === selectedFood
+      );
+      console.log("Selected food data:", selectedFoodData);
+
+      // Check if the selected food data is found
+      if (!selectedFoodData) {
+        throw new Error("Selected food not found");
+      }
+
+      // Check if the calculated food to dispense per day is valid
+      if (isNaN(foodToDispensePerDay) || foodToDispensePerDay <= 0) {
         throw new Error("Invalid food amount");
       }
 
@@ -117,6 +194,7 @@ const FeedAmountComponent = ({
             feedingModeType: "Smart",
             servings: Number(servings),
             amountToDispensePerServingPerDay: Number(foodToDispensePerDay),
+            cageID: cageID,
           };
 
           if (i < Number(servings)) {
@@ -144,6 +222,7 @@ const FeedAmountComponent = ({
             feedingModeType: "Smart",
             servings: Number(servings),
             amountToDispensePerServingPerDay: Number(foodToDispensePerDay),
+            cageID: cageID,
           };
 
           await push(petRef, smartFeeding);
@@ -162,6 +241,7 @@ const FeedAmountComponent = ({
             feedingModeType: "Smart",
             servings: Number(servings),
             amountToDispensePerServingPerDay: Number(foodToDispensePerDay),
+            cageID: cageID,
           };
 
           await push(petRef, smartFeeding);
@@ -183,10 +263,12 @@ const FeedAmountComponent = ({
         createdAt: serverTimestamp(),
         feedingMode: "Smart",
         amountToFeed: foodToDispensePerDay,
+        cageID: cageID,
       });
 
       setFeedingModeType("Smart");
 
+      closeModal();
       toggleModal();
       setServings(0);
       setSelectedFood("");
@@ -196,17 +278,57 @@ const FeedAmountComponent = ({
     }
   };
 
+  const calculateFoodForScheduledFeeding = (
+    weight,
+    activityLevel,
+    selectedFoodId,
+    petFoodList
+  ) => {
+    // Calculate RER and MER as per your original function
+    const RER = 70 * Math.pow(weight, 0.75);
+    console.log(`Calculated RER: ${RER}`);
+
+    const MER = RER * activityLevel;
+    console.log(`Calculated MER: ${MER}`);
+
+    // Find the selected food data
+    const selectedFoodData = petFoodList.find(
+      (food) => food.id === selectedFoodId
+    );
+    console.log(`Selected food data: ${JSON.stringify(selectedFoodData)}`);
+
+    if (!selectedFoodData) {
+      console.error("Selected food data not found");
+      return { RER, MER: 0, selectedFoodData: null };
+    }
+
+    const caloriesPerGram = selectedFoodData.caloriesPerGram;
+    console.log(`Calories per Gram: ${caloriesPerGram}`);
+
+    if (selectedFoodId === "" || isNaN(caloriesPerGram)) {
+      console.error("Invalid food ID or calories per gram");
+      return { RER, MER: 0, selectedFoodData: null };
+    }
+
+    return {
+      RER,
+      MER,
+      selectedFoodData,
+      caloriesPerGram,
+    };
+  };
+
   const handleScheduledFeedingSubmit = async () => {
     try {
-      const { RER, MER, selectedFoodData } =
-        calculateFoodToDispensePerDayForSmartFeeding(
-          weight,
-          activityLevel,
-          selectedFood,
-          petFoodList
-        );
+      const { RER, MER, selectedFoodData } = calculateFoodForScheduledFeeding(
+        weight,
+        activityLevel,
+        selectedFood,
+        petFoodList
+      );
 
       if (
+        !selectedFoodData ||
         !scheduledDate ||
         !scheduledTime ||
         !scheduledFeedAmount ||
@@ -221,8 +343,12 @@ const FeedAmountComponent = ({
         MER: MER,
         caloriesPerGram: selectedFoodData.caloriesPerGram,
         foodSelectedName: selectedFoodData.name,
+        scheduledDate: scheduledDate,
+        scheduledTime: scheduledTime,
+        amountToFeed: Number(scheduledFeedAmount),
         createdAt: serverTimestamp(),
         feedingMode: "Scheduled",
+        cageID: cageID,
       });
 
       const scheduledFeedingData = {
@@ -232,6 +358,7 @@ const FeedAmountComponent = ({
         scheduledDate: scheduledDate,
         scheduledTime: scheduledTime,
         amountToFeed: Number(scheduledFeedAmount),
+        cageID: cageID,
       };
 
       const petRef = ref(
@@ -260,6 +387,7 @@ const FeedAmountComponent = ({
       setFeedingModeType("Scheduled");
 
       toggleModal();
+      closeModal();
 
       console.log("Scheduled Feeding Mode has been saved");
 
@@ -315,31 +443,35 @@ const FeedAmountComponent = ({
   return (
     <div>
       <div className="flex items-center justify-center mb-4">
-        <button onClick={toggleModal}>
-          <div className="flex items-center justify-center mb-4">
-            <button
-              className={` h-12 px-4 font-semibold items-center  border border-white justify-center rounded-l-full focus:outline-none focus:ring-2 ${
-                feedingModeType === "Smart"
-                  ? "bg-darkViolet text-white "
-                  : "bg-gray-200 text-gray-600 "
-              }`}
-            >
-              Smart Feeding
-            </button>
-            <button
-              className={` h-12 px-4 font-semibold items-center  border border-white justify-center rounded-r-full focus:outline-none focus:ring-2 ${
-                feedingModeType === "Scheduled"
-                  ? "bg-darkViolet text-white "
-                  : "bg-gray-200 text-gray-600 "
-              }`}
-            >
-              Scheduled Feeding
-            </button>
-          </div>{" "}
-          <div className="text-sm font-normal italic ">
-            toggle to setup feeding mode
+        <div className="flex items-center justify-center mb-4">
+          <div className="flex flex-col text-center">
+            <div className="m-2">
+              <button
+                onClick={toggleModal}
+                className={` h-12 px-4 font-semibold items-center  border border-white justify-center rounded-l-full focus:outline-none focus:ring-2 ${
+                  feedingModeType === "Smart"
+                    ? "bg-darkViolet text-white "
+                    : "bg-gray-200 text-gray-600 "
+                }`}
+              >
+                Smart Feeding
+              </button>
+              <button
+                onClick={toggleModal}
+                className={` h-12 px-4 font-semibold items-center  border border-white justify-center rounded-r-full focus:outline-none focus:ring-2 ${
+                  feedingModeType === "Scheduled"
+                    ? "bg-darkViolet text-white "
+                    : "bg-gray-200 text-gray-600 "
+                }`}
+              >
+                Scheduled Feeding
+              </button>
+            </div>
+            <div className="text-sm font-normal italic ">
+              toggle to setup feeding mode
+            </div>
           </div>
-        </button>
+        </div>
       </div>
 
       <div className="flex flex-col items-center mx-4 px-4">
@@ -444,7 +576,7 @@ const FeedAmountComponent = ({
                         >
                           <option value="">Select a food</option>
                           {petFoodList.map((food) => (
-                            <option key={food.id} value={food.name}>
+                            <option key={food.id} value={food.id}>
                               {food.name} - {food.caloriesPerGram} Calories Per
                               g
                             </option>
@@ -518,8 +650,8 @@ const FeedAmountComponent = ({
           </div>
         )}
 
-        {latestFeedingInfo && latestFeedingInfo.createdAt && (
-          <div className="feeding-information">
+        {latestFeedingInfo && latestFeedingInfo.createdAt ? (
+          <div className="feeding-information flex">
             {/* Render the latest feeding information here */}
             <p className="text text-gray-600 mt-2 font-semibold">
               Current Feeding Mode:{" "}
@@ -570,8 +702,7 @@ const FeedAmountComponent = ({
               </span>
             </p>
           </div>
-        )}
-        {(!latestFeedingInfo || !latestFeedingInfo.createdAt) && (
+        ) : (
           <p>No feeding information available</p>
         )}
       </div>
@@ -581,13 +712,6 @@ const FeedAmountComponent = ({
 
 FeedAmountComponent.propTypes = {
   petName: PropTypes.string.isRequired,
-  petFoodList: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired,
-      caloriesPerGram: PropTypes.number.isRequired,
-    })
-  ).isRequired,
   weight: PropTypes.number.isRequired,
   activityLevel: PropTypes.number.isRequired,
   latestFeedingInfo: PropTypes.shape({
@@ -597,6 +721,10 @@ FeedAmountComponent.propTypes = {
     foodSelectedName: PropTypes.string,
     createdAt: PropTypes.object,
   }),
+  cageID: PropTypes.string.isRequired,
+  closeModal: PropTypes.func.isRequired,
+  petId: PropTypes.string.isRequired,
+  petType: PropTypes.string.isRequired,
 };
 
 export default FeedAmountComponent;

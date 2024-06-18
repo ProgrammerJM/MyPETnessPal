@@ -1,24 +1,21 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import PropTypes from "prop-types";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import GetWeight from "./getWeight";
 import { auth, storage } from "../../config/firebase";
+import { db } from "../../config/firebase";
 import { setDoc, doc } from "firebase/firestore";
 import { serverTimestamp } from "firebase/firestore";
+import { PetContext } from "../function/PetContext";
 
-const AddPetModal = ({
-  isModalOpen,
-  toggleModal,
-  getPetList,
-  petCollectionRef,
-}) => {
+const AddPetModal = ({ isModalOpen, toggleModal }) => {
+  const { setPetList } = useContext(PetContext);
   const [newPetName, setNewPetName] = useState("");
   const [newPetType, setNewPetType] = useState("");
-  const [petWeight, setPetWeight] = useState(0);
   const [newPetActivityLevel, setNewPetActivityLevel] = useState(0);
   const [addPetError, setAddPetError] = useState("");
   const [file, setFile] = useState(null);
   const [data, setData] = useState({});
+  const [successMessage, setSuccessMessage] = useState("");
 
   useEffect(() => {
     const uploadFile = async () => {
@@ -55,7 +52,6 @@ const AddPetModal = ({
       const docData = {
         name: newPetName,
         petType: newPetType,
-        weight: petWeight,
         activityLevel: newPetActivityLevel,
         id: newPetName,
         userId: auth?.currentUser?.uid,
@@ -66,8 +62,9 @@ const AddPetModal = ({
         docData.imageURL = data.img;
       }
 
-      await setDoc(doc(petCollectionRef, customId), docData);
-      await getPetList();
+      await setDoc(doc(db, "pets", customId), docData);
+      setPetList((prev) => [...prev, docData]);
+      setSuccessMessage("Pet successfully added!");
       console.log("Data saved to Firestore with ID: ", customId);
     } catch (err) {
       console.error(err);
@@ -75,7 +72,10 @@ const AddPetModal = ({
     setFile(null);
     setNewPetName("");
     setNewPetType("");
-    setPetWeight(0);
+    setNewPetActivityLevel(0);
+    setTimeout(() => {
+      setSuccessMessage(""); // Clear success message after a few seconds
+    }, 5000); // Adjust timeout as needed
     toggleModal();
   };
 
@@ -166,20 +166,24 @@ const AddPetModal = ({
                   setNewPetActivityLevel(parseFloat(e.target.value))
                 }
               >
-                {activityLevelOptions[newPetType].map(({ value, label }) => (
-                  <option key={value} value={value}>
-                    {label}
-                  </option>
-                ))}
+                {activityLevelOptions[newPetType].map(
+                  ({ value, label }, index) => (
+                    <option
+                      key={`${newPetType}-${value}-${index}`}
+                      value={value}
+                    >
+                      {label}
+                    </option>
+                  )
+                )}
               </select>
               {addPetError && (
                 <p className="text-red-500 mt-2">{addPetError}</p>
               )}
+              {successMessage && (
+                <p className="text-green-500 mt-2">{successMessage}</p>
+              )}
             </div>
-            <GetWeight setPetWeight={setPetWeight} />
-            {/* {(!newPetName || !newPetType || !newPetActivityLevel) && (
-              <p className="text-red-500">Please fill in all required fields</p>
-            )} */}
           </div>
           <div className="flex flex-col ml-10 justify-center">
             <div className="flex justify-center items-center mt-16">
@@ -228,8 +232,6 @@ const AddPetModal = ({
 AddPetModal.propTypes = {
   isModalOpen: PropTypes.bool.isRequired,
   toggleModal: PropTypes.func.isRequired,
-  getPetList: PropTypes.func.isRequired,
-  petCollectionRef: PropTypes.object.isRequired,
 };
 
 export default AddPetModal;

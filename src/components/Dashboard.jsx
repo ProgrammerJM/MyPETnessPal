@@ -7,23 +7,17 @@ import { IoNotifications } from "react-icons/io5";
 import { GiChemicalTank } from "react-icons/gi";
 import { MdHelp } from "react-icons/md";
 import { IoMdSettings } from "react-icons/io";
-import { IoMdAnalytics } from "react-icons/io";
+import { GiBirdCage } from "react-icons/gi";
 
 const navBarIcon_Close =
-  "text-mainColor size-9 block content-center cursor-pointer ml-2 transition duration-300 ease-in-out";
+  "text-mainColor size-9 cursor-pointer ml-2 transition duration-300 ease-in-out";
 const navBarText =
-  "text-black text-m font-semibold content-center w-full items-center px-2 py-2 transition duration-300 ease-in-out";
+  "text-black text-m font-semibold w-full items-center px-2 py-2 transition duration-300 ease-in-out";
 const navBar_Open =
-  "inline-flex items-center shadow-md mt-2 p-2 w-full transition duration-300 ease-in-out ";
+  "inline-flex items-center shadow-md mt-2 p-2 w-full transition duration-300 ease-in-out";
 
 export default function Dashboard() {
-  const activestyle = {
-    fontWeight: "bold",
-    textDecoration: "underline",
-    color: "#161616",
-  };
-
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(false); // Start with the sidebar closed
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const handleNavLinkClick = () => {
@@ -33,196 +27,96 @@ export default function Dashboard() {
   return (
     <>
       <div className="flex bg-whiteViolet">
+        {/* Mobile Menu Toggle */}
         <div
-          className="lg:hidden block"
+          className="lg:hidden block p-2"
           onClick={() => setIsMobileMenuOpen(true)}
         >
-          <BiMenu className="text-2xl" />
+          <BiMenu className="text-3xl" />
         </div>
+
+        {/* Sidebar - Desktop and Tablet View */}
         <div
-          className={`h-screen text-black pt-3 overflow-visible
-        ${open ? "w-64" : "w-20"}
-        transition duration-300 ease-in-out relative hidden lg:block`}
+          className={`h-screen text-black pt-3 overflow-visible transition duration-300 ease-in-out relative ${
+            open ? "w-64" : "w-20"
+          } hidden lg:block`}
         >
           <BiLeftArrowAlt
-            className={`bg-white mt-16 text-subColor rounded-full text-2xl absolute -right-3 top-12 cursor-pointer 
-            duration-500 shadow-md 
-         ${!open && "rotate-180 mt-12"}`}
+            className={`bg-white mt-16 text-subColor rounded-full text-2xl absolute -right-3 top-12 cursor-pointer duration-500 shadow-md ${
+              !open && "rotate-180 mt-12"
+            }`}
             onClick={() => setOpen(!open)}
           />
 
-          {/*Navbar Header */}
-          <div className="inline-flex  items-center justify-center border-b-2 border-subColor-500 shadow-s  p-5 ">
+          {/* Navbar Header */}
+          <div className="inline-flex items-center justify-center border-b-2 border-subColor-500 shadow-s p-5">
             <img
               src="/images/petness-logo-icon.png"
               alt="Petness"
-              className={`logo size-6 items-center justify-center w-10 h-10 duration-500 ease-in-out ${
-                open && " rotate-[360deg]"
+              className={`w-16 h-16 duration-500 ease-in-out ${
+                open && "rotate-[360deg]"
               }`}
               onClick={() => setOpen(!open)}
             />
-
-            <div className={`duration-300 ${!open && "scale-0"}`}>
-              <img
-                src="/images/petness-logo-name.png"
-                className=" x`x items-center justify-center w-75 mt-100 ml-2"
-              />
-            </div>
+            {open && (
+              <div className="duration-300">
+                <img
+                  src="/images/petness-logo-name.png"
+                  className="ml-2 w-36"
+                />
+              </div>
+            )}
           </div>
 
-          {/*Navbar Content*/}
+          {/* Navbar Content */}
           <div className="flex flex-col content-center mt-7">
-            <div
-              className={`${navBar_Open} 
-            ${
-              !open
-                ? "px-2.5 content-center border border-zinc-100 rounded-2xl mt-0"
-                : "px-4 shadow-none"
-            }`}
-            >
-              <TbLayoutDashboardFilled
-                className={`${navBarIcon_Close} ${open && "mr-2"}`}
-              />
-
-              <NavLink
-                className={`${navBarText} ${!open && "hidden"}`}
-                to="."
-                end
-                activestyle={activestyle}
+            {[
+              { to: ".", label: "Dashboard", icon: TbLayoutDashboardFilled },
+              { to: "petprofile", label: "Pet Profile", icon: MdOutlinePets },
+              { to: "cage", label: "Cage Management", icon: GiBirdCage },
+              {
+                to: "notifications",
+                label: "Notifications",
+                icon: IoNotifications,
+              },
+              { to: "tank", label: "Tank Management", icon: GiChemicalTank },
+              { to: "help", label: "Guidelines", icon: MdHelp },
+              { to: "settings", label: "Settings", icon: IoMdSettings },
+            ].map(({ to, label, icon: Icon }) => (
+              <div
+                key={to}
+                className={`${navBar_Open} ${
+                  !open
+                    ? "px-2.5 border border-zinc-100 rounded-2xl mt-0"
+                    : "px-4 shadow-none"
+                }`}
               >
-                Dashboard
-              </NavLink>
-            </div>
-
-            <div
-              className={`${navBar_Open} 
-            ${
-              !open
-                ? "px-2.5 content-center border border-zinc-100 rounded-2xl mt-0"
-                : "px-4 shadow-none"
-            }`}
-            >
-              <MdOutlinePets
-                className={`${navBarIcon_Close} ${open && "mr-2"}`}
-              />
-
-              <NavLink
-                className={`${navBarText} ${!open && "hidden"}`}
-                to="petprofile"
-                end
-                activestyle={activestyle}
-              >
-                Pet Profile
-              </NavLink>
-            </div>
-
-            <div
-              className={`${navBar_Open} 
-            ${
-              !open
-                ? "px-2.5 content-center border border-zinc-100 rounded-2xl mt-0"
-                : "px-4 shadow-none"
-            }`}
-            >
-              <IoMdAnalytics
-                className={`${navBarIcon_Close} ${open && "mr-2"}`}
-              />
-
-              <NavLink
-                className={`${navBarText} ${!open && "hidden"}`}
-                to="."
-                end
-                activestyle={activestyle}
-              >
-                Analytics
-              </NavLink>
-            </div>
-
-            <div
-              className={`${navBar_Open} 
-            ${
-              !open
-                ? "px-2.5 content-center border border-zinc-100 rounded-2xl mt-0"
-                : "px-4 shadow-none"
-            }`}
-            >
-              <IoNotifications
-                className={`${navBarIcon_Close} ${open && "mr-2"}`}
-              />
-
-              <NavLink
-                className={`${navBarText} ${!open && "hidden"}`}
-                to="notifications"
-                end
-                activestyle={activestyle}
-              >
-                Notifications
-              </NavLink>
-            </div>
-
-            <div
-              className={`${navBar_Open} 
-            ${
-              !open
-                ? "px-2.5 content-center border border-zinc-100 rounded-2xl mt-0"
-                : "px-4 shadow-none"
-            }`}
-            >
-              <GiChemicalTank
-                className={`${navBarIcon_Close} ${open && "mr-2"}`}
-              />
-
-              <NavLink
-                className={`${navBarText} ${!open && "hidden"}`}
-                to="tank"
-                end
-                activestyle={activestyle}
-              >
-                Tank Management
-              </NavLink>
-            </div>
-
-            <div
-              className={`${navBar_Open} 
-            ${
-              !open
-                ? "px-2.5 content-center border border-zinc-100 rounded-2xl mt-0"
-                : "px-4 shadow-none"
-            }`}
-            >
-              <MdHelp className={`${navBarIcon_Close} ${open && "mr-2"}`} />
-
-              <NavLink
-                className={`${navBarText} ${!open && "hidden"}`}
-                to="Help"
-                end
-                activestyle={activestyle}
-              >
-                Guidelines
-              </NavLink>
-            </div>
-
-            <div
-              className={`${navBar_Open} 
-            ${
-              !open
-                ? "px-2.5 content-center border border-zinc-100 rounded-2xl mt-0"
-                : "px-4 shadow-none"
-            }`}
-            >
-              <IoMdSettings
-                className={`${navBarIcon_Close} ${open && "mr-2"}`}
-              />
-
-              <NavLink
-                className={`${navBarText} ${!open && "hidden"}`}
-                to="settings"
-                end
-                activestyle={activestyle}
-              >
-                Settings
-              </NavLink>
-            </div>
+                <NavLink
+                  className={({ isActive }) =>
+                    `${navBarIcon_Close} ${
+                      isActive ? "font-bold underline text-black" : ""
+                    }`
+                  }
+                  to={to}
+                  end
+                >
+                  <Icon className="mr-2 text-3xl" />
+                </NavLink>
+                {open && (
+                  <NavLink
+                    className={({ isActive }) =>
+                      `${navBarText} ${
+                        isActive ? "font-bold underline text-black" : ""
+                      }`
+                    }
+                    to={to}
+                    end
+                  >
+                    {label}
+                  </NavLink>
+                )}
+              </div>
+            ))}
           </div>
         </div>
 
@@ -236,7 +130,7 @@ export default function Dashboard() {
             <img
               src="/images/petness-logo-icon.png"
               alt="Petness"
-              className="logo w-10 h-10"
+              className="w-16 h-16"
             />
             <BiLeftArrowAlt
               className="text-2xl cursor-pointer"
@@ -244,89 +138,48 @@ export default function Dashboard() {
             />
           </div>
           <div className="flex flex-col content-center mt-7">
-            <div className={`${navBar_Open}`} onClick={handleNavLinkClick}>
-              <TbLayoutDashboardFilled className={`${navBarIcon_Close}`} />
-              <NavLink
-                className={`${navBarText}`}
-                to="."
-                end
-                activestyle={activestyle}
+            {[
+              { to: ".", label: "Dashboard", icon: TbLayoutDashboardFilled },
+              { to: "petprofile", label: "Pet Profile", icon: MdOutlinePets },
+              { to: "cage", label: "Cage Management", icon: GiBirdCage },
+              {
+                to: "notifications",
+                label: "Notifications",
+                icon: IoNotifications,
+              },
+              { to: "tank", label: "Tank Management", icon: GiChemicalTank },
+              { to: "help", label: "Guidelines", icon: MdHelp },
+              { to: "settings", label: "Settings", icon: IoMdSettings },
+            ].map(({ to, label, icon: Icon }) => (
+              <div
+                key={to}
+                className={`${navBar_Open}`}
+                onClick={handleNavLinkClick}
               >
-                Dashboard
-              </NavLink>
-            </div>
-
-            <div className={`${navBar_Open}`} onClick={handleNavLinkClick}>
-              <MdOutlinePets className={`${navBarIcon_Close}`} />
-              <NavLink
-                className={`${navBarText}`}
-                to="petprofile"
-                end
-                activestyle={activestyle}
-              >
-                Pet Profile
-              </NavLink>
-            </div>
-
-            <div className={`${navBar_Open}`} onClick={handleNavLinkClick}>
-              <IoMdAnalytics className={`${navBarIcon_Close}`} />
-              <NavLink
-                className={`${navBarText}`}
-                to="."
-                end
-                activestyle={activestyle}
-              >
-                Analytics
-              </NavLink>
-            </div>
-
-            <div className={`${navBar_Open}`} onClick={handleNavLinkClick}>
-              <IoNotifications className={`${navBarIcon_Close}`} />
-              <NavLink
-                className={`${navBarText}`}
-                to="notifications"
-                end
-                activestyle={activestyle}
-              >
-                Notifications
-              </NavLink>
-            </div>
-
-            <div className={`${navBar_Open}`} onClick={handleNavLinkClick}>
-              <GiChemicalTank className={`${navBarIcon_Close}`} />
-              <NavLink
-                className={`${navBarText}`}
-                to="tank"
-                end
-                activestyle={activestyle}
-              >
-                Tank Management
-              </NavLink>
-            </div>
-
-            <div className={`${navBar_Open}`} onClick={handleNavLinkClick}>
-              <MdHelp className={`${navBarIcon_Close}`} />
-              <NavLink
-                className={`${navBarText}`}
-                to="Help"
-                end
-                activestyle={activestyle}
-              >
-                Guidelines
-              </NavLink>
-            </div>
-
-            <div className={`${navBar_Open}`} onClick={handleNavLinkClick}>
-              <IoMdSettings className={`${navBarIcon_Close}`} />
-              <NavLink
-                className={`${navBarText}`}
-                to="settings"
-                end
-                activestyle={activestyle}
-              >
-                Settings
-              </NavLink>
-            </div>
+                <NavLink
+                  className={({ isActive }) =>
+                    `${navBarIcon_Close} ${
+                      isActive ? "font-bold underline text-black" : ""
+                    }`
+                  }
+                  to={to}
+                  end
+                >
+                  <Icon className="mr-2 text-3xl" />
+                </NavLink>
+                <NavLink
+                  className={({ isActive }) =>
+                    `${navBarText} ${
+                      isActive ? "font-bold underline text-black" : ""
+                    }`
+                  }
+                  to={to}
+                  end
+                >
+                  {label}
+                </NavLink>
+              </div>
+            ))}
           </div>
         </div>
       </div>

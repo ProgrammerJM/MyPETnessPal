@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useMemo, useCallback, useContext } from "react";
 import { db, auth } from "../../config/firebase";
 import {
   doc,
@@ -7,12 +7,12 @@ import {
   getDocs,
   setDoc,
 } from "firebase/firestore";
-import PropTypes from "prop-types";
+import { PetContext } from "../function/PetContext";
 import { BarChart, Bar, Rectangle, XAxis, YAxis, Tooltip } from "recharts";
 
 export default function Tank() {
+  const { petFoodList, setPetFoodList } = useContext(PetContext);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [petFoodList, setPetFoodList] = useState([]);
   const [newPetFoodName, setNewPetFoodName] = useState("");
   const [newFoodCaloriesPerGram, setNewFoodCaloriesPerGram] = useState(0);
   const [editingFoodId, setEditingFoodId] = useState(null);
@@ -47,6 +47,13 @@ export default function Tank() {
     }
   };
 
+  const getNextFoodId = () => {
+    const ids = petFoodList.map((food) => food.id);
+    if (!ids.includes("food_01")) return "food_01";
+    if (!ids.includes("food_02")) return "food_02";
+    return null; // No available ID
+  };
+
   const onSavePetFood = async () => {
     if (petFoodList.length >= 2 && !editingFoodId) {
       setErrorAddFood("You can only add up to 2 pet foods.");
@@ -57,10 +64,15 @@ export default function Tank() {
       const docData = {
         name: newPetFoodName,
         caloriesPerGram: Number(newFoodCaloriesPerGram),
-        id: newPetFoodName,
+        id: editingFoodId || getNextFoodId(),
         userId: auth?.currentUser?.uid,
         date: new Date(),
       };
+
+      if (!docData.id) {
+        setErrorAddFood("No available ID for new food.");
+        return;
+      }
 
       if (editingFoodId) {
         // Update existing pet food item
@@ -69,7 +81,7 @@ export default function Tank() {
         setEditingFoodId(null);
       } else {
         // Add new pet food item
-        const docRef = doc(petFoodCollectionRef, newPetFoodName);
+        const docRef = doc(petFoodCollectionRef, docData.id);
         await setDoc(docRef, docData);
       }
 
@@ -87,10 +99,20 @@ export default function Tank() {
       "Are you sure you want to delete this pet food?"
     );
     if (confirmed) {
-      const petFoodDocument = doc(db, "petFoodList", id);
-      await deleteDoc(petFoodDocument);
-      await getPetFoodList();
+      try {
+        const petFoodDocument = doc(db, "petFoodList", id);
+        await deleteDoc(petFoodDocument);
+        await getPetFoodList();
+      } catch (err) {
+        console.error("Error deleting food:", err);
+      }
     }
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setEditingFoodId(null);
+    setErrorAddFood("");
   };
 
   const openEditModal = (food) => {
@@ -199,7 +221,7 @@ export default function Tank() {
               />
             </div>
 
-            <div className="flex mt-5 justify-around">
+            <div className="flex mt-5 justify-between">
               <button
                 className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
                 onClick={onSavePetFood}
@@ -208,7 +230,7 @@ export default function Tank() {
               </button>
               <button
                 className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
-                onClick={toggleModal}
+                onClick={closeModal}
               >
                 Cancel
               </button>
@@ -219,7 +241,3 @@ export default function Tank() {
     </>
   );
 }
-
-Tank.propTypes = {
-  petFoodList: PropTypes.array.isRequired,
-};

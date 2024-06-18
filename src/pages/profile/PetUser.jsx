@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useContext } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { collection, getDocs, limit, orderBy, query } from "firebase/firestore";
 import { db } from "../../config/firebase";
@@ -13,27 +13,24 @@ import {
   Tooltip,
   Legend,
 } from "recharts";
-import PropTypes from "prop-types";
-import FeedAmountComponent from "./feedAmountComponent";
 import PetAnalytics from "../analytics/PetAnalytics";
+import { PetContext } from "../../pages/function/PetContext"; // Import the context
 
-export default function PetUser({ petList, petFoodList, petRecords }) {
+export default function PetUser() {
   const { petId } = useParams();
   const navigate = useNavigate();
   const [latestFeedingInfo, setLatestFeedingInfo] = useState({});
-  const [persistedPetList, setPersistedPetList] = useState([]);
-
-  useEffect(() => {
-    if (petList.length) {
-      setPersistedPetList(petList);
-    }
-  }, [petList]);
+  const { petList } = useContext(PetContext); // Access pet list from context
+  // const { petFoodList } = useContext(PetContext); // Access pet food list from context
+  const { petRecords } = useContext(PetContext); // Access pet records from context
 
   const petData = useMemo(
-    () => persistedPetList.find((pet) => pet.id === petId),
-    [persistedPetList, petId]
+    () => petList.find((pet) => pet.id === petId),
+    [petList, petId]
   );
   const petName = petData ? petData.name : "Unknown";
+
+  console.log(petName);
 
   useEffect(() => {
     const fetchLatestFeedingInfo = async () => {
@@ -171,7 +168,8 @@ export default function PetUser({ petList, petFoodList, petRecords }) {
                 <span className="font-semibold">Calculated Food Needed:</span>
                 242.44 g per meal / 484.88 g per day
               </p> */}
-              <div className="flex item-center justify-center">
+
+              {/* <div className="flex item-center justify-center">
                 <FeedAmountComponent
                   petId={petData.id}
                   petName={petData.name}
@@ -181,7 +179,7 @@ export default function PetUser({ petList, petFoodList, petRecords }) {
                   petFoodList={petFoodList}
                   latestFeedingInfo={latestFeedingInfo}
                 />
-              </div>
+              </div> */}
             </div>
             {/* <div className="col-span-12 border border-stroke bg-white p-10 shadow-default dark:border-strokedark dark:bg-boxdark rounded-xl shadow-md">
               <h2 className="text-xl font-semibold mb-4">
@@ -310,39 +308,3 @@ export default function PetUser({ petList, petFoodList, petRecords }) {
     </>
   );
 }
-
-PetUser.propTypes = {
-  petList: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired,
-      weight: PropTypes.number.isRequired,
-      activityLevel: PropTypes.number.isRequired,
-      petType: PropTypes.string.isRequired,
-      // include other pet properties here
-    })
-  ).isRequired,
-  petFoodList: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired,
-      //   brand: PropTypes.string.isRequired,
-      //   type: PropTypes.string.isRequired,
-      //   kcalPerCup: PropTypes.number.isRequired,
-      //   cupsPerDay: PropTypes.number.isRequired,
-      //   weight: PropTypes.number.isRequired,
-    })
-  ).isRequired,
-  petRecords: PropTypes.objectOf(
-    PropTypes.arrayOf(
-      PropTypes.shape({
-        id: PropTypes.string.isRequired,
-        date: PropTypes.string.isRequired,
-        time: PropTypes.string.isRequired,
-        amount: PropTypes.number.isRequired,
-        mode: PropTypes.string.isRequired,
-        // Add other properties of pet records here
-      })
-    )
-  ).isRequired,
-};

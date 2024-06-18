@@ -6,8 +6,8 @@ import { LuView } from "react-icons/lu";
 const PetList = ({
   petList,
   deletePet,
-  //   smartFeedingActivated,
-  //   petFoodList,
+  // smartFeedingActivated,
+  // petFoodList,
 }) => {
   const navigate = useNavigate();
   const activityLevelOptions = {
@@ -34,9 +34,9 @@ const PetList = ({
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-6 bg-white rounded-2xl">
-      {petList.map((pet) => (
+      {petList.map((pet, index) => (
         <div
-          key={pet.id}
+          key={index}
           className="relative flex flex-col border border-gray-300 bg-white rounded-xl shadow-md overflow-hidden"
         >
           <div className="grid overflow-auto">
@@ -70,17 +70,6 @@ const PetList = ({
                 </p>
               </div>
             </div>
-            {/* <div className="flex item-center justify-center">
-              <FeedAmountComponent
-                petId={String(pet.id)}
-                petName={String(pet.name)}
-                petType={pet.petType}
-                weight={Number(pet.weight)}
-                activityLevel={Number(pet.activityLevel)}
-                smartFeedingActivated={Boolean(smartFeedingActivated)}
-                petFoodList={petFoodList}
-              />
-            </div> */}
           </div>
           <div className="flex flex-col gap-2 absolute top-0 right-0 m-2 cursor-pointer">
             <button
@@ -115,8 +104,8 @@ const PetList = ({
 PetList.propTypes = {
   petList: PropTypes.array.isRequired,
   deletePet: PropTypes.func.isRequired,
-  smartFeedingActivated: PropTypes.bool.isRequired,
-  petFoodList: PropTypes.array.isRequired,
+  smartFeedingActivated: PropTypes.bool,
+  petFoodList: PropTypes.array,
 };
 
 export default PetList;
