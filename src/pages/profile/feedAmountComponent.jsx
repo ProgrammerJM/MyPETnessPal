@@ -78,6 +78,11 @@ const FeedAmountComponent = ({
     }
   };
 
+  const handleCancel = () => {
+    setFeedingModeType("");
+    setModalOpen(!modalOpen);
+  };
+
   const toggleModal = () => {
     setModalOpen(!modalOpen);
   };
@@ -109,7 +114,8 @@ const FeedAmountComponent = ({
       return { RER, MER, foodToDispensePerDay: 0 };
     }
 
-    const caloriesPerGram = selectedFoodData.caloriesPerGram;
+    // Convert kcalPerKg to caloriesPerGram
+    const caloriesPerGram = selectedFoodData.kcalPerKg / 1000;
     console.log(`Calories per Gram: ${caloriesPerGram}`);
 
     if (selectedFoodId === "" || isNaN(caloriesPerGram) || servings <= 0) {
@@ -258,7 +264,7 @@ const FeedAmountComponent = ({
       await addDoc(feedingInformationsCollection, {
         RER: RER,
         MER: MER,
-        caloriesPerGram: selectedFoodData.caloriesPerGram,
+        caloriesPerGram: selectedFoodData.kcalPerKg / 1000,
         foodSelectedName: selectedFoodData.name,
         createdAt: serverTimestamp(),
         feedingMode: "Smart",
@@ -302,7 +308,7 @@ const FeedAmountComponent = ({
       return { RER, MER: 0, selectedFoodData: null };
     }
 
-    const caloriesPerGram = selectedFoodData.caloriesPerGram;
+    const caloriesPerGram = selectedFoodData.kcalPerKg / 1000;
     console.log(`Calories per Gram: ${caloriesPerGram}`);
 
     if (selectedFoodId === "" || isNaN(caloriesPerGram)) {
@@ -341,7 +347,7 @@ const FeedAmountComponent = ({
       await addDoc(feedingInformationsCollection, {
         RER: RER,
         MER: MER,
-        caloriesPerGram: selectedFoodData.caloriesPerGram,
+        caloriesPerGram: selectedFoodData.kcalPerKg / 1000,
         foodSelectedName: selectedFoodData.name,
         scheduledDate: scheduledDate,
         scheduledTime: scheduledTime,
@@ -442,8 +448,8 @@ const FeedAmountComponent = ({
 
   return (
     <div>
-      <div className="flex items-center justify-center mb-4">
-        <div className="flex items-center justify-center mb-4">
+      <div className="flex items-center justify-center mb-2">
+        <div className="flex items-center justify-center mb-2">
           <div className="flex flex-col text-center">
             <div className="m-2">
               <button
@@ -493,7 +499,7 @@ const FeedAmountComponent = ({
               <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
                 <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                   <button
-                    onClick={toggleModal}
+                    onClick={handleCancel}
                     className="absolute top-0 right-0 m-4 text-gray-400 hover:text-gray-800"
                     aria-label="Close"
                   >
@@ -577,8 +583,7 @@ const FeedAmountComponent = ({
                           <option value="">Select a food</option>
                           {petFoodList.map((food) => (
                             <option key={food.id} value={food.id}>
-                              {food.name} - {food.caloriesPerGram} Calories Per
-                              g
+                              {food.name} - {food.kcalPerKg} Kcal Per Kg
                             </option>
                           ))}
                         </select>
@@ -630,8 +635,7 @@ const FeedAmountComponent = ({
                           <option value="">Select a food</option>
                           {petFoodList.map((food) => (
                             <option key={food.id} value={food.id}>
-                              {food.name} - {food.caloriesPerGram} Calories Per
-                              g
+                              {food.name} - {food.kcalPerKg} Kcal Per Kg
                             </option>
                           ))}
                         </select>
@@ -651,13 +655,11 @@ const FeedAmountComponent = ({
         )}
 
         {latestFeedingInfo && latestFeedingInfo.createdAt ? (
-          <div className="feeding-information flex">
+          <div className="feeding-information flex flex-col">
             {/* Render the latest feeding information here */}
             <p className="text text-gray-600 mt-2 font-semibold">
               Current Feeding Mode:{" "}
-              <span className="text-darkViolet">
-                {feedingModeType} Feeding Mode
-              </span>
+              <span className="text-darkViolet">{feedingModeType}</span>
             </p>
             <p className="text text-gray-600 mt-2 font-semibold">
               Resting Energy Requirement (RER):{" "}
@@ -698,7 +700,7 @@ const FeedAmountComponent = ({
             <p className="text text-gray-600 mt-2 font-semibold">
               Food{`'`}s Calories Per Gram:{" "}
               <span className="text-darkViolet">
-                {latestFeedingInfo.caloriesPerGram} kcal/g
+                {latestFeedingInfo.kcalPerKg} kcal/g
               </span>
             </p>
           </div>
@@ -717,6 +719,7 @@ FeedAmountComponent.propTypes = {
   latestFeedingInfo: PropTypes.shape({
     RER: PropTypes.number,
     MER: PropTypes.number,
+    KcalPerKg: PropTypes.number,
     caloriesPerGram: PropTypes.number,
     foodSelectedName: PropTypes.string,
     createdAt: PropTypes.object,

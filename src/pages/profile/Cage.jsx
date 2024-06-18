@@ -1,5 +1,5 @@
 import { useState, useEffect, useContext, useCallback, useMemo } from "react";
-import { FaPlus, FaTrash } from "react-icons/fa";
+import { FaPlus } from "react-icons/fa";
 import Modal from "react-modal";
 import FeedAmountComponent from "./feedAmountComponent";
 import { PetContext } from "../../pages/function/PetContext";
@@ -15,6 +15,7 @@ import {
   updateDoc,
   writeBatch,
 } from "firebase/firestore";
+import { TiDelete } from "react-icons/ti";
 
 Modal.setAppElement("#root");
 
@@ -189,33 +190,38 @@ export default function Cage() {
 
   return (
     <div className="p-4">
-      <div className="grid grid-row-1 sm:grid-row-2 md:grid-row-3 lg:grid-row-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 w-full gap-4">
         {cages.map((cage, index) => (
           <div
             key={cage.id}
-            className="border-2 border-gray-300 flex flex-col items-center justify-center p-4"
+            className="border-2 border-gray-300 rounded-lg shadow-lg flex flex-col items-center justify-center p-4 hover:shadow-xl transition-shadow duration-200 relative"
           >
+            <div className="absolute top-0 left-0 m-2 text-gray-400">
+              {cage.id}
+            </div>
             {cage.pet ? (
-              <div className="text-center">
-                <div className="flex item-center justify-center">
-                  <span className="border-re">
+              <div className="text-center flex">
+                <div className="flex items-center justify-center">
+                  <span className="text-gray-500 italic mb-2">
                     {cageFetchingWeight[cage.id]
-                      ? "Fetching weight"
+                      ? "Fetching weight..."
                       : cageWeights[cage.id] !== undefined &&
                         cageWeights[cage.id] !== null
-                      ? `Successfully fetched weight: ${
-                          cageWeights[cage.id]
-                        } kg`
+                      ? `Weight: ${cageWeights[cage.id]} kg`
                       : ""}
                   </span>
-                  <img
-                    src={cage.pet.imageURL}
-                    className="w-20 h-20 object-cover rounded-full"
-                    alt="pet's image in cage system"
-                  />
-                  <h2 className="text-lg font-bold">{cage.pet.name}</h2>
                 </div>
-                <div className="mt-2 p-2 border-t border-gray-200 w-full">
+                <div className="mt-2 p-2 border-t border-gray-200 w-fit">
+                  <div className="flex items-center justify-center">
+                    <img
+                      src={cage.pet.imageURL}
+                      className="w-16 h-16 object-cover rounded-full m-2"
+                      alt="pet's image in cage system"
+                    />
+                    <h2 className="font-bold text-darkViolet m-2">
+                      {cage.pet.name}
+                    </h2>
+                  </div>
                   <FeedAmountComponent
                     petId={cage.pet.id}
                     petName={cage.pet.name}
@@ -227,15 +233,16 @@ export default function Cage() {
                     closeModal={closeModal}
                   />
                 </div>
-                <p className="text-gray-400 mt-1">{cage.id}</p>
                 <button
-                  className="mt-2 p-2 bg-red-500 text-white rounded flex items-center"
+                  className="absolute top-0 right-0 m-2 bg-red-500 text-white rounded flex items-center justify-center hover:bg-red-600 transition-colors duration-200 h-fit w-fit"
                   onClick={(e) => {
                     e.stopPropagation();
                     deleteCage(cage.id);
                   }}
                 >
-                  <FaTrash className="mr-2" /> Delete Pet
+                  <div className="relative bg-mainColor hover:bg-darkViolet py-1 px-2 transition-all duration-300 rounded flex items-center">
+                    <TiDelete className="size-6" />
+                  </div>
                 </button>
               </div>
             ) : (
@@ -247,9 +254,8 @@ export default function Cage() {
                 />
                 <p className="text-gray-500 mt-2">Click to add a pet</p>
                 <span className="text-gray-500 mt-1 font-extralight italic">
-                  Automatically triggers fetching weight upon adding a pet
+                  Automatically triggers fetching weight
                 </span>
-                <p className="text-gray-400 mt-1">{cage.id}</p>
               </div>
             )}
           </div>
@@ -258,37 +264,27 @@ export default function Cage() {
       <Modal
         isOpen={modalIsOpen}
         onRequestClose={closeModal}
-        style={{
-          content: {
-            top: "50%",
-            left: "50%",
-            right: "auto",
-            bottom: "auto",
-            marginRight: "-50%",
-            transform: "translate(-50%, -50%)",
-            width: "30%",
-            height: "auto",
-          },
-        }}
+        contentLabel="Select a Pet"
+        className="bg-white rounded-lg p-4 max-w-md mx-auto mt-20 border border-gray-300 shadow-lg"
       >
-        <h2>Select a Pet to Add</h2>
-        <ul className="p-4">
+        <h2 className="text-lg font-bold mb-4">Select a Pet</h2>
+        <ul className="grid grid-cols-3">
           {petList.map((pet) => (
             <li
               key={pet.id}
               onClick={() => addPetToCage(pet)}
-              className="cursor-pointer hover p-2"
+              className="p-2 m-2 border border-gray-200 rounded mb-2 cursor-pointer hover:bg-gray-100 transition-colors duration-200"
             >
               {pet.name}
             </li>
           ))}
+          <button
+            onClick={closeModal}
+            className="m-2 bg-red-500 text-white p-2 rounded hover:bg-red-600 transition-colors duration-200"
+          >
+            Cancel
+          </button>
         </ul>
-        <button
-          className="mt-4 p-2 bg-blue-500 text-white rounded"
-          onClick={closeModal}
-        >
-          Close
-        </button>
       </Modal>
     </div>
   );

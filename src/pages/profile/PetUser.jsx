@@ -2,17 +2,7 @@ import { useEffect, useState, useMemo, useContext } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { collection, getDocs, limit, orderBy, query } from "firebase/firestore";
 import { db } from "../../config/firebase";
-import {
-  BarChart,
-  Bar,
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-} from "recharts";
+import { PiVideoCameraSlashThin } from "react-icons/pi";
 import PetAnalytics from "../analytics/PetAnalytics";
 import { PetContext } from "../../pages/function/PetContext"; // Import the context
 
@@ -86,9 +76,9 @@ export default function PetUser() {
               <p className="dark:text-indigo-200">Hi its me, {petId}!</p>
             </div>
           </div>
-          <div className=" grid grid-cols-12 md:mt-6 md:gap-4 2xl:mt-7.5 2xl:gap-7.5 w-full">
+          <div className="grid grid-cols-3 md:mt-6 md:gap-3 2xl:mt-7.5 w-full">
             {/* PET PROFILE DEETS */}
-            <div className="flex max-sm:flex-col max-sm:p-5 items-center col-span-12 border border-stroke bg-white p-10 shadow-default dark:border-strokedark sm:px-7.5 xl:col-span-6 rounded-xl shadow-md">
+            <div className="flex max-sm:flex-col max-sm:p-5 items-center col-span-2 border border-stroke bg-white p-10 shadow-default dark:border-strokedark sm:px-7.5 rounded-xl shadow-md">
               <div className="flex items-center ml-10 max-sm:m-0">
                 <div className="rounded-full bg-darkViolet/80 backdrop-blur p-1">
                   <div className="rounded-full bg-white p-1 overflow-hidden size-48">
@@ -137,93 +127,41 @@ export default function PetUser() {
                 </p>
               </div>
             </div>
-
-            {/* <!-- FEEDING MODE SELECTION --> */}
-            <div className="col-span-12 border border-stroke bg-white p-10 shadow-default dark:border-strokedark dark:bg-boxdark xl:col-span-6 rounded-xl shadow-md">
-              {/* <h2 className="text-xl font-semibold text-gray-900 mb-4">
-                Feeding Mode
-              </h2>
-              <div className="flex items-center mb-4">
-                <button className="flex-1 py-2 px-4 bg-gray-200 rounded-l-full text-gray-600 font-semibold focus:outline-none focus:ring-2 focus:ring-darkViolet">
-                  Smart Feeding
-                </button>
-                <button className="flex-1 py-2 px-4 bg-darkViolet text-white rounded-r-full font-semibold focus:outline-none focus:ring-2 focus:ring-darkViolet">
-                  Scheduled Feeding
-                </button>
-              </div>
-             
-              <p className="text text-gray-600">
-                Descriptive Analytics Enter Here Descriptive Analytics Enter
-                HereDescriptive Analytics Enter HereDescriptive
-              </p>
-              <p className="text text-gray-600 mt-2">
-                <span className="font-semibold">
-                  Maintenance Energy Requirement (MER):
-                </span>
-                <a href="#" className="text-darkViolet underline">
-                  1556.70 kilocalories/day
-                </a>
-              </p>
-              <p className="text text-gray-600 mt-2">
-                <span className="font-semibold">Calculated Food Needed:</span>
-                242.44 g per meal / 484.88 g per day
-              </p> */}
-
-              {/* <div className="flex item-center justify-center">
-                <FeedAmountComponent
-                  petId={petData.id}
-                  petName={petData.name}
-                  petType={petData.petType}
-                  weight={Number(petData.weight)}
-                  activityLevel={Number(petData.activityLevel)}
-                  petFoodList={petFoodList}
-                  latestFeedingInfo={latestFeedingInfo}
-                />
-              </div> */}
+            <div className="flex justify-center border border-stroke bg-white p-10 shadow-default dark:border-strokedark dark:bg-boxdark rounded-xl shadow-md items-center ">
+              <PiVideoCameraSlashThin className="w-48 h-48 " />
             </div>
-            {/* <div className="col-span-12 border border-stroke bg-white p-10 shadow-default dark:border-strokedark dark:bg-boxdark rounded-xl shadow-md">
-              <h2 className="text-xl font-semibold mb-4">
-                Mingming Weight Trend
-              </h2>
-              <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
-                <div className="border border-stroke bg-white p-5 shadow-default dark:border-strokedark rounded-lg shadow-sm xl:col-span-1 flex justify-center items-center">
-                  <p className="text-center">GRAPH HERE</p>
-                  PET PROFILE
-                  <p>Id {petData.id}</p>
-                  <p>Weight {petData.weight}</p>
-                  <p>Activity Level {petData.activityLevel}</p>
-                </div>
-              </div>
-            </div> */}
           </div>
 
           {/* PET RECORDS CHART */}
           <div className="mt-5 col-span-12 border border-stroke bg-white p-10 shadow-default dark:border-strokedark dark:bg-boxdark rounded-xl shadow-md">
-            <h1 className="text-xl font-bold mb-4 text-darkViolet">
+            <h1
+              className="text-xl
+             font-bold mb-4 text-darkViolet"
+            >
               Pet Records
             </h1>
             {currentRecords.length > 0 ? (
               <>
-                <div className="justify-center">
-                  <table className="text-left justify-center m-10 bg-lavender">
+                <div className="justify-center overflow-x-auto max-h-72 xl:w-full">
+                  <table className="text-left bg-lavender">
                     <thead>
-                      <tr>
-                        <th className="py-2 px-6 border-b text-center text-lavender-dark">
+                      <tr className="text-left">
+                        <th className="py-2 px-6 border-b text-lavender-dark">
                           ID
                         </th>
-                        <th className="py-2 px-6 border-b text-center text-lavender-dark">
+                        <th className="py-2 px-6 border-b text-lavender-dark">
                           Mode
                         </th>
-                        <th className="py-2 px-6 border-b text-center text-lavender-dark">
+                        <th className="py-2 px-6 border-b text-lavender-dark  text-justify">
                           Date
                         </th>
-                        <th className="py-2 px-6 border-b text-center text-lavender-dark">
+                        <th className="py-2 px-6 border-b text-lavender-dark">
                           Time
                         </th>
-                        <th className="py-2 px-6 border-b text-center text-lavender-dark">
+                        <th className="py-2 px-6 border-b text-lavender-dark">
                           Amount Dispensed (g)
                         </th>
-                        <th className="py-2 px-6 border-b text-center text-lavender-dark">
+                        <th className="py-2 px-6 border-b text-lavender-dark">
                           Amount Remain (g)
                         </th>
                       </tr>
@@ -254,42 +192,6 @@ export default function PetUser() {
                     </tbody>
                   </table>
                 </div>
-                <h1 className="text-l font-bold mb-4 text-darkViolet">
-                  Amount Dispensed (Bar Chart)
-                </h1>
-                <div className="flex flex-col justify-center">
-                  <BarChart
-                    className="flex"
-                    width={800}
-                    height={400}
-                    data={currentRecords}
-                    margin={{ top: 5, right: 20, bottom: 5, left: 0 }}
-                  >
-                    <CartesianGrid stroke="#f5f5f5" />
-                    <XAxis dataKey="date" />
-                    <YAxis />
-                    <Tooltip />
-                    <Legend />
-                    <Bar dataKey="amount" fill="#8884d8" />
-                  </BarChart>
-                  <br />
-                  <h1 className="text-l font-bold mb-4 text-darkViolet">
-                    Amount Dispensed (Line Chart)
-                  </h1>
-                  <LineChart
-                    width={800}
-                    height={400}
-                    data={currentRecords}
-                    margin={{ top: 5, right: 20, bottom: 5, left: 0 }}
-                  >
-                    <CartesianGrid stroke="#f5f5f5" />
-                    <XAxis dataKey="time" />
-                    <YAxis />
-                    <Tooltip />
-                    <Legend />
-                    <Line type="monotone" dataKey="amount" stroke="#8884d8" />
-                  </LineChart>
-                </div>
               </>
             ) : (
               <p className="text-center text-gray-500">
@@ -300,7 +202,6 @@ export default function PetUser() {
 
           {/* PetAnalytics here */}
           <div className="mt-5 col-span-12 border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark rounded-xl shadow-md">
-            <h1 className="text-xl font-bold m-10">PET {petId} Analytics</h1>
             <PetAnalytics data={currentRecords} petId={petId} />
           </div>
         </main>

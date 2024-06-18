@@ -14,7 +14,7 @@ export default function Tank() {
   const { petFoodList, setPetFoodList } = useContext(PetContext);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newPetFoodName, setNewPetFoodName] = useState("");
-  const [newFoodCaloriesPerGram, setNewFoodCaloriesPerGram] = useState(0);
+  const [newFoodKCaloriesPerGram, setNewFoodKCaloriesPerGram] = useState(0);
   const [editingFoodId, setEditingFoodId] = useState(null);
   const [errorAddFood, setErrorAddFood] = useState("");
 
@@ -63,7 +63,7 @@ export default function Tank() {
     try {
       const docData = {
         name: newPetFoodName,
-        caloriesPerGram: Number(newFoodCaloriesPerGram),
+        kcalPerKg: newFoodKCaloriesPerGram,
         id: editingFoodId || getNextFoodId(),
         userId: auth?.currentUser?.uid,
         date: new Date(),
@@ -90,7 +90,7 @@ export default function Tank() {
       console.error(err);
     }
     setNewPetFoodName("");
-    setNewFoodCaloriesPerGram(0);
+    setNewFoodKCaloriesPerGram(0);
     setIsModalOpen(false);
   };
 
@@ -117,7 +117,7 @@ export default function Tank() {
 
   const openEditModal = (food) => {
     setNewPetFoodName(food.name);
-    setNewFoodCaloriesPerGram(food.caloriesPerGram);
+    setNewFoodKCaloriesPerGram(food.caloriesPerGram);
     setEditingFoodId(food.id);
     setIsModalOpen(true);
   };
@@ -137,27 +137,27 @@ export default function Tank() {
         {petFoodList.map((food) => (
           <div
             key={food.id}
-            className="relative flex flex-col border border-gray-300 rounded-md p-4 mb-2"
+            className="relative flex flex-col border border-gray-300 rounded-md mt-8 p-4 mb-2 w-full h-full overflow-hidden shadow-md bg-white"
           >
-            <div className="ml-4">
-              <h2 className="font-bold">Pet Food Name: {food.name}</h2>
-              <h2 className="text-gray-600">
-                Calories Per Gram: {food.caloriesPerGram}
-              </h2>
-            </div>
-            <div className="absolute top-0 right-0 m-2">
-              <button
-                onClick={() => openEditModal(food)}
-                className="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-1 px-3 rounded"
-              >
-                Edit
-              </button>
-              <button
-                onClick={() => deleteFood(food.id)}
-                className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-3 rounded ml-2"
-              >
-                &times;
-              </button>
+            <div className="flex">
+              <div className="m-2">
+                <h2 className="font-bold w-auto">Pet Food Name: {food.name}</h2>
+                <h2 className="text-gray-600">Kcal Per kg: {food.kcalPerKg}</h2>
+              </div>
+              <div className="flex h-fit w-fit m-2">
+                <button
+                  onClick={() => openEditModal(food)}
+                  className="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-1 px-3 rounded"
+                >
+                  Edit
+                </button>
+                <button
+                  onClick={() => deleteFood(food.id)}
+                  className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-3 rounded ml-2"
+                >
+                  &times;
+                </button>
+              </div>
             </div>
             <div className="flex justify-center mt-4">
               <BarChart
@@ -199,7 +199,7 @@ export default function Tank() {
               </label>
               <input
                 type="text"
-                placeholder="E.g PEDIGREE® Adult 1+ Years Chicken & Vegetables Flavor"
+                placeholder="E.g PEDIGREE Healthy Weight Roasted Chicken & Vegetable Flavor Dry Dog Food"
                 value={newPetFoodName}
                 onChange={(e) => setNewPetFoodName(e.target.value)}
                 className="p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
@@ -210,13 +210,13 @@ export default function Tank() {
                 htmlFor="petName"
                 className="text-sm font-medium text-gray-700 mb-1"
               >
-                Calories Per Gram
+                KCal per kg
               </label>
               <input
                 type="number"
-                placeholder="E.g 348 grams"
-                value={newFoodCaloriesPerGram}
-                onChange={(e) => setNewFoodCaloriesPerGram(e.target.value)}
+                placeholder="E.g 3253 KCalories per kilogram"
+                value={newFoodKCaloriesPerGram}
+                onChange={(e) => setNewFoodKCaloriesPerGram(e.target.value)}
                 className="p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
               />
             </div>
