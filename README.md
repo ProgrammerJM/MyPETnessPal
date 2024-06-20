@@ -1,4 +1,4 @@
-# Petness App
+# MyPETnessPal App
 
 This is a React application for managing pets. It utilizes Firebase Realtime Database & Firestore for data storage and React Router for routing.
 
