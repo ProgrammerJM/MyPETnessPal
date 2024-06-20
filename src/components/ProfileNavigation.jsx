@@ -10,13 +10,13 @@ import { IoMdSettings } from "react-icons/io";
 import { GiBirdCage } from "react-icons/gi";
 
 const navBarIcon_Close =
-  "text-mainColor size-9 cursor-pointer ml-2 transition duration-300 ease-in-out";
+  "text-light-mainColor size-9 cursor-pointer ml-2 transition duration-300 ease-in-out";
 const navBarText =
   "text-black text-m font-semibold w-full items-center px-2 py-2 transition duration-300 ease-in-out";
 const navBar_Open =
   "inline-flex items-center shadow-md mt-2 p-2 w-full transition duration-300 ease-in-out";
 
-export default function Dashboard() {
+export default function ProfileNavigation() {
   const [open, setOpen] = useState(true); // Start with the sidebar closed
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -26,7 +26,7 @@ export default function Dashboard() {
 
   return (
     <>
-      <div className="flex bg-whiteViolet">
+      <div className="flex bg-light-whiteViolet">
         {/* Mobile Menu Toggle */}
         <div
           className="lg:hidden block p-2"

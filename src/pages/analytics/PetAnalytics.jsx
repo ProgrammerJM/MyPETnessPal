@@ -172,28 +172,29 @@ const PetAnalytics = ({ petId, data }) => {
 
   return (
     <div className="p-10">
-      <h1 className="font-bold  text-darkViolet text-xl">PET Analytics</h1>
+      <h1 className="font-bold text-light-darkViolet text-xl">PET Analytics</h1>
       <div className="flex flex-wrap justify-start max-w-screen-xl p-4">
-        <div className="w-full md:w-1/2 lg:w-1/3 p-4 flex-shrink-0 text-darkViolet">
+        <div className="w-full md:w-1/2 lg:w-1/3 p-4 flex-shrink-0 text-light-darkViolet">
           <VisualizeWeightTrend records={processedRecords} />
         </div>
-        <div className="w-full md:w-1/2 lg:w-1/3 p-4 flex-shrink-0 text-darkViolet">
+        <div className="w-full md:w-1/2 lg:w-1/3 p-4 flex-shrink-0 text-light-darkViolet">
           <VisualizeAmountRecords records={processedRecords} />
         </div>
-        <div className="w-full md:w-1/2 lg:w-1/3 p-4 flex-shrink-0 text-darkViolet">
+        <div className="w-full md:w-1/2 lg:w-1/3 p-4 flex-shrink-0 text-light-darkViolet">
           <VisualizeAmountRemainRecords records={processedRecords} />
         </div>
       </div>
       <div>
-        <div className="mx-10 flex">
+        <div className="mx-10 flex flex-col">
+          <p>
+            <span className="font-bold text-light-darkViolet">Summary</span>
+          </p>
           <p>
             <span className="font-bold text-darkViolet">
               Total Food Consumed:{" "}
             </span>
             {Number.isNaN(totalFoodConsumed) ? "N/A" : totalFoodConsumed} g
           </p>
-        </div>
-        <div className="mx-10 flex">
           <p>
             <span className="font-bold text-darkViolet">
               Average Food Consumed Per Day:{" "}
@@ -203,8 +204,6 @@ const PetAnalytics = ({ petId, data }) => {
               : avgFoodConsumedPerDay}{" "}
             g
           </p>
-        </div>
-        <div className="mx-10 flex">
           <span className="font-bold text-darkViolet">
             Consumption By Mode:{" "}
           </span>
@@ -213,9 +212,9 @@ const PetAnalytics = ({ petId, data }) => {
               {mode}: {amount} g
             </p>
           ))}
-        </div>
-        <div className="mx-10 flex">
-          <h3 className="font-bold  text-darkViolet">Consumption by User: </h3>
+          <span className="font-bold  text-darkViolet">
+            Consumption by User:{" "}
+          </span>
           {Object.entries(consumptionByUser).map(([user, amount]) => (
             <p key={user} className="mx-2">
               {user}: {amount} g

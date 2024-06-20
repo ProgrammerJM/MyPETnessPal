@@ -48,7 +48,7 @@ export default function PetProfile() {
   return (
     <>
       <button
-        className="text-white inline-flex items-center justify-center gap-2.5 rounded-md bg-darkViolet py-3 px-6
+        className="text-white inline-flex items-center justify-center gap-2.5 rounded-md bg-light-darkViolet py-3 px-6
         text-center font-medium hover:bg-opacity-90 mb-4"
         onClick={toggleModal}
       >

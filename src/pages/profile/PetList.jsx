@@ -76,10 +76,10 @@ const PetList = ({
               onClick={() => handleViewClick(pet.id)}
               className="text-white font-bold flex items-center justify-center relative"
             >
-              <div className="relative bg-mainColor hover:bg-darkViolet py-1 px-2 transition-all duration-300 rounded flex items-center">
+              <div className="relative bg-light-mainColor hover:bg-light-darkViolet py-1 px-2 transition-all duration-300 rounded flex items-center">
                 <LuView className="size-6" />
               </div>
-              <span className="absolute top-0 bg-darkViolet text-white px-2 mr-4 py-1 rounded opacity-0 transition-opacity duration-300 hover:opacity-100">
+              <span className="absolute top-0 bg-light-darkViolet text-white px-2 mr-4 py-1 rounded opacity-0 transition-opacity duration-300 hover:opacity-100">
                 View
               </span>
             </button>
@@ -87,10 +87,10 @@ const PetList = ({
               onClick={() => deletePet(pet.id)}
               className="text-white font-bold flex items-center justify-center relative"
             >
-              <div className="relative bg-mainColor hover:bg-darkViolet py-1 px-2 transition-all duration-300 rounded flex items-center">
+              <div className="relative bg-light-mainColor hover:bg-light-darkViolet  py-1 px-2 transition-all duration-300 rounded flex items-center">
                 <TiDelete className="size-6" />
               </div>
-              <span className="absolute top-0 bg-darkViolet text-white px-2 mr-5 py-1 rounded opacity-0 transition-opacity duration-300 hover:opacity-100">
+              <span className="absolute top-0 bg-light-darkViolet  text-white px-2 mr-5 py-1 rounded opacity-0 transition-opacity duration-300 hover:opacity-100">
                 Delete
               </span>
             </button>

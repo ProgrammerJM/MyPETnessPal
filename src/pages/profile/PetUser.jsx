@@ -61,7 +61,7 @@ export default function PetUser() {
       <div className="relative flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
         <main>
           <button
-            className="text-white inline-flex items-center justify-center gap-2 rounded-md bg-darkViolet py-3 px-6
+            className="text-white inline-flex items-center justify-center gap-2 rounded-md bg-light-darkViolet py-3 px-6
         text-center font-medium hover:bg-opacity-90 mb-4"
             onClick={() => navigate(-1)}
           >
@@ -80,7 +80,7 @@ export default function PetUser() {
             {/* PET PROFILE DEETS */}
             <div className="flex max-sm:flex-col max-sm:p-5 items-center col-span-2 border border-stroke bg-white p-10 shadow-default dark:border-strokedark sm:px-7.5 rounded-xl shadow-md">
               <div className="flex items-center ml-10 max-sm:m-0">
-                <div className="rounded-full bg-darkViolet/80 backdrop-blur p-1">
+                <div className="rounded-full bg-light-darkViolet/80 backdrop-blur p-1">
                   <div className="rounded-full bg-white p-1 overflow-hidden size-48">
                     {/* Insert Here Selected Pet Profile Picture */}
                     <img
@@ -94,12 +94,10 @@ export default function PetUser() {
                   </div>
                 </div>
               </div>
-
               <div className="flex flex-col text-left ml-10 max-sm:m-0">
                 <h2 className="text-xl my-4 font-semibold text-gray-900">
                   {petName}
                 </h2>
-
                 <p className="text-md text-gray-600">
                   {/* PET'S TYPE */}
                   <span className="font-semibold">Pet Type:</span>{" "}
@@ -136,7 +134,7 @@ export default function PetUser() {
           <div className="mt-5 col-span-12 border border-stroke bg-white p-10 shadow-default dark:border-strokedark dark:bg-boxdark rounded-xl shadow-md">
             <h1
               className="text-xl
-             font-bold mb-4 text-darkViolet"
+             font-bold mb-4 text-light-darkViolet"
             >
               Pet Records
             </h1>

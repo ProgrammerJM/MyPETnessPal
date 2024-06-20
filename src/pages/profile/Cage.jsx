@@ -193,13 +193,13 @@ export default function Cage() {
       <div>
         <p className="text-gray-600 mt-2 font-semibold">
           Feeding Type:{" "}
-          <span className="text-darkViolet">
+          <span className="text-light-darkViolet">
             {feedingInfo.feedingMode ? feedingInfo.feedingMode : "N/A"}
           </span>
         </p>
         <p className="text-gray-600 mt-2 font-semibold">
           Resting Energy Requirement (RER):{" "}
-          <span className="text-darkViolet">
+          <span className="text-light-darkViolet">
             {feedingInfo.RER
               ? `${Number(feedingInfo.RER).toFixed(2)} kcal/day`
               : "N/A"}
@@ -207,7 +207,7 @@ export default function Cage() {
         </p>
         <p className="text-gray-600 mt-2 font-semibold">
           Maintenance Energy Requirement (MER):{" "}
-          <span className="text-darkViolet">
+          <span className="text-light-darkViolet">
             {feedingInfo.MER
               ? `${Number(feedingInfo.MER).toFixed(2)} kcal/day`
               : "N/A"}
@@ -215,7 +215,7 @@ export default function Cage() {
         </p>
         <p className="text-gray-600 mt-2 font-semibold">
           Date Started Feeding:{" "}
-          <span className="text-darkViolet">
+          <span className="text-light-darkViolet">
             {feedingInfo.createdAt &&
             typeof feedingInfo.createdAt.toDate === "function"
               ? feedingInfo.createdAt.toDate().toLocaleDateString(undefined, {
@@ -231,7 +231,7 @@ export default function Cage() {
         </p>
         <p className="text-gray-600 mt-2 font-semibold">
           Selected Food:{" "}
-          <span className="text-darkViolet">
+          <span className="text-light-darkViolet">
             {feedingInfo.foodSelectedName
               ? feedingInfo.foodSelectedName
               : "N/A"}
@@ -239,9 +239,9 @@ export default function Cage() {
         </p>
         <p className="text-gray-600 mt-2 font-semibold">
           Food{"'"}s Calories Per Gram:{" "}
-          <span className="text-darkViolet">
+          <span className="text-light-darkViolet">
             {feedingInfo.caloriesPerGram
-              ? `${feedingInfo.caloriesPerGram} kcal/g`
+              ? `${feedingInfo.caloriesPerGram} Calories/g`
               : "N/A"}
           </span>
         </p>
@@ -267,24 +267,24 @@ export default function Cage() {
               </div>
               {pet ? (
                 <div className="text-center flex">
-                  <div className="flex items-center justify-center">
-                    <span className="text-gray-500 italic mb-2">
-                      {cageFetchingWeight[cage.id]
-                        ? "Fetching weight..."
-                        : cageWeights[cage.id] !== undefined &&
-                          cageWeights[cage.id] !== null
-                        ? `Weight: ${cageWeights[cage.id]} kg`
-                        : ""}
-                    </span>
-                  </div>
                   <div className="mt-2 p-2 border-t border-gray-200 w-fit">
+                    <div className="flex items-center justify-center">
+                      <span className="text-gray-500 italic mb-2">
+                        {cageFetchingWeight[cage.id]
+                          ? "Fetching weight..."
+                          : cageWeights[cage.id] !== undefined &&
+                            cageWeights[cage.id] !== null
+                          ? `Weight: ${cageWeights[cage.id]} kg`
+                          : ""}
+                      </span>
+                    </div>
                     <div className="flex items-center justify-center">
                       <img
                         src={pet.imageURL}
-                        className="w-16 h-16 object-cover rounded-full m-2"
+                        className="w-24 h-24 object-cover rounded-3xl m-2"
                         alt="pet's image in cage system"
                       />
-                      <h2 className="font-bold text-darkViolet m-2">
+                      <h2 className="font-bold text-light-darkViolet m-2">
                         {pet.name}
                       </h2>
                     </div>
@@ -307,7 +307,7 @@ export default function Cage() {
                       deleteCage(cage.id);
                     }}
                   >
-                    <div className="relative bg-mainColor hover:bg-darkViolet py-1 px-2 transition-all duration-300 rounded flex items-center">
+                    <div className="relative bg-light-mainColor hover:bg-darkViolet py-1 px-2 transition-all duration-300 rounded flex items-center">
                       <TiDelete className="size-6" />
                     </div>
                   </button>
