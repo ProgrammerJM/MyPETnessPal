@@ -4,8 +4,7 @@ import Modal from "react-modal";
 import FeedAmountComponent from "./feedAmountComponent";
 import { PetContext } from "../../pages/function/PetContext";
 import { ref, onValue, set, remove } from "firebase/database";
-import { realtimeDatabase } from "../../config/firebase";
-import { db } from "../../config/firebase";
+import { realtimeDatabase, db } from "../../config/firebase";
 import {
   collection,
   doc,
@@ -20,7 +19,7 @@ import { TiDelete } from "react-icons/ti";
 Modal.setAppElement("#root");
 
 export default function Cage() {
-  const { petList, petRecords } = useContext(PetContext);
+  const { petList, petRecords, latestFeedingInfo } = useContext(PetContext);
 
   const initialCages = useMemo(
     () => [
@@ -188,78 +187,147 @@ export default function Cage() {
     return <div>{error}</div>;
   }
 
+  const renderFeedingInfo = (cage) => {
+    const feedingInfo = latestFeedingInfo[cage.pet?.id];
+    return feedingInfo ? (
+      <div>
+        <p className="text-gray-600 mt-2 font-semibold">
+          Feeding Type:{" "}
+          <span className="text-darkViolet">
+            {feedingInfo.feedingMode ? feedingInfo.feedingMode : "N/A"}
+          </span>
+        </p>
+        <p className="text-gray-600 mt-2 font-semibold">
+          Resting Energy Requirement (RER):{" "}
+          <span className="text-darkViolet">
+            {feedingInfo.RER
+              ? `${Number(feedingInfo.RER).toFixed(2)} kcal/day`
+              : "N/A"}
+          </span>
+        </p>
+        <p className="text-gray-600 mt-2 font-semibold">
+          Maintenance Energy Requirement (MER):{" "}
+          <span className="text-darkViolet">
+            {feedingInfo.MER
+              ? `${Number(feedingInfo.MER).toFixed(2)} kcal/day`
+              : "N/A"}
+          </span>
+        </p>
+        <p className="text-gray-600 mt-2 font-semibold">
+          Date Started Feeding:{" "}
+          <span className="text-darkViolet">
+            {feedingInfo.createdAt &&
+            typeof feedingInfo.createdAt.toDate === "function"
+              ? feedingInfo.createdAt.toDate().toLocaleDateString(undefined, {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                  hour12: true,
+                })
+              : "N/A"}
+          </span>
+        </p>
+        <p className="text-gray-600 mt-2 font-semibold">
+          Selected Food:{" "}
+          <span className="text-darkViolet">
+            {feedingInfo.foodSelectedName
+              ? feedingInfo.foodSelectedName
+              : "N/A"}
+          </span>
+        </p>
+        <p className="text-gray-600 mt-2 font-semibold">
+          Food{"'"}s Calories Per Gram:{" "}
+          <span className="text-darkViolet">
+            {feedingInfo.caloriesPerGram
+              ? `${feedingInfo.caloriesPerGram} kcal/g`
+              : "N/A"}
+          </span>
+        </p>
+      </div>
+    ) : (
+      <p>No feeding information available</p>
+    );
+  };
+
   return (
     <div className="p-4">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 w-full gap-4">
-        {cages.map((cage, index) => (
-          <div
-            key={cage.id}
-            className="border-2 border-gray-300 rounded-lg shadow-lg flex flex-col items-center justify-center p-4 hover:shadow-xl transition-shadow duration-200 relative"
-          >
-            <div className="absolute top-0 left-0 m-2 text-gray-400">
-              {cage.id}
-            </div>
-            {cage.pet ? (
-              <div className="text-center flex">
-                <div className="flex items-center justify-center">
-                  <span className="text-gray-500 italic mb-2">
-                    {cageFetchingWeight[cage.id]
-                      ? "Fetching weight..."
-                      : cageWeights[cage.id] !== undefined &&
-                        cageWeights[cage.id] !== null
-                      ? `Weight: ${cageWeights[cage.id]} kg`
-                      : ""}
+        {cages.map((cage, index) => {
+          const pet = cage.pet;
+
+          return (
+            <div
+              key={cage.id}
+              className="border-2 border-gray-300 rounded-lg shadow-lg flex flex-col items-center justify-center p-4 hover:shadow-xl transition-shadow duration-200 relative"
+            >
+              <div className="absolute top-0 left-0 m-2 text-gray-400">
+                {cage.id}
+              </div>
+              {pet ? (
+                <div className="text-center flex">
+                  <div className="flex items-center justify-center">
+                    <span className="text-gray-500 italic mb-2">
+                      {cageFetchingWeight[cage.id]
+                        ? "Fetching weight..."
+                        : cageWeights[cage.id] !== undefined &&
+                          cageWeights[cage.id] !== null
+                        ? `Weight: ${cageWeights[cage.id]} kg`
+                        : ""}
+                    </span>
+                  </div>
+                  <div className="mt-2 p-2 border-t border-gray-200 w-fit">
+                    <div className="flex items-center justify-center">
+                      <img
+                        src={pet.imageURL}
+                        className="w-16 h-16 object-cover rounded-full m-2"
+                        alt="pet's image in cage system"
+                      />
+                      <h2 className="font-bold text-darkViolet m-2">
+                        {pet.name}
+                      </h2>
+                    </div>
+                    <FeedAmountComponent
+                      petId={pet.id}
+                      petName={pet.name}
+                      petType={pet.petType}
+                      weight={cageWeights[cage.id] || Number(pet.weight)}
+                      activityLevel={Number(pet.activityLevel)}
+                      latestFeedingInfo={petRecords[pet.name]?.[0] || {}}
+                      cageID={cage.id}
+                      closeModal={closeModal}
+                    />
+                    {renderFeedingInfo(cage)}
+                  </div>
+                  <button
+                    className="absolute top-0 right-0 m-2 bg-red-500 text-white rounded flex items-center justify-center hover:bg-red-600 transition-colors duration-200 h-fit w-fit"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      deleteCage(cage.id);
+                    }}
+                  >
+                    <div className="relative bg-mainColor hover:bg-darkViolet py-1 px-2 transition-all duration-300 rounded flex items-center">
+                      <TiDelete className="size-6" />
+                    </div>
+                  </button>
+                </div>
+              ) : (
+                <div className="flex flex-col items-center justify-center">
+                  <FaPlus
+                    size={24}
+                    onClick={() => openModal(index)}
+                    className="border border-black rounded-full cursor-pointer"
+                  />
+                  <p className="text-gray-500 mt-2">Click to add a pet</p>
+                  <span className="text-gray-500 mt-1 font-extralight italic">
+                    Automatically triggers fetching weight
                   </span>
                 </div>
-                <div className="mt-2 p-2 border-t border-gray-200 w-fit">
-                  <div className="flex items-center justify-center">
-                    <img
-                      src={cage.pet.imageURL}
-                      className="w-16 h-16 object-cover rounded-full m-2"
-                      alt="pet's image in cage system"
-                    />
-                    <h2 className="font-bold text-darkViolet m-2">
-                      {cage.pet.name}
-                    </h2>
-                  </div>
-                  <FeedAmountComponent
-                    petId={cage.pet.id}
-                    petName={cage.pet.name}
-                    petType={cage.pet.petType}
-                    weight={cageWeights[cage.id] || Number(cage.pet.weight)}
-                    activityLevel={Number(cage.pet.activityLevel)}
-                    latestFeedingInfo={petRecords[cage.pet.name]?.[0] || {}}
-                    cageID={cage.id}
-                    closeModal={closeModal}
-                  />
-                </div>
-                <button
-                  className="absolute top-0 right-0 m-2 bg-red-500 text-white rounded flex items-center justify-center hover:bg-red-600 transition-colors duration-200 h-fit w-fit"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    deleteCage(cage.id);
-                  }}
-                >
-                  <div className="relative bg-mainColor hover:bg-darkViolet py-1 px-2 transition-all duration-300 rounded flex items-center">
-                    <TiDelete className="size-6" />
-                  </div>
-                </button>
-              </div>
-            ) : (
-              <div className="flex flex-col items-center justify-center">
-                <FaPlus
-                  size={24}
-                  onClick={() => openModal(index)}
-                  className="border border-black rounded-full cursor-pointer"
-                />
-                <p className="text-gray-500 mt-2">Click to add a pet</p>
-                <span className="text-gray-500 mt-1 font-extralight italic">
-                  Automatically triggers fetching weight
-                </span>
-              </div>
-            )}
-          </div>
-        ))}
+              )}
+            </div>
+          );
+        })}
       </div>
       <Modal
         isOpen={modalIsOpen}

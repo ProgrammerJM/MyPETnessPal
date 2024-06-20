@@ -19,34 +19,54 @@ export const PetProvider = ({ children }) => {
   const [feedingInformationRecords, setFeedingInformationRecords] = useState(
     {}
   );
+  const [latestFeedingInfo, setLatestFeedingInfo] = useState({});
 
   // Memoize the collection references
   const petCollectionRef = useMemo(() => collection(db, "pets"), []);
   const petFoodCollectionRef = useMemo(() => collection(db, "petFoodList"), []);
-  // Memoize the feedingInformations collection reference, updating when petList changes
-  const feedingInformationsCollection = useMemo(() => {
-    if (petList.length > 0) {
-      return collection(db, `pets/${petList[0].petName}/feedingInformations`);
-    }
-    return null;
-  }, [petList]);
 
   useEffect(() => {
-    if (!feedingInformationsCollection) return;
+    if (petList.length === 0) return;
 
-    const unsubscribe = onSnapshot(
-      feedingInformationsCollection,
-      (snapshot) => {
-        const petFeedingInformations = snapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-        setFeedingInformationRecords(petFeedingInformations);
-      }
-    );
+    const unsubscribeFeedingInfoListeners = [];
 
-    return () => unsubscribe();
-  }, [feedingInformationsCollection]);
+    petList.forEach((pet) => {
+      const feedingInformationsCollection = collection(
+        db,
+        `pets/${pet.id}/feedingInformations`
+      );
+
+      const unsubscribe = onSnapshot(
+        feedingInformationsCollection,
+        (snapshot) => {
+          const petFeedingInformations = snapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          }));
+
+          setFeedingInformationRecords((prev) => ({
+            ...prev,
+            [pet.id]: petFeedingInformations,
+          }));
+
+          const latestInfo = petFeedingInformations.reduce((latest, info) => {
+            return info.timestamp > latest.timestamp ? info : latest;
+          }, petFeedingInformations[0] || {});
+
+          setLatestFeedingInfo((prev) => ({
+            ...prev,
+            [pet.id]: latestInfo,
+          }));
+        }
+      );
+
+      unsubscribeFeedingInfoListeners.push(unsubscribe);
+    });
+
+    return () => {
+      unsubscribeFeedingInfoListeners.forEach((unsubscribe) => unsubscribe());
+    };
+  }, [petList]);
 
   useEffect(() => {
     const unsubscribe = onSnapshot(petFoodCollectionRef, (snapshot) => {
@@ -110,6 +130,7 @@ export const PetProvider = ({ children }) => {
         setPetList,
         petFoodList,
         setPetFoodList,
+        latestFeedingInfo,
         petRecords,
         feedingInformationRecords,
       }}

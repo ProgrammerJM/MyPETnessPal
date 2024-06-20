@@ -4,10 +4,10 @@ import {
   collection,
   addDoc,
   serverTimestamp,
-  query,
-  orderBy,
-  limit,
-  getDocs,
+  // query,
+  // orderBy,
+  // limit,
+  // getDocs,
 } from "firebase/firestore";
 import { db } from "../../config/firebase";
 import { realtimeDatabase } from "../../config/firebase";
@@ -15,7 +15,7 @@ import { PetContext } from "../function/PetContext";
 import PropTypes from "prop-types";
 
 const FeedAmountComponent = ({
-  petId,
+  // petId,
   petName,
   // petType,
   weight,
@@ -33,32 +33,6 @@ const FeedAmountComponent = ({
   const [scheduledDate, setScheduledDate] = useState("");
   const [scheduledTime, setScheduledTime] = useState("");
   const [scheduledSubmitError, setScheduledSubmitError] = useState("");
-  const [latestFeedingInfo, setLatestFeedingInfo] = useState({});
-
-  useEffect(() => {
-    const fetchLatestFeedingInfo = async () => {
-      try {
-        const q = query(
-          collection(db, `pets/${petName}/feedingInformations/`),
-          orderBy("createdAt", "desc"),
-          limit(1)
-        );
-        const querySnapshot = await getDocs(q);
-
-        if (!querySnapshot.empty) {
-          const doc = querySnapshot.docs[0];
-          setLatestFeedingInfo(doc.data());
-        } else {
-          console.log("No documents found in the collection.");
-        }
-      } catch (error) {
-        console.error("Error fetching latest feeding info:", error);
-      }
-    };
-    if (petName !== "Unknown") {
-      fetchLatestFeedingInfo();
-    }
-  }, [petName, cageID, petId]);
 
   const feedingInformationsCollection = collection(
     db,
@@ -653,60 +627,6 @@ const FeedAmountComponent = ({
             </div>
           </div>
         )}
-
-        {latestFeedingInfo && latestFeedingInfo.createdAt ? (
-          <div className="feeding-information flex flex-col">
-            {/* Render the latest feeding information here */}
-            <p className="text text-gray-600 mt-2 font-semibold">
-              Current Feeding Mode:{" "}
-              <span className="text-darkViolet">{feedingModeType}</span>
-            </p>
-            <p className="text text-gray-600 mt-2 font-semibold">
-              Resting Energy Requirement (RER):{" "}
-              <span className="text-darkViolet">
-                {latestFeedingInfo.RER.toFixed(2)} kcal/day
-              </span>
-            </p>
-            <p className="text text-gray-600 mt-2 font-semibold">
-              Maintenance Energy Requirement (MER):{" "}
-              <span className="text-darkViolet">
-                {latestFeedingInfo.MER.toFixed(2)} kcal/day
-              </span>
-            </p>
-            <p className="text text-gray-600 mt-2 font-semibold">
-              Date Started Feeding:{" "}
-              <span className="text-darkViolet">
-                {latestFeedingInfo.createdAt &&
-                typeof latestFeedingInfo.createdAt.toDate === "function"
-                  ? latestFeedingInfo.createdAt
-                      .toDate()
-                      .toLocaleDateString(undefined, {
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                        hour: "2-digit",
-                        minute: "2-digit",
-                        hour12: true,
-                      })
-                  : "N/A"}
-              </span>
-            </p>
-            <p className="text text-gray-600 mt-2 font-semibold">
-              Selected Food:{" "}
-              <span className="text-darkViolet">
-                {latestFeedingInfo.foodSelectedName}
-              </span>
-            </p>
-            <p className="text text-gray-600 mt-2 font-semibold">
-              Food{`'`}s Calories Per Gram:{" "}
-              <span className="text-darkViolet">
-                {latestFeedingInfo.kcalPerKg} kcal/g
-              </span>
-            </p>
-          </div>
-        ) : (
-          <p>No feeding information available</p>
-        )}
       </div>
     </div>
   );
@@ -716,14 +636,6 @@ FeedAmountComponent.propTypes = {
   petName: PropTypes.string.isRequired,
   weight: PropTypes.number.isRequired,
   activityLevel: PropTypes.number.isRequired,
-  latestFeedingInfo: PropTypes.shape({
-    RER: PropTypes.number,
-    MER: PropTypes.number,
-    KcalPerKg: PropTypes.number,
-    caloriesPerGram: PropTypes.number,
-    foodSelectedName: PropTypes.string,
-    createdAt: PropTypes.object,
-  }),
   cageID: PropTypes.string.isRequired,
   closeModal: PropTypes.func.isRequired,
   petId: PropTypes.string.isRequired,
