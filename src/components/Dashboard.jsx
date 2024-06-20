@@ -17,7 +17,7 @@ const navBar_Open =
   "inline-flex items-center shadow-md mt-2 p-2 w-full transition duration-300 ease-in-out";
 
 export default function Dashboard() {
-  const [open, setOpen] = useState(false); // Start with the sidebar closed
+  const [open, setOpen] = useState(true); // Start with the sidebar closed
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const handleNavLinkClick = () => {

@@ -1,5 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { PetProvider } from "./pages/function/PetContext";
+import { ThemeContext } from "./pages/function/ThemeContext";
+import { useContext } from "react";
 import Layout from "./components/Layout";
 import Home from "./pages/Home";
 import About from "./pages/About";
@@ -20,30 +22,34 @@ import NotFound from "./pages/NotFound";
 import Cage from "./pages/profile/Cage";
 
 function App() {
+  const { theme } = useContext(ThemeContext); // use ThemeContext
+
   return (
     <PetProvider>
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Layout />}>
-            <Route index element={<Home />} />
-            <Route path="about" element={<About />} />
-            <Route path="contact" element={<Contact />} />
-            <Route path="signup" element={<Signup />} />
-            <Route path="login" element={<Login />} />
-            <Route path="forgot-password" element={<ForgotPassword />} />
-          </Route>
-          <Route path="/profile" element={<PetsLayout />}>
-            <Route index element={<Dashboard />} />
-            <Route path="petprofile" element={<PetProfile />} />
-            <Route path="petprofile/:petId" element={<PetUser />} />
-            <Route path="cage" element={<Cage />} />
-            <Route path="notifications" element={<Notifications />} />
-            <Route path="help" element={<Help />} />
-            <Route path="tank" element={<Tank />} />
-            <Route path="settings" element={<Settings />} />
-          </Route>
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        <div className={theme === "light" ? "light-class" : "dark-class"}>
+          <Routes>
+            <Route path="/" element={<Layout />}>
+              <Route index element={<Home />} />
+              <Route path="about" element={<About />} />
+              <Route path="contact" element={<Contact />} />
+              <Route path="signup" element={<Signup />} />
+              <Route path="login" element={<Login />} />
+              <Route path="forgot-password" element={<ForgotPassword />} />
+            </Route>
+            <Route path="/profile" element={<PetsLayout />}>
+              <Route index element={<Dashboard />} />
+              <Route path="petprofile" element={<PetProfile />} />
+              <Route path="petprofile/:petId" element={<PetUser />} />
+              <Route path="cage" element={<Cage />} />
+              <Route path="notifications" element={<Notifications />} />
+              <Route path="help" element={<Help />} />
+              <Route path="tank" element={<Tank />} />
+              <Route path="settings" element={<Settings />} />
+            </Route>
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </div>
       </BrowserRouter>
     </PetProvider>
   );

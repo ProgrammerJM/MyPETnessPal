@@ -1,6 +1,8 @@
 import { auth } from "../../config/firebase";
 import { signOut } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
+import { useContext } from "react";
+import { ThemeContext } from "../function/ThemeContext";
 
 export default function Settings() {
   const navigate = useNavigate();
@@ -12,6 +14,7 @@ export default function Settings() {
       console.error(err);
     }
   };
+  const { toggleTheme } = useContext(ThemeContext);
   return (
     <>
       <button
@@ -21,6 +24,7 @@ export default function Settings() {
         {" "}
         Logout{" "}
       </button>
+      <button onClick={toggleTheme}>Toggle Theme</button>
     </>
   );
 }
