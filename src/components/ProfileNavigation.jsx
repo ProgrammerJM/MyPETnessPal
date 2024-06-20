@@ -74,12 +74,12 @@ export default function ProfileNavigation() {
               { to: ".", label: "Dashboard", icon: TbLayoutDashboardFilled },
               { to: "petprofile", label: "Pet Profile", icon: MdOutlinePets },
               { to: "cage", label: "Cage Management", icon: GiBirdCage },
+              { to: "tank", label: "Tank Management", icon: GiChemicalTank },
               {
                 to: "notifications",
                 label: "Notifications",
                 icon: IoNotifications,
               },
-              { to: "tank", label: "Tank Management", icon: GiChemicalTank },
               { to: "help", label: "Guidelines", icon: MdHelp },
               { to: "settings", label: "Settings", icon: IoMdSettings },
             ].map(({ to, label, icon: Icon }) => (
