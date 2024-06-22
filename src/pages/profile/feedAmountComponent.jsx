@@ -1,5 +1,5 @@
 import { useState, useEffect, useContext } from "react";
-import { ref, push, get, set, remove, update } from "firebase/database";
+import { ref, push, get, set } from "firebase/database";
 import {
   collection,
   addDoc,
@@ -12,7 +12,10 @@ import {
 import { db } from "../../config/firebase";
 import { realtimeDatabase } from "../../config/firebase";
 import { PetContext } from "../function/PetContext";
+import Modal from "react-modal";
 import PropTypes from "prop-types";
+
+// Modal.setAppElement("#root");
 
 const FeedAmountComponent = ({
   // petId,
@@ -33,6 +36,8 @@ const FeedAmountComponent = ({
   const [scheduledDate, setScheduledDate] = useState("");
   const [scheduledTime, setScheduledTime] = useState("");
   const [scheduledSubmitError, setScheduledSubmitError] = useState("");
+  const [smartSubmitError, setSmartSubmitError] = useState("");
+  const [submitConfirmation, setSubmitConfirmation] = useState(false);
 
   const feedingInformationsCollection = collection(
     db,
@@ -57,7 +62,8 @@ const FeedAmountComponent = ({
     setModalOpen(!modalOpen);
   };
 
-  const toggleModal = () => {
+  const toggleModal = (mode) => {
+    setFeedingModeType(mode);
     setModalOpen(!modalOpen);
   };
 
@@ -161,78 +167,25 @@ const FeedAmountComponent = ({
         await set(scheduledFeedingStatusRef, false);
       }
 
-      const snapshot = await get(petRef);
+      const smartFeeding = [
+        {
+          selectedFood: selectedFood,
+          petName: petName,
+          feedingModeType: "Smart",
+          servings: Number(servings),
+          amountToDispensePerServingPerDay: Number(foodToDispensePerDay),
+          cageID: cageID,
+        },
+      ];
 
-      if (snapshot.exists()) {
-        const data = snapshot.val();
-        const keys = Object.keys(data);
+      // Update or create a single document with smart feeding data
+      await set(petRef, smartFeeding);
 
-        for (let i = 0; i < keys.length; i++) {
-          const smartFeeding = {
-            selectedFood: selectedFood,
-            petName: petName,
-            feedingModeType: "Smart",
-            servings: Number(servings),
-            amountToDispensePerServingPerDay: Number(foodToDispensePerDay),
-            cageID: cageID,
-          };
-
-          if (i < Number(servings)) {
-            await update(
-              ref(
-                realtimeDatabase,
-                `petFeedingSchedule/${petName}/smartFeeding/${keys[i]}`
-              ),
-              smartFeeding
-            );
-          } else {
-            await remove(
-              ref(
-                realtimeDatabase,
-                `petFeedingSchedule/${petName}/smartFeeding/${keys[i]}`
-              )
-            );
-          }
-        }
-
-        for (let i = keys.length; i < Number(servings); i++) {
-          const smartFeeding = {
-            selectedFood: selectedFood,
-            petName: petName,
-            feedingModeType: "Smart",
-            servings: Number(servings),
-            amountToDispensePerServingPerDay: Number(foodToDispensePerDay),
-            cageID: cageID,
-          };
-
-          await push(petRef, smartFeeding);
-        }
-
-        const feedingStatusRef = ref(
-          realtimeDatabase,
-          `petFeedingSchedule/${petName}/smartFeeding/smartFeedingStatus`
-        );
-        await set(feedingStatusRef, true);
-      } else {
-        for (let i = 0; i < Number(servings); i++) {
-          const smartFeeding = {
-            selectedFood: selectedFood,
-            petName: petName,
-            feedingModeType: "Smart",
-            servings: Number(servings),
-            amountToDispensePerServingPerDay: Number(foodToDispensePerDay),
-            cageID: cageID,
-          };
-
-          await push(petRef, smartFeeding);
-        }
-
-        const feedingStatusRef = ref(
-          realtimeDatabase,
-          `petFeedingSchedule/${petName}/smartFeeding/smartFeedingStatus`
-        );
-        await set(feedingStatusRef, true);
-      }
+      const feedingStatusRef = ref(
+        realtimeDatabase,
+        `petFeedingSchedule/${petName}/smartFeeding/smartFeedingStatus`
+      );
+      await set(feedingStatusRef, true);
 
       // Save the feeding information to Firestore (SMART FEEDING)
       await addDoc(feedingInformationsCollection, {
@@ -247,14 +200,16 @@ const FeedAmountComponent = ({
       });
 
       setFeedingModeType("Smart");
+      setSubmitConfirmation(true);
 
-      closeModal();
       toggleModal();
+      closeModal();
       setServings(0);
       setSelectedFood("");
       console.log("Smart Feeding Mode has been saved");
     } catch (error) {
       console.error("Error handling smart feeding submission:", error);
+      setSmartSubmitError("Please fill in all required fields");
     }
   };
 
@@ -365,6 +320,7 @@ const FeedAmountComponent = ({
       await set(feedingStatusRef, true);
 
       setFeedingModeType("Scheduled");
+      setSubmitConfirmation(true);
 
       toggleModal();
       closeModal();
@@ -427,20 +383,20 @@ const FeedAmountComponent = ({
           <div className="flex flex-col text-center">
             <div className="m-2">
               <button
-                onClick={toggleModal}
+                onClick={() => toggleModal("Smart")}
                 className={` h-12 px-4 font-semibold items-center  border border-white justify-center rounded-l-full focus:outline-none focus:ring-2 ${
                   feedingModeType === "Smart"
-                    ? "bg-darkViolet text-white "
+                    ? "bg-light-darkViolet text-white "
                     : "bg-gray-200 text-gray-600 "
                 }`}
               >
                 Smart Feeding
               </button>
               <button
-                onClick={toggleModal}
+                onClick={() => toggleModal("Scheduled")}
                 className={` h-12 px-4 font-semibold items-center  border border-white justify-center rounded-r-full focus:outline-none focus:ring-2 ${
                   feedingModeType === "Scheduled"
-                    ? "bg-darkViolet text-white "
+                    ? "bg-light-darkViolet text-white "
                     : "bg-gray-200 text-gray-600 "
                 }`}
               >
@@ -453,15 +409,26 @@ const FeedAmountComponent = ({
           </div>
         </div>
       </div>
-
+      <Modal
+        isOpen={submitConfirmation}
+        onRequestClose={() => setSubmitConfirmation(false)}
+        contentLabel="Confirmation Modal"
+        className="modal"
+        overlayClassName="fixed inset-0 flex items-start justify-center" // Change items-center to items-start
+      >
+        <div className="flex items-center justify-between bg-light-darkViolet bg-opacity-90 shadow-lg p-2 rounded-lg">
+          <h2 className="text-xl text-white font-semibold text-center mr-2">
+            Feeding Mode has been saved
+          </h2>
+          <button
+            onClick={() => setSubmitConfirmation(false)}
+            className="py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md bg-light-darkViolet text-white hover:bg-light-darkViolet focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+          >
+            Close
+          </button>
+        </div>
+      </Modal>
       <div className="flex flex-col items-center mx-4 px-4">
-        {/* <button
-          onClick={toggleModal}
-          className="text-white inline-flex items-center justify-center gap-2.5 bg-mainColor py-2 px-3 font-bold hover:bg-darkViolet mb-4"
-        >
-          Change Feeding Mode
-        </button> */}
-
         {modalOpen && (
           <div className="fixed z-10 inset-0 overflow-y-auto">
             <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
@@ -582,16 +549,19 @@ const FeedAmountComponent = ({
                         htmlFor="servings"
                         className="block text-sm font-medium text-gray-700"
                       >
-                        Number of Servings:
+                        Select Number of Servings:
                       </label>
-                      <input
-                        type="number"
+                      <select
                         id="servings"
                         value={servings}
-                        onChange={(e) => setServings(e.target.value)}
+                        onChange={(e) => setServings(Number(e.target.value))}
                         className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                         aria-required="true"
-                      />
+                      >
+                        <option value="">Select number of servings</option>
+                        <option value={2}>2 servings per day</option>
+                        <option value={3}>3 servings per day</option>
+                      </select>
                       <div className="flex flex-col mt-4">
                         <label
                           htmlFor="foodSelect"
@@ -613,6 +583,11 @@ const FeedAmountComponent = ({
                             </option>
                           ))}
                         </select>
+                        {smartSubmitError && (
+                          <p className="text-red-500 mt-2">
+                            Please fill in all required fields
+                          </p>
+                        )}
                         <button
                           onClick={handleSmartFeedingSubmit}
                           className="mt-4 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
