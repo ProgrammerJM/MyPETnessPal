@@ -20,9 +20,9 @@ export default function Login() {
       setEmail("");
       setPassword("");
     }
-    // Simulate login process
-    console.log("Logging in with:", email, password);
-    // Clear input fields after login
+    // // Simulate login process
+    // console.log("Logging in with:", email, password);
+    // // Clear input fields after login
   };
 
   return (
