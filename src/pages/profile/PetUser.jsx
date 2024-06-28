@@ -2,9 +2,10 @@ import { useEffect, useState, useMemo, useContext } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { collection, getDocs, limit, orderBy, query } from "firebase/firestore";
 import { db } from "../../config/firebase";
-import { PiVideoCameraSlashThin } from "react-icons/pi";
+// import { PiVideoCameraSlashThin } from "react-icons/pi";
 import PetAnalytics from "../analytics/PetAnalytics";
 import { PetContext } from "../../pages/function/PetContext"; // Import the context
+import CameraStream from "../camerastream/CameraStream";
 
 export default function PetUser() {
   const { petId } = useParams();
@@ -55,6 +56,9 @@ export default function PetUser() {
   if (!petData) {
     return <p>Loading...</p>;
   }
+
+  console.log(latestFeedingInfo)
+  console.log(currentRecords)
 
   return (
     <>
@@ -126,7 +130,8 @@ export default function PetUser() {
               </div>
             </div>
             <div className="flex justify-center border border-stroke bg-white p-10 shadow-default dark:border-strokedark dark:bg-boxdark rounded-xl shadow-md items-center ">
-              <PiVideoCameraSlashThin className="w-48 h-48 " />
+              <CameraStream />
+              {/* <PiVideoCameraSlashThin className="w-48 h-48 " /> */}
             </div>
           </div>
 
