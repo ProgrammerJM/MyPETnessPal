@@ -12,6 +12,7 @@ const PetRecords = async (petName) => {
     });
   } catch (error) {
     console.error("Error fetching pet records:", error);
+    throw error; // Propagate the error to be handled by the caller
   }
   return records;
 };
