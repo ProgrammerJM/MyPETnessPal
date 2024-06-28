@@ -69,14 +69,20 @@ export const PetProvider = ({ children }) => {
   }, [petList]);
 
   useEffect(() => {
-    const unsubscribe = onSnapshot(petFoodCollectionRef, (snapshot) => {
-      const petFoodData = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-      setPetFoodList(petFoodData);
-    });
-
+    const unsubscribe = onSnapshot(
+      petFoodCollectionRef,
+      (snapshot) => {
+        const petFoodData = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setPetFoodList(petFoodData);
+      },
+      (error) => {
+        console.error("Error fetching pet food data:", error);
+      }
+    );
+  
     return () => unsubscribe();
   }, [petFoodCollectionRef]);
 
