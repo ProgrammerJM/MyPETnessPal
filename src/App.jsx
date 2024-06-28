@@ -25,7 +25,6 @@ function App() {
   const { theme } = useContext(ThemeContext); // use ThemeContext
 
   return (
-    <PetProvider>
       <BrowserRouter>
         <div className={theme === "light" ? "light-class" : "dark-class"}>
           <Routes>
@@ -37,7 +36,10 @@ function App() {
               <Route path="login" element={<Login />} />
               <Route path="forgot-password" element={<ForgotPassword />} />
             </Route>
-            <Route path="/profile" element={<PetsLayout />}>
+            <Route path="/profile" element={
+              <PetProvider>
+                <PetsLayout />
+              </PetProvider>}>
               <Route index element={<Dashboard />} />
               <Route path="petprofile" element={<PetProfile />} />
               <Route path="petprofile/:petId" element={<PetUser />} />
@@ -51,7 +53,6 @@ function App() {
           </Routes>
         </div>
       </BrowserRouter>
-    </PetProvider>
   );
 }
 
