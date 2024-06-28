@@ -7,6 +7,8 @@ export default function FetchPets(onPetListChange) {
 
   const petCollectionRef = useMemo(() => collection(db, "pets"), []);
 
+  console.log(petList);
+
   const getPetList = useCallback(() => {
     const inOrderPetList = query(petCollectionRef, orderBy("createdAt"));
     const unsubscribe = onSnapshot(
