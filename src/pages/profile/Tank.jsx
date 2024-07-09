@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useCallback, useContext } from "react";
-import { db, auth } from "../../config/firebase";
+import { auth, db, realtimeDatabase } from "../../config/firebase";
 import {
   doc,
   deleteDoc,
@@ -7,6 +7,7 @@ import {
   getDocs,
   setDoc,
 } from "firebase/firestore";
+import { ref, set, onValue } from "firebase/database";
 import { PetContext } from "../function/PetContext";
 import { BarChart, Bar, Rectangle, XAxis, YAxis, Tooltip } from "recharts";
 
@@ -17,6 +18,10 @@ export default function Tank() {
   const [newFoodKCaloriesPerGram, setNewFoodKCaloriesPerGram] = useState(0);
   const [editingFoodId, setEditingFoodId] = useState(null);
   const [errorAddFood, setErrorAddFood] = useState("");
+  const [foodPercentages, setFoodPercentages] = useState({
+    food1: 0,
+    food2: 0,
+  });
 
   const petFoodCollectionRef = useMemo(() => collection(db, "petFoodList"), []);
 
@@ -117,12 +122,43 @@ export default function Tank() {
 
   const openEditModal = (food) => {
     setNewPetFoodName(food.name);
-    setNewFoodKCaloriesPerGram(food.caloriesPerGram);
+    setNewFoodKCaloriesPerGram(food.kcalPerKg);
     setEditingFoodId(food.id);
     setIsModalOpen(true);
   };
 
-  const data = [{ name: "Tank Container Status", value: 100 }];
+  const triggerArduino = async () => {
+    try {
+      const triggerRef = ref(realtimeDatabase, "trigger/getPetFood/status");
+      await set(triggerRef, true);
+
+      onValue(ref(realtimeDatabase, "pets"), (snapshot) => {
+        const data = snapshot.val();
+        if (data) {
+          setFoodPercentages({
+            food1: data.food1 ? data.food1.percentage : 0,
+            food2: data.food2 ? data.food2.percentage : 0,
+          });
+        }
+      });
+
+      console.log("get pet food status triggered");
+    } catch (err) {
+      console.error("Error triggering Arduino:", err);
+    }
+  };
+
+  const getStatusMessage = (percentage) => {
+    if (percentage > 75) {
+      return "Full";
+    } else if (percentage > 50) {
+      return "Good";
+    } else if (percentage > 25) {
+      return "Low";
+    } else {
+      return "Empty";
+    }
+  };
 
   return (
     <>
@@ -132,16 +168,29 @@ export default function Tank() {
       >
         + Add Food Option
       </button>
+      <button
+        className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mb-3"
+        onClick={triggerArduino}
+      >
+        Get Latest Pet Food Status
+      </button>
       {errorAddFood && <p className="text-red-500">{errorAddFood}</p>}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full items-center h-full">
-        {petFoodList.map((food) => (
+        {petFoodList.map((food, index) => (
           <div
             key={food.id}
             className="relative flex flex-col border border-gray-300 rounded-md mt-8 p-4 mb-2 w-full h-full overflow-hidden shadow-md bg-white"
           >
             <div className="flex">
               <div className="m-2">
-                <h2 className="font-bold w-auto">Pet Food Name: {food.name}</h2>
+                <h2 className="font-bold w-auto">
+                  Pet Food Name:{" "}
+                  <span data-tip={food.name}>
+                    {food.name.length > 20
+                      ? `${food.name.slice(0, 20)}...`
+                      : food.name}
+                  </span>
+                </h2>
                 <h2 className="text-gray-600">Kcal Per kg: {food.kcalPerKg}</h2>
               </div>
               <div className="flex h-fit w-fit m-2">
@@ -161,9 +210,20 @@ export default function Tank() {
             </div>
             <div className="flex justify-center mt-4">
               <BarChart
-                width={500}
-                height={300}
-                data={data}
+                width={300}
+                height={200}
+                data={[
+                  {
+                    name:
+                      food.name.length > 35
+                        ? `${food.name.slice(0, 35)}...`
+                        : food.name,
+                    value:
+                      index === 0
+                        ? foodPercentages.food1
+                        : foodPercentages.food2,
+                  },
+                ]}
                 margin={{
                   top: 5,
                   right: 30,
@@ -181,7 +241,11 @@ export default function Tank() {
                 />
               </BarChart>
             </div>
-            <p className="text-center text-green-500 mt-2">Full</p>
+            <p className="text-center text-green-500 mt-2">
+              {getStatusMessage(
+                index === 0 ? foodPercentages.food1 : foodPercentages.food2
+              )}
+            </p>
           </div>
         ))}
       </div>
@@ -193,46 +257,43 @@ export default function Tank() {
             <div className="flex flex-col mb-4 mt-4">
               <label
                 htmlFor="petName"
-                className="text-sm font-medium text-gray-700 mb-1"
+                className="text-sm font-medium text-gray-700 mb-2"
               >
-                Pet Food Name:
+                Pet Food Name
               </label>
               <input
-                type="text"
-                placeholder="E.g PEDIGREE Healthy Weight Roasted Chicken & Vegetable Flavor Dry Dog Food"
+                id="petName"
                 value={newPetFoodName}
                 onChange={(e) => setNewPetFoodName(e.target.value)}
-                className="p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                className="border border-gray-300 rounded p-2 w-full"
               />
             </div>
             <div className="flex flex-col mb-4">
               <label
-                htmlFor="petName"
-                className="text-sm font-medium text-gray-700 mb-1"
+                htmlFor="kCaloriesPerGram"
+                className="text-sm font-medium text-gray-700 mb-2"
               >
-                KCal per kg
+                Kcal Per Kg
               </label>
               <input
-                type="number"
-                placeholder="E.g 3253 KCalories per kilogram"
+                id="kCaloriesPerGram"
                 value={newFoodKCaloriesPerGram}
                 onChange={(e) => setNewFoodKCaloriesPerGram(e.target.value)}
-                className="p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                className="border border-gray-300 rounded p-2 w-full"
               />
             </div>
-
-            <div className="flex mt-5 justify-between">
+            <div className="flex justify-between">
               <button
-                className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
-                onClick={onSavePetFood}
-              >
-                {editingFoodId ? "Update" : "Save"}
-              </button>
-              <button
-                className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+                className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
                 onClick={closeModal}
               >
                 Cancel
+              </button>
+              <button
+                onClick={onSavePetFood}
+                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+              >
+                Save
               </button>
             </div>
           </div>
