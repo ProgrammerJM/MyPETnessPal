@@ -174,13 +174,13 @@ const PetAnalytics = ({ petId, data }) => {
     <div className="p-10">
       <h1 className="font-bold text-light-darkViolet text-xl">PET Analytics</h1>
       <div className="flex flex-wrap justify-start max-w-screen-xl p-4">
-        <div className="w-full md:w-1/2 lg:w-1/3 p-4 flex-shrink-0 text-light-darkViolet">
+        <div className="w-full md:w-1/2 lg:w-1/3 p-4 flex-shrink-0 text-light-darkViolet  text-ellipsis">
           <VisualizeWeightTrend records={processedRecords} />
         </div>
-        <div className="w-full md:w-1/2 lg:w-1/3 p-4 flex-shrink-0 text-light-darkViolet">
+        <div className="w-full md:w-1/2 lg:w-1/3 p-4 flex-shrink-0 text-light-darkViolet text-ellipsis">
           <VisualizeAmountRecords records={processedRecords} />
         </div>
-        <div className="w-full md:w-1/2 lg:w-1/3 p-4 flex-shrink-0 text-light-darkViolet">
+        <div className="w-full md:w-1/2 lg:w-1/3 p-4 flex-shrink-0 text-light-darkViolet text-clip">
           <VisualizeAmountRemainRecords records={processedRecords} />
         </div>
       </div>
