@@ -1,5 +1,5 @@
 import { NavLink } from "react-router-dom";
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { BiLeftArrowAlt, BiMenu } from "react-icons/bi";
 import { TbLayoutDashboardFilled } from "react-icons/tb";
 import { MdOutlinePets } from "react-icons/md";
@@ -8,6 +8,7 @@ import { GiChemicalTank } from "react-icons/gi";
 import { MdHelp } from "react-icons/md";
 import { IoMdSettings } from "react-icons/io";
 import { GiBirdCage } from "react-icons/gi";
+import { NotificationContext } from "../pages/function/NotificationsContext";
 
 const navBarIcon_Close =
   "text-light-mainColor size-9 cursor-pointer ml-2 transition duration-300 ease-in-out";
@@ -19,6 +20,7 @@ const navBar_Open =
 export default function ProfileNavigation() {
   const [open, setOpen] = useState(true); // Start with the sidebar closed
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { unreadCount } = useContext(NotificationContext);
 
   const handleNavLinkClick = () => {
     setIsMobileMenuOpen(false);
@@ -101,7 +103,13 @@ export default function ProfileNavigation() {
                   end
                 >
                   <Icon className="mr-2 text-3xl" />
+                  {to === "notifications" && unreadCount > 0 && (
+                    <span className="ml-1 text-xs bg-red-500 text-white rounded-full h-4 w-4 flex items-center justify-center relative left-4 bottom-1">
+                      {unreadCount}
+                    </span>
+                  )}
                 </NavLink>
+
                 {open && (
                   <NavLink
                     className={({ isActive }) =>
@@ -166,6 +174,11 @@ export default function ProfileNavigation() {
                   end
                 >
                   <Icon className="mr-2 text-3xl" />
+                  {to === "notifications" && unreadCount > 0 && (
+                    <span className="ml-1 text-xs bg-red-500 text-white rounded-full h-6 w-6 flex items-center justify-center">
+                      {unreadCount}
+                    </span>
+                  )}
                 </NavLink>
                 <NavLink
                   className={({ isActive }) =>
