@@ -1,16 +1,29 @@
 import { useState, useEffect } from "react";
+import { ref, onValue, off } from "firebase/database";
+import { realtimeDatabase } from "../../config/firebase";
 import { PiVideoCameraSlashThin } from "react-icons/pi";
 
+
 const CameraStream = () => {
-  const [esp32Ip] = useState("192.168.1.17");
+  const [esp32Ip, setEsp32Ip] = useState("");
   const [isCameraOn, setIsCameraOn] = useState(false);
 
   useEffect(() => {
-    // Optionally, you can fetch the ESP32 IP from Firebase or some configuration
+    const ipRef = ref(realtimeDatabase, "/esp32/ip");
+
+    const handleIpUpdate = (snapshot) => {
+      const ip = snapshot.val();
+      setEsp32Ip(ip);
+    };
+
+    onValue(ipRef, handleIpUpdate);
+
+    // Cleanup listener on component unmount
+    return () => off(ipRef, "value", handleIpUpdate);
   }, []);
 
   const toggleCamera = () => {
-    setIsCameraOn(!isCameraOn);
+    setIsCameraOn((prev) => !prev);
   };
 
   return (
@@ -28,10 +41,8 @@ const CameraStream = () => {
             margin: "auto",
             backgroundColor: "hsl(0, 0%, 25%)",
           }}
-          src={`http://${esp32Ip}/`}
+          src={`http://${esp32Ip}:8080`}
           alt="ESP32 Camera Stream"
-          width="943"
-          height="707"
         />
       ) : (
         <div
