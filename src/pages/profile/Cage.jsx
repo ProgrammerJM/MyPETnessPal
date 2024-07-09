@@ -190,7 +190,10 @@ export default function Cage() {
   const renderFeedingInfo = (cage) => {
     const feedingInfo = latestFeedingInfo[cage.pet?.id];
     return feedingInfo ? (
-      <div>
+      <div className="text-center text-wrap whitespace-break-spaces text-clip">
+        <p className="text-light-darkViolet mt-2 font-bold ">
+          Latest Feeding Information:
+        </p>
         <p className="text-gray-600 mt-2 font-semibold">
           Feeding Type:{" "}
           <span className="text-light-darkViolet">
