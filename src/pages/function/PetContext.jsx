@@ -50,7 +50,7 @@ export const PetProvider = ({ children }) => {
           }));
 
           const latestInfo = petFeedingInformations.reduce((latest, info) => {
-            return info.timestamp > latest.timestamp ? info : latest;
+            return info.createdAt > latest.createdAt ? info : latest;
           }, petFeedingInformations[0] || {});
 
           setLatestFeedingInfo((prev) => ({
@@ -82,7 +82,7 @@ export const PetProvider = ({ children }) => {
         console.error("Error fetching pet food data:", error);
       }
     );
-  
+
     return () => unsubscribe();
   }, [petFoodCollectionRef]);
 
