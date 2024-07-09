@@ -1,116 +1,94 @@
-import { useState, useEffect } from "react";
-import { db } from "../../config/firebase"; // Adjust the path as per your project structure
-import { collection, onSnapshot } from "firebase/firestore";
+import { useContext, useState } from "react";
+import { NotificationContext } from "../function/NotificationsContext";
+import { TiDelete } from "react-icons/ti";
 
 const Notifications = () => {
-  const [notifications, setNotifications] = useState([]);
+  const { notifications, markAsRead, deleteNotification } =
+    useContext(NotificationContext);
+  const [expandedNotifications, setExpandedNotifications] = useState({});
 
-  // Fetch notifications from Firestore
-  useEffect(() => {
-    console.log('Notifications component mounted.');
+  const toggleNotification = (id) => {
+    setExpandedNotifications((prevState) => ({
+      ...prevState,
+      [id]: !prevState[id],
+    }));
 
-    const unsubscribe = onSnapshot(collection(db, 'notifications'), (snapshot) => {
-      const notificationsData = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }));
-      console.log('Fetched notifications:', notificationsData);
-      setNotifications(notificationsData);
-    });
-
-    return () => {
-      console.log('Cleaning up Notifications component.');
-      unsubscribe();
-    };
-  }, []);
-
-  // Function to safely parse JSON data
-  const safeParseJSON = (jsonString) => {
-    try {
-      return JSON.parse(jsonString);
-    } catch (error) {
-      console.error('Error parsing JSON', error);
-      return null;
+    const notification = notifications.find(
+      (notification) => notification.id === id
+    );
+    if (notification && !notification.read) {
+      markAsRead(id);
     }
   };
 
-  console.log('Notifications:', notifications);
-  // Categorize notifications
-  const categorizedNotifications = notifications.reduce((acc, notification) => {
-    if (notification.title === 'New Pet Added') {
-      acc.newPet.push(notification);
-    } else if (notification.title === 'New Pet Record Added') {
-      acc.newPetRecord.push(notification);
-    } else if (notification.title === 'New Feeding Information') {
-      acc.newFeedingInfo.push(notification);
-    }
-    return acc;
-  }, { newPet: [], newPetRecord: [], newFeedingInfo: [] });
-
   const noNotifications = notifications.length === 0;
 
-
-  console.log(categorizedNotifications)
-  
   return (
-    <div className="max-w-md">
-      <h2 className="text-xl font-semibold text-light-darkViolet">Notifications</h2>
-
+    <div className="mt-4">
       {noNotifications ? (
         <p className="text-gray-600">No notifications received yet.</p>
       ) : (
-        <>
-          {categorizedNotifications.newPet.length > 0 && (
-            <div>
-              {categorizedNotifications.newPet.map(notification => (
-                <div key={notification.id} className="bg-white shadow-md rounded-lg overflow-hidden my-4">
-                  <div className="p-4">
-                    <p className="font-bold text-lg">{notification.title}</p>
-                    <p className="text-gray-700">{notification.body}</p>
-                  </div>
-                </div>
-              ))}
+        notifications.map((notification) => (
+          <div
+            key={notification.id}
+            className={`bg-white border ${
+              notification.read
+                ? "border-light-whiteViolet"
+                : "border-light-darkViolet"
+            } rounded-lg shadow-sm my-2`}
+          >
+            <div
+              className="p-4 cursor-pointer flex justify-between items-center"
+              onClick={() => toggleNotification(notification.id)}
+            >
+              <p
+                className={`font-semibold text-lg ${
+                  notification.read ? "text-gray-800" : "text-light-darkViolet"
+                }`}
+              >
+                {notification.title}
+              </p>
+              <span
+                className={`text-gray-500 transition-transform duration-200 ${
+                  expandedNotifications[notification.id]
+                    ? "rotate-180"
+                    : "rotate-0"
+                }`}
+              >
+                &#x25BC;
+              </span>
             </div>
-          )}
-
-          {categorizedNotifications.newPetRecord.length > 0 && (
-            <div>
-              {categorizedNotifications.newPetRecord.map(notification => (
-                <div key={notification.id} className="bg-white shadow-md rounded-lg overflow-hidden my-4">
-                  <div className="p-4">
-                    <p className="font-bold text-lg">{notification.title}</p>
-                    <p className="text-gray-700">{notification.body}</p>
-                  </div>
-                  <div className="bg-gray-100 p-4">
-                    <p className="text-gray-600">Records:</p>
-                    <pre className="whitespace-pre-wrap text-sm">
-                      {JSON.stringify(safeParseJSON(notification.recordData), null, 2)}
+            {expandedNotifications[notification.id] && (
+              <div className="bg-gray-50 border-t border-gray-200 p-4 flex justify-between">
+                <p className="text-gray-700">{notification.body}</p>
+                {notification.recordData && (
+                  <div className="mt-2">
+                    <p className="text-gray-600 font-medium">Records:</p>
+                    <pre className="whitespace-pre-wrap text-sm bg-gray-100 p-2 rounded">
+                      {JSON.stringify(notification.recordData, null, 2)}
                     </pre>
                   </div>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {categorizedNotifications.newFeedingInfo.length > 0 && (
-            <div>
-              {categorizedNotifications.newFeedingInfo.map(notification => (
-                <div key={notification.id} className="bg-white shadow-md rounded-lg overflow-hidden my-4">
-                  <div className="p-4">
-                    <p className="font-bold text-lg">{notification.title}</p>
-                    <p className="text-gray-700">{notification.body}</p>
-                  </div>
-                  <div className="bg-gray-100 p-4">
-                    <p className="text-gray-600">Latest Feeding Info:</p>
-                    <pre className="whitespace-pre-wrap text-sm">
-                      {JSON.stringify(safeParseJSON(notification.feedingInfoData), null, 2)}
+                )}
+                {notification.feedingInfoData && (
+                  <div className="mt-2">
+                    <p className="text-gray-600 font-medium">
+                      Latest Feeding Info:
+                    </p>
+                    <pre className="text-sm bg-gray-100 p-2 rounded">
+                      {JSON.stringify(notification.feedingInfoData, null, 2)}
                     </pre>
                   </div>
+                )}
+                <div className="w-fit bg-light-mainColor hover:bg-darkViolet py-1 px-2 transition-all duration-300 rounded flex items-center">
+                  <TiDelete
+                    className="size-6 fill-white hover:fill-light-darkViolet transition-all duration-300 cursor-pointer"
+                    onClick={() => deleteNotification(notification.id)}
+                  />
                 </div>
-              ))}
-            </div>
-          )}
-        </>
+              </div>
+            )}
+          </div>
+        ))
       )}
     </div>
   );

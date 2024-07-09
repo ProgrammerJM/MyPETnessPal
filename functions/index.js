@@ -1,3 +1,7 @@
+/* eslint-disable arrow-parens */
+/* eslint-disable comma-dangle */
+/* eslint-disable quotes */
+/* eslint-disable indent */
 /* eslint-disable max-len */
 /* eslint-disable require-jsdoc */
 const functions = require("firebase-functions");
@@ -6,7 +10,7 @@ const serviceAccount = require("./serviceAccountKey.json");
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
-  databaseURL: "https://your-database-url",
+  databaseURL: "https://petness-92c55-default-rtdb.asia-southeast1.firebasedatabase.app",
 });
 
 const region = "asia-southeast1";
@@ -27,31 +31,51 @@ async function getPetName(petId) {
   return petName;
 }
 
+// Helper function to create notification messages
+function createNotificationMessage(title, body) {
+  return {
+    title: title,
+    body: body,
+    timestamp: admin.firestore.FieldValue.serverTimestamp()
+  };
+}
+
 // Function to send notification on new pet added
 exports.sendNotificationOnNewPet = functions.region(region).firestore
     .document("pets/{petId}")
     .onCreate(async (snapshot, context) => {
       const newPet = snapshot.data();
-      const newPetMessage = {
-        notification: {
-          title: "New Pet Added",
-          body: `Name: ${newPet.name}`,
-        },
-        topic: "new-pet-topic",
-      };
+      const newPetMessage = createNotificationMessage(
+        `New Pet Added (${newPet.name})`,
+        `${newPet.name} has been created.`
+      );
 
       try {
-        await admin.messaging().send(newPetMessage);
         await admin.firestore().collection("notifications").add({
-          title: newPetMessage.notification.title,
-          body: newPetMessage.notification.body,
+          title: newPetMessage.title,
+          body: newPetMessage.body,
           petName: newPet.name,
-          timestamp: admin.firestore.FieldValue.serverTimestamp(),
+          timestamp: newPetMessage.timestamp,
         });
       } catch (error) {
         console.error("Error sending new pet notification:", error.message, error.stack);
       }
     });
+
+// Function to format pet record data into a readable string
+function formatPetRecord(record) {
+  const fields = [
+    `User Name: ${record.userName}`,
+    `Cage ID: ${record.cageID}`,
+    `Date: ${record.date}`,
+    `Time: ${record.time}`,
+    `Mode: ${record.mode} Mode`,
+    `Amount: ${record.amount}`,
+    `Food Consumed: ${record.foodConsumed}`,
+    `Weight: ${record.weight}`
+  ];
+  return fields.filter(field => field.includes(': null') === false).join(', ');
+}
 
 // Function to send notification on new pet record added
 exports.sendNotificationOnNewPetRecord = functions.region(region).firestore
@@ -60,27 +84,30 @@ exports.sendNotificationOnNewPetRecord = functions.region(region).firestore
       const newRecord = snapshot.data();
       const {petId} = context.params;
       const petName = await getPetName(petId);
-      const newRecordMessage = {
-        notification: {
-          title: "New Pet Record Added",
-          body: `Record for ${petName}: ${JSON.stringify(newRecord)}`,
-        },
-        topic: "new-record-topic",
-      };
+
+      const newRecordMessage = createNotificationMessage(
+        "New Pet Record Added for " + petName,
+        `There is a new record added for ${petName} with a specific dispense amount value of ${newRecord.amount}. 
+        \nMore Details: \n${formatPetRecord(newRecord)}`
+      );
 
       try {
-        await admin.messaging().send(newRecordMessage);
         await admin.firestore().collection("notifications").add({
-          title: newRecordMessage.notification.title,
-          body: newRecordMessage.notification.body,
+          title: newRecordMessage.title,
+          body: newRecordMessage.body,
           petName: petName,
-          recordData: newRecord,
-          timestamp: admin.firestore.FieldValue.serverTimestamp(),
+          timestamp: newRecordMessage.timestamp,
         });
       } catch (error) {
         console.error("Error sending new pet record notification:", error.message, error.stack);
       }
     });
+
+  // Function to format feeding information data into a readable string
+  function formatFeedingInfo(feedingInfo) {
+    return `Scheduled Date: ${feedingInfo.scheduledDate}\nScheduled Time: ${feedingInfo.scheduledTime}\nAmount to Feed: ${feedingInfo.amountToFeed} 
+    \nRER: ${feedingInfo.RER} \nMER: ${feedingInfo.MER} \nFood Name: ${feedingInfo.foodSelectedName} & Calories Per Gram: ${feedingInfo.caloriesPerGram}`;
+  }
 
 // Function to send notification on new feeding information added
 exports.sendNotificationOnLatestFeedingInfo = functions.region(region).firestore
@@ -89,22 +116,18 @@ exports.sendNotificationOnLatestFeedingInfo = functions.region(region).firestore
       const newFeedingInfo = snapshot.data();
       const {petId} = context.params;
       const petName = await getPetName(petId);
-      const newFeedingInfoMessage = {
-        notification: {
-          title: "New Feeding Information",
-          body: `Feeding info for ${petName}: ${JSON.stringify(newFeedingInfo)}`,
-        },
-        topic: "new-feeding-info-topic",
-      };
+
+      const newFeedingInfoMessage = createNotificationMessage(
+        "New Feeding Schedule Added for " + petName,
+        `A new feeding schedule has been made for ${petName} with\n${formatFeedingInfo(newFeedingInfo)}.`
+      );
 
       try {
-        await admin.messaging().send(newFeedingInfoMessage);
         await admin.firestore().collection("notifications").add({
-          title: newFeedingInfoMessage.notification.title,
-          body: newFeedingInfoMessage.notification.body,
+          title: newFeedingInfoMessage.title,
+          body: newFeedingInfoMessage.body,
           petName: petName,
-          feedingInfoData: newFeedingInfo,
-          timestamp: admin.firestore.FieldValue.serverTimestamp(),
+          timestamp: newFeedingInfoMessage.timestamp,
         });
       } catch (error) {
         console.error("Error sending new feeding information notification:", error.message, error.stack);
