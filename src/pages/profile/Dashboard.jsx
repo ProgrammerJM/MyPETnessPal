@@ -1,122 +1,165 @@
-// import { useContext } from "react";
-// import { PetContext } from "../function/PetContext";
-// import {
-//   LineChart,
-//   Line,
-//   XAxis,
-//   YAxis,
-//   CartesianGrid,
-//   Tooltip,
-//   Legend,
-// } from "recharts";
-
-// export default function Dashboard() {
-// const { petRecords } = useContext(PetContext);
-
-// // Ensure petRecords and the required pets' records are defined
-// const hanniRecords = petRecords["Hanni"] || [];
-// const kazuhaRecords = petRecords["Kazuha"] || [];
-
-// // Map petRecords to a format that recharts can understand
-// const hanniData = hanniRecords.map((record, index) => ({
-//   name: `Record ${index + 1}`,
-//   amount: record.amount,
-// }));
-// const kazuhaData = kazuhaRecords.map((record, index) => ({
-//   name: `Record ${index + 1}`,
-//   amount: record.amount,
-// }));
-
-// return (
-//   <>
-//     <p className="font-bold">This is Hanni{`'`}s Amount Dispensed Record</p>
-//     <LineChart
-//       width={500}
-//       height={300}
-//       data={hanniData}
-//       margin={{
-//         top: 5,
-//         right: 30,
-//         left: 20,
-//         bottom: 5,
-//       }}
-//     >
-//       <CartesianGrid strokeDasharray="3 3" />
-//       <XAxis dataKey="name" />
-//       <YAxis />
-//       <Tooltip />
-//       <Legend />
-//       <Line
-//         type="monotone"
-//         dataKey="amount"
-//         stroke="#8884d8"
-//         activeDot={{ r: 8 }}
-//       />
-//     </LineChart>
-//     <p className="font-bold">This is Chaewon{`'`}s Amount Dispensed Record</p>
-//     <LineChart
-//       width={500}
-//       height={300}
-//       data={kazuhaData}
-//       margin={{
-//         top: 5,
-//         right: 30,
-//         left: 20,
-//         bottom: 5,
-//       }}
-//     >
-//       <CartesianGrid strokeDasharray="3 3" />
-//       <XAxis dataKey="name" />
-//       <YAxis />
-//       <Tooltip />
-//       <Legend />
-//       <Line
-//         type="monotone"
-//         dataKey="amount"
-//         stroke="#8884d8"
-//         activeDot={{ r: 8 }}
-//       />
-//     </LineChart>
-//   </>
-
-import { useContext } from "react";
+import { useContext, useState, useEffect } from "react";
+// import { Link } from "react-router-dom";
 import { PetContext } from "../function/PetContext";
-import PetAnalytics from "../analytics/PetAnalytics";
+import { NotificationContext } from "../function/NotificationsContext";
+import PetAnalyticsSummary from "../analytics/PetAnalyticsSummary";
+import Notifications from "../profile/Notifications";
+import PetRecords from "../function/PetRecords";
 
 export default function Dashboard() {
-  const { petList } = useContext(PetContext);
+  const { petList, latestFeedingInfo } = useContext(PetContext);
+  const { notifications, unreadCount } = useContext(NotificationContext);
+  const [petRecords, setPetRecords] = useState({});
+
+  useEffect(() => {
+    const fetchAllRecords = async () => {
+      const records = {};
+      for (const pet of petList) {
+        const petName = pet.name;
+        try {
+          records[petName] = await PetRecords(petName);
+        } catch (error) {
+          console.error(`Error fetching records for ${petName}:`, error);
+        }
+      }
+      setPetRecords(records);
+    };
+
+    if (petList.length > 0) {
+      fetchAllRecords();
+    }
+  }, [petList]);
 
   return (
-    <>
-      <h1 className="text-2xl font-bold text-light-darkViolet mb-6">
-        Welcome to Dashboard
-      </h1>
-      <div className="grid grid-flow-row-dense grid-cols-2 grid-rows-auto">
-        {petList.map((pet, index) => (
-          <div key={index} className="p-4 m-2 border rounded-xl shadow">
-            <div
-              className="flex
-          "
-            >
-              <div className="flex-col">
-                <img
-                  src={pet.imageURL}
-                  alt={pet.name}
-                  className="w-48 h-48 object-cover rounded-xl mb-2"
-                />
-                <h2 className="text-xl font-bold">{pet.name}</h2>
-                <p>Type: {pet.petType}</p>
-                <p>Activity Level: {pet.activityLevel}</p>
-                <p>Weight: {pet.weight}</p>
-              </div>
-              <div></div>
-              <div className="flex-col">
-                <PetAnalytics petId={pet.id} data={pet.data} />
-              </div>
-            </div>
+    <div className="flex flex-col min-h-screen bg-gray-100">
+      <header className="bg-white shadow p-4">
+        <h1 className="text-2xl font-bold text-light-darkViolet mb-4">
+          Welcome to Dashboard
+        </h1>
+        <div className="flex justify-between">
+          <div className="text-lg">
+            <p>Total Pets: {petList.length}</p>
+            <p>Unread Notifications: {unreadCount}</p>
           </div>
-        ))}
+        </div>
+      </header>
+      <div className="flex flex-grow">
+        <main className="flex-grow p-4">
+          <section className="mb-8">
+            <h2 className="text-xl font-bold mb-4 text-light-darkViolet">
+              Your Pets
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {petList.map((pet, index) => (
+                <div
+                  key={index}
+                  className="bg-white p-4 border rounded-lg shadow-lg flex flex-col"
+                >
+                  <div className="flex items-center">
+                    <div className="flex-shrink-0 mb-4">
+                      <img
+                        src={pet.imageURL}
+                        alt={pet.name}
+                        className="w-48 h-48 object-cover rounded-lg"
+                      />
+                    </div>
+                    <div className="flex-grow pl-4">
+                      <h3 className="text-xl font-bold">{pet.name}</h3>
+                      <p>Type: {pet.petType}</p>
+                      <p>Activity Level: {pet.activityLevel}</p>
+                      <p>Weight: {pet.weight} kg</p>
+                      {latestFeedingInfo[pet.name] && (
+                        <div className="mt-2">
+                          <p className="text-sm text-gray-500">
+                            Last Date Fed:{" "}
+                            {latestFeedingInfo[pet.name].scheduledDate || "N/A"}
+                          </p>
+                          <p className="text-sm text-gray-500">
+                            Mode of Feeding:{" "}
+                            {latestFeedingInfo[pet.name].feedingMode || "N/A"}
+                          </p>
+                          <p className="text-sm text-gray-500">
+                            RER:{" "}
+                            {isNaN(Number(latestFeedingInfo[pet.name].RER))
+                              ? "N/A"
+                              : Number(latestFeedingInfo[pet.name].RER).toFixed(
+                                  2
+                                )}
+                          </p>
+                          <p className="text-sm text-gray-500">
+                            MER:{" "}
+                            {isNaN(Number(latestFeedingInfo[pet.name].MER))
+                              ? "N/A"
+                              : Number(latestFeedingInfo[pet.name].MER).toFixed(
+                                  2
+                                )}
+                          </p>
+                          <p className="text-sm text-gray-500">
+                            Last Fed:{" "}
+                            {isNaN(
+                              Number(latestFeedingInfo[pet.name].amountToFeed)
+                            )
+                              ? "N/A"
+                              : `${latestFeedingInfo[pet.name].amountToFeed} g`}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  <div className="w-full mt-4">
+                    <h4 className="text-lg font-semibold mb-2 text-light-darkViolet text-center">
+                      PET Analytics Summary
+                    </h4>
+                    <div className="h-fit">
+                      <PetAnalyticsSummary data={petRecords[pet.name] || []} />
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+          <section>
+            <h2 className="text-xl font-bold mb-4 text-light-darkViolet">
+              Notifications
+            </h2>
+            <Notifications notifications={notifications} />
+          </section>
+        </main>
       </div>
-    </>
+    </div>
   );
+}
+
+{
+  /* <aside className="w-1/5 bg-light-mainColor text-white p-4">
+          <nav>
+            <ul>
+              <li className="mb-2">
+                <Link to="/profile/petprofile" className="hover:underline">
+                  Pets
+                </Link>
+              </li>
+              <li className="mb-2">
+                <Link to="/food-records" className="hover:underline">
+                  Food Records
+                </Link>
+              </li>
+              <li className="mb-2">
+                <Link to="/analytics" className="hover:underline">
+                  Analytics
+                </Link>
+              </li>
+              <li className="mb-2">
+                <Link to="/profile/notifications" className="hover:underline">
+                  Notifications
+                </Link>
+              </li>
+              <li className="mb-2">
+                <Link to="/profile/help" className="hover:underline">
+                  Help
+                </Link>
+              </li>
+            </ul>
+          </nav>
+        </aside> */
 }
