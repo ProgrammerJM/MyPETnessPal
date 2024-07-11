@@ -248,6 +248,12 @@ export default function Cage() {
               : "N/A"}
           </span>
         </p>
+        <p className="text-gray-600 mt-2 font-semibold">
+          Amount To Feed:{" "}
+          <span className="text-light-darkViolet">
+            {feedingInfo.amountToFeed ? `${feedingInfo.amountToFeed}g` : "N/A"}
+          </span>
+        </p>
       </div>
     ) : (
       <p>No feeding information available</p>
