@@ -1,26 +1,28 @@
-import { useState, useEffect } from "react";
-import { ref, onValue, off } from "firebase/database";
-import { realtimeDatabase } from "../../config/firebase";
+import { useState } from "react";
+// import { ref, onValue, off } from "firebase/database";
+// import { realtimeDatabase } from "../../config/firebase";
 import { PiVideoCameraSlashThin } from "react-icons/pi";
 
-
 const CameraStream = () => {
-  const [esp32Ip, setEsp32Ip] = useState("");
+  // const [esp32Ip, setEsp32Ip] = useState("");
   const [isCameraOn, setIsCameraOn] = useState(false);
+  const [petnessPalCamIP] = useState(
+    "https://duly-still-mongrel.ngrok-free.app"
+  );
 
-  useEffect(() => {
-    const ipRef = ref(realtimeDatabase, "/esp32/ip");
+  // useEffect(() => {
+  //   const ipRef = ref(realtimeDatabase, "/esp32/ip");
 
-    const handleIpUpdate = (snapshot) => {
-      const ip = snapshot.val();
-      setEsp32Ip(ip);
-    };
+  //   const handleIpUpdate = (snapshot) => {
+  //     const ip = snapshot.val();
+  //     setEsp32Ip(ip);
+  //   };
 
-    onValue(ipRef, handleIpUpdate);
+  //   onValue(ipRef, handleIpUpdate);
 
-    // Cleanup listener on component unmount
-    return () => off(ipRef, "value", handleIpUpdate);
-  }, []);
+  //   // Cleanup listener on component unmount
+  //   return () => off(ipRef, "value", handleIpUpdate);
+  // }, []);
 
   const toggleCamera = () => {
     setIsCameraOn((prev) => !prev);
@@ -41,7 +43,8 @@ const CameraStream = () => {
             margin: "auto",
             backgroundColor: "hsl(0, 0%, 25%)",
           }}
-          src={`http://${esp32Ip}:8080`}
+          // src={`http://${esp32Ip}:49152`}
+          src={petnessPalCamIP}
           alt="ESP32 Camera Stream"
         />
       ) : (
