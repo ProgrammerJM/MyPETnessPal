@@ -149,6 +149,57 @@ exports.sendNotificationOnLatestFeedingInfo = functions
         petName: petName,
         timestamp: newFeedingInfoMessage.timestamp,
       });
+
+      // Fetch pet food amount status
+      const food1Doc = await admin
+        .firestore()
+        .collection("petFoodAmountStatus")
+        .doc("food1")
+        .get();
+      const food2Doc = await admin
+        .firestore()
+        .collection("petFoodAmountStatus")
+        .doc("food2")
+        .get();
+
+      const food1Percentage = food1Doc.exists ? food1Doc.data().percentage : 0;
+      const food2Percentage = food2Doc.exists ? food2Doc.data().percentage : 0;
+
+      let food1Status;
+      if (food1Percentage > 75) {
+        food1Status = "Full";
+      } else if (food1Percentage > 50) {
+        food1Status = "Good";
+      } else if (food1Percentage > 25) {
+        food1Status = "Low";
+      } else {
+        food1Status = "Empty";
+      }
+
+      let food2Status;
+      if (food2Percentage > 75) {
+        food2Status = "Full";
+      } else if (food2Percentage > 50) {
+        food2Status = "Good";
+      } else if (food2Percentage > 25) {
+        food2Status = "Low";
+      } else {
+        food2Status = "Empty";
+      }
+
+      const foodStatusMessage = `Current Food Status: \nFood 1: ${food1Percentage}% - ${food1Status}\nFood 2: ${food2Percentage}% - ${food2Status}`;
+
+      const foodStatusNotification = createNotificationMessage(
+        "Pet Food Amount Status",
+        foodStatusMessage
+      );
+
+      await admin.firestore().collection("notifications").add({
+        title: foodStatusNotification.title,
+        body: foodStatusNotification.body,
+        petName: petName,
+        timestamp: foodStatusNotification.timestamp,
+      });
     } catch (error) {
       console.error(
         "Error sending new feeding information notification:",
