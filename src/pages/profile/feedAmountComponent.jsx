@@ -38,6 +38,7 @@ const FeedAmountComponent = ({
   const [scheduledSubmitError, setScheduledSubmitError] = useState("");
   const [smartSubmitError, setSmartSubmitError] = useState("");
   const [submitConfirmation, setSubmitConfirmation] = useState(false);
+  const [lastSavedFeedingMode, setLastSavedFeedingMode] = useState("");
 
   const feedingInformationsCollection = collection(
     db,
@@ -74,11 +75,12 @@ const FeedAmountComponent = ({
     petFoodList,
     servings
   ) => {
+    const numericWeight = parseFloat(weight); // Ensure weight is a number
     console.log(
-      `weight: ${weight}, activityLevel: ${activityLevel}, selectedFoodId: ${selectedFoodId}, servings: ${servings}`
+      `weight: ${numericWeight}, activityLevel: ${activityLevel}, selectedFoodId: ${selectedFoodId}, servings: ${servings}`
     );
 
-    const RER = 70 * Math.pow(weight, 0.75); // Calculate Resting Energy Requirement
+    const RER = 70 * Math.pow(numericWeight, 0.75); // Calculate Resting Energy Requirement
     console.log(`Calculated RER: ${RER}`);
 
     const MER = RER * activityLevel; // Calculate Maintenance Energy Requirement
@@ -197,9 +199,11 @@ const FeedAmountComponent = ({
         feedingMode: "Smart",
         amountToFeed: foodToDispensePerDay,
         cageID: cageID,
+        servings: servings,
       });
 
       setFeedingModeType("Smart");
+      setLastSavedFeedingMode("Smart");
       setSubmitConfirmation(true);
 
       toggleModal();
@@ -320,6 +324,7 @@ const FeedAmountComponent = ({
       await set(feedingStatusRef, true);
 
       setFeedingModeType("Scheduled");
+      setLastSavedFeedingMode("Scheduled");
       setSubmitConfirmation(true);
 
       toggleModal();
@@ -371,6 +376,7 @@ const FeedAmountComponent = ({
       }
 
       setFeedingModeType(lastFeedingModeType);
+      setLastSavedFeedingMode(lastFeedingModeType);
     };
 
     fetchFeedingMode();
@@ -384,20 +390,20 @@ const FeedAmountComponent = ({
             <div className="m-2">
               <button
                 onClick={() => toggleModal("Smart")}
-                className={` h-12 px-4 font-semibold items-center  border border-white justify-center rounded-l-full focus:outline-none focus:ring-2 ${
-                  feedingModeType === "Smart"
-                    ? "bg-light-darkViolet text-white "
-                    : "bg-gray-200 text-gray-600 "
+                className={`h-12 px-4 font-semibold items-center border border-white justify-center rounded-l-full focus:outline-none focus:ring-2 ${
+                  lastSavedFeedingMode === "Smart"
+                    ? "bg-light-darkViolet text-white"
+                    : "bg-gray-200 text-gray-600"
                 }`}
               >
                 Smart Feeding
               </button>
               <button
                 onClick={() => toggleModal("Scheduled")}
-                className={` h-12 px-4 font-semibold items-center  border border-white justify-center rounded-r-full focus:outline-none focus:ring-2 ${
-                  feedingModeType === "Scheduled"
-                    ? "bg-light-darkViolet text-white "
-                    : "bg-gray-200 text-gray-600 "
+                className={`h-12 px-4 font-semibold items-center border border-white justify-center rounded-r-full focus:outline-none focus:ring-2 ${
+                  lastSavedFeedingMode === "Scheduled"
+                    ? "bg-light-darkViolet text-white"
+                    : "bg-gray-200 text-gray-600"
                 }`}
               >
                 Scheduled Feeding
@@ -535,7 +541,7 @@ const FeedAmountComponent = ({
                         )}
                         <button
                           onClick={handleScheduledFeedingSubmit}
-                          className="mt-4 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                          className="mt-4 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-light-mainColor hover:bg-light-darkViolet focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                         >
                           Submit
                         </button>
@@ -590,7 +596,7 @@ const FeedAmountComponent = ({
                         )}
                         <button
                           onClick={handleSmartFeedingSubmit}
-                          className="mt-4 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                          className="mt-4 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-light-mainColor hover:bg-light-darkViolet focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                         >
                           Submit
                         </button>
