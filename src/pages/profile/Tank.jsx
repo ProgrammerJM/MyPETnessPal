@@ -6,6 +6,7 @@ import {
   collection,
   getDocs,
   setDoc,
+  getDoc,
 } from "firebase/firestore";
 import { ref, set, onValue } from "firebase/database";
 import { PetContext } from "../function/PetContext";
@@ -40,7 +41,22 @@ export default function Tank() {
 
   useEffect(() => {
     getPetFoodList(); // Fetch pet food list on component mount
+    fetchFoodPercentages(); // Fetch food percentages on component mount
   }, [getPetFoodList]); // Only run on mount, memoized getPetFoodList function
+
+  const fetchFoodPercentages = async () => {
+    try {
+      const food1Doc = await getDoc(doc(db, "petFoodAmountStatus", "food1"));
+      const food2Doc = await getDoc(doc(db, "petFoodAmountStatus", "food2"));
+
+      setFoodPercentages({
+        food1: food1Doc.exists() ? food1Doc.data().percentage : 0,
+        food2: food2Doc.exists() ? food2Doc.data().percentage : 0,
+      });
+    } catch (err) {
+      console.error("Error fetching food percentages:", err);
+    }
+  };
 
   const toggleModal = () => {
     if (petFoodList.length >= 2) {
@@ -132,12 +148,21 @@ export default function Tank() {
       const triggerRef = ref(realtimeDatabase, "trigger/getPetFood/status");
       await set(triggerRef, true);
 
-      onValue(ref(realtimeDatabase, "pets"), (snapshot) => {
+      onValue(ref(realtimeDatabase, "foods"), async (snapshot) => {
         const data = snapshot.val();
         if (data) {
-          setFoodPercentages({
+          const updatedPercentages = {
             food1: data.food1 ? data.food1.percentage : 0,
             food2: data.food2 ? data.food2.percentage : 0,
+          };
+          setFoodPercentages(updatedPercentages);
+
+          // Save the percentages to Firestore
+          await setDoc(doc(db, "petFoodAmountStatus", "food1"), {
+            percentage: updatedPercentages.food1,
+          });
+          await setDoc(doc(db, "petFoodAmountStatus", "food2"), {
+            percentage: updatedPercentages.food2,
           });
         }
       });
