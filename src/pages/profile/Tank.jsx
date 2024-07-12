@@ -188,13 +188,13 @@ export default function Tank() {
   return (
     <>
       <button
-        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-3"
+        className="bg-light-darkViolet hover:bg-light-mainColor text-white font-bold py-2 px-4 rounded mb-3 mr-6"
         onClick={toggleModal}
       >
         + Add Food Option
       </button>
       <button
-        className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mb-3"
+        className="bg-light-darkViolet hover:bg-light-mainColor text-white font-bold py-2 px-4 rounded mb-3"
         onClick={triggerArduino}
       >
         Get Latest Pet Food Status
@@ -218,7 +218,7 @@ export default function Tank() {
                 </h2>
                 <h2 className="text-gray-600">Kcal Per kg: {food.kcalPerKg}</h2>
               </div>
-              <div className="flex h-fit w-fit m-2">
+              <div className="flex h-fit w-fit m-2 relative left-auto">
                 <button
                   onClick={() => openEditModal(food)}
                   className="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-1 px-3 rounded"
