@@ -36,7 +36,7 @@ export default function Dashboard() {
         <h1 className="text-2xl font-bold text-light-darkViolet mb-4">
           Welcome to Dashboard
         </h1>
-        <div className="flex justify-between">
+        <div className="flex flex-col md:flex-row justify-between">
           <div className="text-lg">
             <p>Total Pets: {petList.length}</p>
             <p>Unread Notifications: {unreadCount}</p>
@@ -55,25 +55,29 @@ export default function Dashboard() {
                   key={index}
                   className="bg-white p-4 border rounded-lg shadow-lg flex flex-col"
                 >
-                  <div className="flex items-center">
-                    <div className="flex-shrink-0 mb-4">
+                  <div className="flex flex-col md:flex-row items-center">
+                    <div className="flex-shrink-0 mb-4 md:mb-0">
                       <img
                         src={pet.imageURL}
                         alt={pet.name}
-                        className="w-48 h-48 object-cover rounded-lg"
+                        className="w-full md:w-48 h-48 object-cover rounded-lg"
                       />
                     </div>
-                    <div className="flex-grow pl-4">
+                    <div className="flex-grow pl-0 md:pl-4">
                       <h3 className="text-xl font-bold">{pet.name}</h3>
                       <p>Type: {pet.petType}</p>
                       <p>Activity Level: {pet.activityLevel}</p>
                       <p>Weight: {pet.weight} kg</p>
                       {latestFeedingInfo[pet.name] && (
                         <div className="mt-2">
-                          <p className="text-sm text-gray-500">
-                            Last Date Fed:{" "}
-                            {latestFeedingInfo[pet.name].scheduledDate || "N/A"}
-                          </p>
+                          {latestFeedingInfo[pet.name].feedingMode ===
+                          "Smart" ? null : (
+                            <p className="text-sm text-gray-500">
+                              Last Date Fed:{" "}
+                              {latestFeedingInfo[pet.name].scheduledDate ||
+                                "N/A"}
+                            </p>
+                          )}
                           <p className="text-sm text-gray-500">
                             Mode of Feeding:{" "}
                             {latestFeedingInfo[pet.name].feedingMode || "N/A"}
@@ -100,8 +104,18 @@ export default function Dashboard() {
                               Number(latestFeedingInfo[pet.name].amountToFeed)
                             )
                               ? "N/A"
-                              : `${latestFeedingInfo[pet.name].amountToFeed} g`}
+                              : `${Number(
+                                  latestFeedingInfo[pet.name].amountToFeed
+                                ).toFixed(2)} g`}
                           </p>
+                          {latestFeedingInfo[pet.name].feedingMode ===
+                            "Scheduled" && (
+                            <p className="text-sm text-gray-500">
+                              Scheduled Time:{" "}
+                              {latestFeedingInfo[pet.name].scheduledTime ||
+                                "N/A"}
+                            </p>
+                          )}
                         </div>
                       )}
                     </div>
@@ -122,7 +136,7 @@ export default function Dashboard() {
             <h2 className="text-xl font-bold mb-4 text-light-darkViolet">
               Notifications
             </h2>
-            <Notifications notifications={notifications} />
+            <Notifications notifications={notifications.slice(0, 5)} />
           </section>
         </main>
       </div>
