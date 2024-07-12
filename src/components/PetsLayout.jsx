@@ -1,14 +1,14 @@
 import { Outlet } from "react-router-dom";
 import Dashboard from "./ProfileNavigation";
 import FooterDashboard from "./FooterDashboard";
-import HeaderDashboard from "./HeaderDashboard";
+// import HeaderDashboard from "./HeaderDashboard";
 
 export default function PetsLayout() {
   return (
     <div className="flex h-screen overflow-active ">
       <Dashboard />
       <div className="flex-1 flex flex-col">
-        <HeaderDashboard />
+        {/* <HeaderDashboard /> */}
         <main className="flex-1 overflow-y-auto bg-light-backdrop">
           <div className="container max-w-full mx-auto p-8">
             <div className="Outlet">
