@@ -103,7 +103,7 @@ export default function Signup() {
           </div>
 
           <div>
-            <button className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+            <button className="flex w-full justify-center rounded-md bg-light-mainColor text-white shadow-sm hover:bg-light-darkViolet px-3 py-1.5 text-sm font-semibold leading-6 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
               Sign up
             </button>
           </div>
@@ -114,7 +114,7 @@ export default function Signup() {
           Already have an account?{" "}
           <Link
             to="/login"
-            className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500"
+            className="font-semibold leading-6 text-light-mainColor hover:text-light-darkViolet"
           >
             Sign in here
           </Link>
