@@ -1,10 +1,15 @@
+/* eslint-disable react/prop-types */
 import { useContext, useState } from "react";
 import { NotificationContext } from "../function/NotificationsContext";
 import { TiDelete } from "react-icons/ti";
 
-const Notifications = () => {
-  const { notifications, markAsRead, deleteNotification } =
-    useContext(NotificationContext);
+const Notifications = ({ notifications: propNotifications }) => {
+  const {
+    notifications: contextNotifications,
+    markAsRead,
+    deleteNotification,
+  } = useContext(NotificationContext);
+  const notifications = propNotifications || contextNotifications;
   const [expandedNotifications, setExpandedNotifications] = useState({});
 
   const toggleNotification = (id) => {
@@ -38,11 +43,11 @@ const Notifications = () => {
             } rounded-lg shadow-sm my-2`}
           >
             <div
-              className="p-4 cursor-pointer flex justify-between items-center"
+              className="p-2 cursor-pointer flex justify-between items-center"
               onClick={() => toggleNotification(notification.id)}
             >
               <p
-                className={`font-semibold text-lg ${
+                className={`font-semibold text-base ${
                   notification.read ? "text-gray-800" : "text-light-darkViolet"
                 }`}
               >
