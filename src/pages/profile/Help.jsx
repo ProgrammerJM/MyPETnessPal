@@ -4,15 +4,15 @@ import { FaCat } from "react-icons/fa";
 export default function Help() {
   return (
     <>
-      <div className="flex">
-        <div className="bg-lavender-light min-h-screen flex items-center justify-center">
+      <div className="flex flex-col md:flex-row">
+        <div className="bg-lavender-light min-h-screen flex items-center justify-center md:w-1/2">
           <div className="container mx-auto p-4">
-            <div className="overflow-x-auto  bg-white shadow-md rounded-lg ">
-              <div className="flex span- p-4 m-2 justify-center ">
-                <FaDog className="self-center stroke-2 size-10 mx-3" />
+            <div className="overflow-x-auto bg-white shadow-md rounded-lg">
+              <div className="flex items-center justify-center p-4">
+                <FaDog className="self-center stroke-2 h-10 w-10 md:mx-3" />
                 <h1 className="text-3xl font-bold text-purple-800">
                   Dog Activity Level Guide
-                </h1>{" "}
+                </h1>
               </div>
 
               <table className="min-w-full bg-white border border-gray-200 mb-8">
@@ -95,14 +95,15 @@ export default function Help() {
             </div>
           </div>
         </div>
-        <div className="bg-lavender-light min-h-screen flex items-center justify-center">
+
+        <div className="bg-lavender-light min-h-screen flex items-center justify-center md:w-1/2">
           <div className="container mx-auto p-4">
-            <div className="overflow-x-auto  bg-white shadow-md rounded-lg ">
-              <div className="flex span- p-4 m-2 justify-center ">
-                <FaCat className="self-center stroke-2 size-10 mx-3" />
+            <div className="overflow-x-auto bg-white shadow-md rounded-lg">
+              <div className="flex items-center justify-center p-4">
+                <FaCat className="self-center stroke-2 h-10 w-10 md:mx-3" />
                 <h1 className="text-3xl font-bold text-purple-800">
                   Cat Activity Level Guide
-                </h1>{" "}
+                </h1>
               </div>
               <table className="min-w-full bg-white border border-gray-200 mb-8">
                 <thead>
@@ -113,7 +114,7 @@ export default function Help() {
                     <th className="py-2 px-4 border-b text-center text-lavender-dark">
                       Definition / Guide
                     </th>
-                    <th className="py-2 px-4 border-b text-center text-lavender-ssdark">
+                    <th className="py-2 px-4 border-b text-center text-lavender-dark">
                       RER Multiplier
                     </th>
                   </tr>

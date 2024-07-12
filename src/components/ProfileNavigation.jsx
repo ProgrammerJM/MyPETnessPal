@@ -28,14 +28,15 @@ export default function ProfileNavigation() {
 
   return (
     <>
-      <div className="flex bg-light-whiteViolet">
-        {/* Mobile Menu Toggle */}
-        <div
-          className="lg:hidden block p-2"
-          onClick={() => setIsMobileMenuOpen(true)}
-        >
-          <BiMenu className="text-3xl" />
-        </div>
+      <div className="lg:flex bg-light-whiteViolet">
+        {!isMobileMenuOpen && (
+          <div
+            className="lg:hidden fixed top-2 z-50 text-light-darkViolet"
+            onClick={() => setIsMobileMenuOpen(true)}
+          >
+            <BiMenu className="text-3xl" />
+          </div>
+        )}
 
         {/* Sidebar - Desktop and Tablet View */}
         <div
@@ -130,7 +131,7 @@ export default function ProfileNavigation() {
 
         {/* Mobile Menu */}
         <div
-          className={`fixed top-0 left-0 w-64 h-full bg-whiteViolet transform transition-transform duration-200 ease-in-out z-50 lg:hidden ${
+          className={`fixed top-0 left-0 w-64 h-full bg-light-whiteViolet transform transition-transform duration-200 ease-in-out z-40 lg:hidden ${
             isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"
           }`}
         >
