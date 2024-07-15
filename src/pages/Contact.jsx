@@ -10,6 +10,10 @@
 //     </div>
 //   );
 // }
+import githubIcon from "../assets/images/github-icon.svg";
+import linkedinIcon from "../assets/images/linkedin-icon.svg";
+import facebookIcon from "../assets/images/facebook-icon.svg";
+import instagramIcon from "../assets/images/instagram-icon.svg";
 
 export default function Contact() {
   return (
@@ -66,22 +70,16 @@ export default function Contact() {
             href="https://www.linkedin.com/in/johnmarktizado/"
             className="mx-2"
           >
-            <img src="/src/assets/images/linkedin-icon.svg" alt="github icon" />
+            <img src={linkedinIcon} alt="github icon" />
           </a>
           <a href="https://github.com/ProgrammerJM" className="mx-2">
-            <img src="/src/assets/images/github-icon.svg" alt="github icon" />
+            <img src={githubIcon} alt="github icon" />
           </a>
           <a href="https://www.facebook.com/johnmarkt00" className="mx-2">
-            <img
-              src="/src/assets/images/facebook-icon.svg"
-              alt="facebook link"
-            />
+            <img src={facebookIcon} alt="facebook link" />
           </a>
           <a href="https://www.instagram.com/jmjtiz" className="mx-2">
-            <img
-              src="/src/assets/images/instagram-icon.svg"
-              alt="instagram link"
-            />
+            <img src={instagramIcon} alt="instagram link" />
           </a>
         </div>
       </div>
