@@ -32,6 +32,7 @@
 //   );
 // }
 import aboutusImg from "../assets/images/AboutUs.jpg";
+import githubIcon from "../assets/images/github-icon.svg";
 
 export default function About() {
   return (
@@ -97,7 +98,7 @@ export default function About() {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <img src="/images/github-icon.svg" alt="Github Logo" />
+                <img src={githubIcon} alt="Github Logo" />
               </a>
             </div>
           </div>
