@@ -21,7 +21,7 @@ export default function Header() {
         <div className="flex items-center gap-6 md:gap-10">
           <Link
             to="/"
-            className="text-lg font-medium px-4 py-2 text-light-darkViolet hover:text-indigo-900 hover:shadow-md transition duration-150 ease-in-out"
+            className="text-lg font-medium py-2 text-light-darkViolet hover:text-indigo-900 hover:shadow-md transition duration-150 ease-in-out"
           >
             Home
           </Link>
