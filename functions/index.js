@@ -208,3 +208,52 @@ exports.sendNotificationOnLatestFeedingInfo = functions
       );
     }
   });
+
+exports.sendNotificationOnWeightChange = functions
+  .region(region)
+  .firestore.document("pets/{petId}/records/{recordId}")
+  .onCreate(async (snapshot, context) => {
+    const currentRecord = snapshot.data();
+    const { petId } = context.params;
+    const petName = await getPetName(petId);
+
+    // Retrieve the latest record's weight
+    const currentWeight = currentRecord.weight;
+
+    // Retrieve the pet's weight from the pet document
+    const petRef = admin.firestore().doc(`pets/${petId}`);
+    const petSnapshot = await petRef.get();
+    if (!petSnapshot.exists) {
+      console.log("Pet document does not exist");
+      return;
+    }
+    const petData = petSnapshot.data();
+    const petWeight = petData.weight; // Assuming the pet document has a weight field
+
+    // Compare the weights
+    const weightDifference = currentWeight - petWeight;
+    if (Math.abs(weightDifference) >= 0.5) {
+      const direction = weightDifference > 0 ? "increased" : "decreased";
+      const weightChangeMessage = createNotificationMessage(
+        `Weight Alert: ${petName}'s weight has ${direction}`,
+        `The weight of your pet ${petName} has ${direction} by ${Math.abs(
+          weightDifference
+        )}kg. Consider adjusting their diet and consult a veterinarian as needed.`
+      );
+
+      try {
+        await admin.firestore().collection("notifications").add({
+          title: weightChangeMessage.title,
+          body: weightChangeMessage.body,
+          petName: petName,
+          timestamp: weightChangeMessage.timestamp,
+        });
+      } catch (error) {
+        console.error(
+          "Error sending weight change notification:",
+          error.message,
+          error.stack
+        );
+      }
+    }
+  });
