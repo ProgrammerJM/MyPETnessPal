@@ -1,3 +1,4 @@
+/* eslint-disable linebreak-style */
 /* eslint-disable object-curly-spacing */
 /* eslint-disable no-trailing-spaces */
 /* eslint-disable arrow-parens */
