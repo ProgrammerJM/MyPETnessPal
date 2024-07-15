@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { auth } from "../config/firebase";
 import { sendPasswordResetEmail } from "firebase/auth";
+import petnessLogoIcon from "../assets/images/petness-logo-icon.png";
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState("");
@@ -30,7 +31,7 @@ export default function ForgotPassword() {
       <div className="sm:mx-auto sm:w-full sm:max-w-sm">
         <img
           className="mx-auto h-10 w-auto"
-          src="/images/petness-logo-icon.png"
+          src={petnessLogoIcon}
           alt="Petness"
         />
         <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
