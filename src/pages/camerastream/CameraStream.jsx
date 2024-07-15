@@ -36,7 +36,7 @@ const CameraStream = () => {
       </button>
       {isCameraOn ? (
         <img
-          className=" rounded-full shadow-lg"
+          className="rounded-full shadow-lg max-[440px]:w-fit"
           style={{
             display: "block",
             WebkitUserSelect: "none",

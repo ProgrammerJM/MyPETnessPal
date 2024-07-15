@@ -186,7 +186,7 @@ export default function Tank() {
   };
 
   return (
-    <>
+    <div className="mt-4">
       <button
         className="bg-light-darkViolet hover:bg-light-mainColor text-white font-bold py-2 px-4 rounded mb-3 mr-6"
         onClick={toggleModal}
@@ -200,11 +200,11 @@ export default function Tank() {
         Get Latest Pet Food Status
       </button>
       {errorAddFood && <p className="text-red-500">{errorAddFood}</p>}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full items-center h-full">
+      <div className="mt-4 h-full grid grid-cols-1 sm:grid-cols-2 gap-4 w-full items-center">
         {petFoodList.map((food, index) => (
           <div
             key={food.id}
-            className="relative flex flex-col border border-gray-300 rounded-md mt-8 p-4 mb-2 w-full h-full overflow-hidden shadow-md bg-white"
+            className="relative flex flex-col border border-gray-300 rounded-md my-8 p-4 w-full h-full overflow-hidden shadow-md bg-white"
           >
             <div className="flex">
               <div className="m-2">
@@ -324,6 +324,6 @@ export default function Tank() {
           </div>
         </div>
       )}
-    </>
+    </div>
   );
 }

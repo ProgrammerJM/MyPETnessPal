@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 // import { Link } from "react-router-dom";
 
 // export default function Home() {
@@ -276,6 +277,8 @@ import About from "./About";
 import Contact from "./Contact";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import homeBG from "../assets/images/bg-petness.png";
+import petnessLogoIcon from "../assets/images/petness-logo-icon.png";
 
 export default function Home() {
   const features = [
@@ -309,12 +312,36 @@ export default function Home() {
     },
   ];
 
+  function SampleNextArrow(props) {
+    const { className, style, onClick } = props;
+    return (
+      <div
+        className={`${className} bg-light-mainColor hover:bg-light-darkViolet rounded-full`} // Example using TailwindCSS for styling
+        style={{ ...style, display: "block" }} // Keep non-TailwindCSS styles
+        onClick={onClick}
+      />
+    );
+  }
+
+  function SamplePrevArrow(props) {
+    const { className, style, onClick } = props;
+    return (
+      <div
+        className={`${className} bg-light-mainColor hover:bg-light-darkViolet rounded-full`} // Example using TailwindCSS for styling
+        style={{ ...style, display: "block" }} // Keep non-TailwindCSS styles
+        onClick={onClick}
+      />
+    );
+  }
+
   const settings = {
     dots: true,
     infinite: true,
     speed: 500,
     slidesToShow: 1,
     slidesToScroll: 1,
+    nextArrow: <SampleNextArrow />,
+    prevArrow: <SamplePrevArrow />,
     responsive: [
       {
         breakpoint: 1024,
@@ -343,13 +370,16 @@ export default function Home() {
   };
 
   return (
-    <div className="bg-homeBG bg-no-repeat bg-cover min-h-screen flex flex-col overflow-auto">
+    <div
+      style={{ backgroundImage: `url(${homeBG})` }}
+      className=" bg-no-repeat bg-cover min-h-screen flex flex-col overflow-auto"
+    >
       <div className="flex-1 max-w-screen-xl p-8 lg:p-0 mx-auto pb-8 lg:gap-8 xl:gap-0 lg:grid lg:grid-cols-12 text-pretty">
         <div className="lg:col-span-6 flex flex-col justify-center h-full lg:h-lvh">
-          <h1 className="max-w-3xl text-4xl font-extrabold leading-none tracking-tight md:text-5xl xl:text-6xl text-light-darkViolet text-center">
+          <h1 className="pb-10 max-w-3xl text-4xl font-extrabold leading-none tracking-tight md:text-5xl xl:text-6xl text-light-darkViolet text-center">
             Elevate Your Pet{"'"}s Health with PetnessPal
           </h1>
-          <section className="text-center mt-14">
+          <section className="text-center mt-2">
             <h2 className="text-3xl font-bold mb-4 text-light-darkViolet">
               Get Started
             </h2>
@@ -375,7 +405,7 @@ export default function Home() {
         </div>
         <div className="lg:col-span-6 flex flex-col items-center justify-center h-full mt-10 w-full lg:mt-0">
           <img
-            src="/images/petness-logo-icon.png"
+            src={petnessLogoIcon}
             alt="hero image"
             className="h-40 w-40 object-contain mb-6 lg:mb-0"
           />
@@ -383,7 +413,7 @@ export default function Home() {
             <h2 className="text-3xl font-bold text-center mb-6 text-light-darkViolet">
               Features
             </h2>
-            <Slider {...settings} className="w-80 lg:w-full md:w-4/6">
+            <Slider {...settings} className="w-72 lg:w-full md:w-4/6">
               {features.map((feature, index) => (
                 <div key={index} className="p-3 w-full">
                   <div className="feature p-3 border border-gray-300 rounded-lg shadow-md bg-white dark:bg-gray-800 dark:border-gray-700">

@@ -9,6 +9,8 @@ import { MdHelp } from "react-icons/md";
 import { IoMdSettings } from "react-icons/io";
 import { GiBirdCage } from "react-icons/gi";
 import { NotificationContext } from "../pages/function/NotificationsContext";
+import petnessLogoName from "../assets/images/petness-logo-name.png";
+import petnessLogoIcon from "../assets/images/petness-logo-icon.png";
 
 const navBarIcon_Close =
   "text-light-mainColor size-9 cursor-pointer ml-2 transition duration-300 ease-in-out";
@@ -54,7 +56,7 @@ export default function ProfileNavigation() {
           {/* Navbar Header */}
           <div className="inline-flex items-center justify-center border-b-2 border-subColor-500 shadow-s p-5">
             <img
-              src="/images/petness-logo-icon.png"
+              src={petnessLogoIcon}
               alt="Petness"
               className={`w-16 h-16 duration-500 ease-in-out ${
                 open && "rotate-[360deg]"
@@ -63,10 +65,7 @@ export default function ProfileNavigation() {
             />
             {open && (
               <div className="duration-300">
-                <img
-                  src="/images/petness-logo-name.png"
-                  className="ml-2 w-36"
-                />
+                <img src={petnessLogoName} className="ml-2 w-36" />
               </div>
             )}
           </div>
@@ -136,11 +135,7 @@ export default function ProfileNavigation() {
           }`}
         >
           <div className="p-4 flex justify-between items-center border-b-2 border-subColor-500 shadow-s">
-            <img
-              src="/images/petness-logo-icon.png"
-              alt="Petness"
-              className="w-16 h-16"
-            />
+            <img src={petnessLogoIcon} alt="Petness" className="w-16 h-16" />
             <BiLeftArrowAlt
               className="text-2xl cursor-pointer"
               onClick={() => setIsMobileMenuOpen(false)}
