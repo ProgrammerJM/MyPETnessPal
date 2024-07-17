@@ -36,9 +36,9 @@ import githubIcon from "../assets/images/github-icon.svg";
 
 export default function About() {
   return (
-    <section id="about-section" className="md:py-2">
+    <section id="about-section" className="md:py-2 h-full">
       <h1 className="text-5xl flex justify-center m-6 text-center">
-        <span className="font-bold ml-2 text-light-darkViolet">
+        <span className="font-bold text-light-darkViolet">
           MyPetnessPal Team
         </span>
       </h1>
@@ -71,7 +71,7 @@ export default function About() {
             Our team consists of a group of passionate pet owners who are
             dedicated to providing the best possible care for their pets. We
             understand the importance of keeping track of your pet{"'"}s health
-            and well-being, and we are committed to helping you do just that. w
+            and well-being, and we are committed to helping you do just that.
           </p>
           <p className="mb-4">
             <span className="font-bold text-light-darkViolet">
