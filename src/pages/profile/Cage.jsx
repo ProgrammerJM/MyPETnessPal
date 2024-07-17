@@ -368,6 +368,7 @@
 //   );
 // }
 import { useState, useEffect, useContext, useCallback, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import { FaPlus } from "react-icons/fa";
 import Modal from "react-modal";
 import FeedAmountComponent from "./feedAmountComponent";
@@ -385,10 +386,12 @@ import {
   getDoc,
 } from "firebase/firestore";
 import { TiDelete } from "react-icons/ti";
+import { LuView } from "react-icons/lu";
 
 Modal.setAppElement("#root");
 
 export default function Cage() {
+  const navigate = useNavigate();
   const { petList, petRecords, latestFeedingInfo } = useContext(PetContext);
 
   const initialCages = useMemo(
@@ -815,6 +818,7 @@ export default function Cage() {
 
   return (
     <div className="p-4">
+      <h2 className="text-xl font-bold mb-4 text-light-darkViolet">Cages</h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 w-full gap-4">
         {cages.map((cage, index) => {
           const pet = cage.pet;
@@ -869,14 +873,22 @@ export default function Cage() {
                     {renderFeedingInfo(cage)}
                   </div>
                   <button
-                    className="absolute top-0 right-0 m-2 bg-red-500 text-white rounded flex items-center justify-center hover:bg-red-600 transition-colors duration-200 h-fit w-fit"
+                    className="absolute top-0 right-0 m-2 text-white rounded flex items-center justify-center transition-colors duration-200 h-fit w-fit"
                     onClick={(e) => {
                       e.stopPropagation();
                       deleteCage(cage.id);
                     }}
                   >
-                    <div className="relative bg-light-mainColor hover:bg-darkViolet py-1 px-2 transition-all duration-300 rounded flex items-center">
+                    <div className="relative bg-light-mainColor hover:bg-light-darkViolet py-1 px-2 transition-all duration-300 rounded flex items-center">
                       <TiDelete className="size-6" />
+                    </div>
+                  </button>
+                  <button
+                    className="absolute top-0 right-11 m-2 text-white rounded flex items-center justify-center transition-colors duration-200 h-fit w-fit"
+                    onClick={() => navigate(`/profile/petprofile/${pet.name}`)}
+                  >
+                    <div className="relative bg-light-mainColor hover:bg-light-darkViolet py-1 px-2 transition-all duration-300 rounded flex items-center">
+                      <LuView className="size-6" />
                     </div>
                   </button>
                 </div>
@@ -903,7 +915,9 @@ export default function Cage() {
         contentLabel="Select a Pet"
         className="bg-white rounded-lg p-4 max-w-md mx-auto mt-20 border border-gray-300 shadow-lg"
       >
-        <h2 className="text-lg font-bold mb-4">Select a Pet</h2>
+        <h2 className="text-lg font-bold mb-4 text-light-darkViolet">
+          Select a Pet
+        </h2>
         <ul className="grid grid-cols-3">
           {petList.map((pet) => (
             <li
@@ -916,7 +930,7 @@ export default function Cage() {
           ))}
           <button
             onClick={closeModal}
-            className="m-2 bg-red-500 text-white p-2 rounded hover:bg-red-600 transition-colors duration-200"
+            className="m-2 bg-light-mainColor text-white p-2 rounded hover:bg-light-darkViolet transition-colors duration-200"
           >
             Cancel
           </button>
