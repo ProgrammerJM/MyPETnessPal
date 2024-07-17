@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { auth } from "../config/firebase";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import petnessLogoSquare from "../assets/images/petness-logo-square.png";
+import homeBG from "../assets/images/bg-petness.png";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -41,7 +42,10 @@ export default function Login() {
   };
 
   return (
-    <main className="flex flex-col justify-center items-center min-h-screen bg-white p-4">
+    <main
+      className="bg-no-repeat bg-cover min-h-screen flex flex-col overflow-auto justify-center items-center bg-white p-4"
+      style={{ backgroundImage: `url(${homeBG})` }}
+    >
       <section className="flex flex-col md:flex-row justify-center items-center w-full max-w-4xl bg-gray-50 rounded-lg shadow-md overflow-hidden">
         <div className="w-full md:w-1/2 p-4 flex justify-center items-center">
           <img
