@@ -17,7 +17,10 @@ import instagramIcon from "../assets/images/instagram-icon.svg";
 
 export default function Contact() {
   return (
-    <section id="contact-section" className="my-10 p-10 md:p-20 h-full">
+    <section
+      id="contact-section"
+      className="my-10 lg:my-0 p-10 md:p-20 h-full lg:h-full"
+    >
       <div className="container mx-auto px-4">
         <div className="text-center mb-10">
           <h1 className="text-5xl font-bold mb-4 text-light-darkViolet">
