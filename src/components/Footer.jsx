@@ -8,7 +8,7 @@ export default function Footer() {
           <img src={petnessLogo} className="h-12 mr-3 sm:h-20" alt="PETness" />
         </div>
         <div className="text-sm text-center text-white mb-2">
-          © 2023-2324 PETNESS™. All Rights Reserved.
+          © 2023-2024 PETNESS™. All Rights Reserved.
         </div>
       </div>
     </footer>
