@@ -22,7 +22,7 @@ export default function PetUser() {
   );
   const petName = petData ? petData.name : "Unknown";
 
-  console.log(petName);
+  // console.log(petName);
 
   useEffect(() => {
     const fetchLatestFeedingInfo = async () => {
@@ -58,8 +58,8 @@ export default function PetUser() {
     return <p>Loading...</p>;
   }
 
-  console.log(latestFeedingInfo);
-  console.log(currentRecords);
+  // console.log(latestFeedingInfo);
+  // console.log(currentRecords);
 
   return (
     <div className="flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
@@ -89,7 +89,7 @@ export default function PetUser() {
           {/* PET PROFILE DEETS */}
           <article className=" max-[440px]:w-full lg-full md:w-full flex lg:w-full md:p-4 p-4 lg:flex-col lg:justify-center md:flex-row sm:flex-row md:items-center col-span-2 border border-stroke bg-white shadow-default dark:border-strokedark sm:px-7.5 rounded-xl shadow-md">
             <div className="flex items-center md:justify-start">
-              <div className="rounded-full bg-light-darkViolet/80 backdrop-blur p-1 mr-4">
+              <div className="rounded-full bg-light-darkViolet/80 backdrop-blur lg:w-fit md:w-full w-full p-1 mr-4">
                 <div className=" rounded-full bg-white p-1 overflow-hidden">
                   <img
                     src={
@@ -101,7 +101,7 @@ export default function PetUser() {
                   />
                 </div>
               </div>
-              <div className="flex flex-col text-left lg:mt-4 md:mt-0 md:ml-10">
+              <div className="flex flex-col text-left lg:ml-2 md:mt-0 md:ml-10">
                 <h2 className="text-xl lg:my-4 font-semibold text-gray-900">
                   {petName}
                 </h2>
@@ -121,7 +121,7 @@ export default function PetUser() {
                   {petData.activityLevel}
                 </p>
                 <p className="text-md text-gray-600">
-                  <span className="font-semibold">
+                  <span className="font-semibold block sm:block max-w-sm break-words">
                     Food Selected:{" "}
                     {latestFeedingInfo?.foodSelectedName || "N/A"}
                   </span>
@@ -145,9 +145,9 @@ export default function PetUser() {
               <table className="bg-lavender w-full">
                 <thead className="text-left justify-center items-center">
                   <tr>
-                    <th className="py-2 px-6 border-b text-lavender-dark">
+                    {/* <th className="py-2 px-6 border-b text-lavender-dark">
                       ID
-                    </th>
+                    </th> */}
                     <th className="py-2 px-6 border-b text-lavender-dark">
                       Mode
                     </th>
@@ -165,9 +165,9 @@ export default function PetUser() {
                 <tbody className="text-left">
                   {currentRecords.map((record) => (
                     <tr key={record.id}>
-                      <td className="py-2 px-6 border-b text-sm">
+                      {/* <td className="py-2 px-6 border-b text-sm">
                         {record.id}
-                      </td>
+                      </td> */}
                       <td className="py-2 px-6 border-b text-sm">
                         {record.mode}
                       </td>
