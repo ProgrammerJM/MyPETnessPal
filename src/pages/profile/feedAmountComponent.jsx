@@ -76,20 +76,20 @@ const FeedAmountComponent = ({
     servings
   ) => {
     const numericWeight = parseFloat(weight); // Ensure weight is a number
-    console.log(
-      `weight: ${numericWeight}, activityLevel: ${activityLevel}, selectedFoodId: ${selectedFoodId}, servings: ${servings}`
-    );
+    // console.log(
+    //   `weight: ${numericWeight}, activityLevel: ${activityLevel}, selectedFoodId: ${selectedFoodId}, servings: ${servings}`
+    // );
 
     const RER = 70 * Math.pow(numericWeight, 0.75); // Calculate Resting Energy Requirement
-    console.log(`Calculated RER: ${RER}`);
+    // console.log(`Calculated RER: ${RER}`);
 
     const MER = RER * activityLevel; // Calculate Maintenance Energy Requirement
-    console.log(`Calculated MER: ${MER}`);
+    // console.log(`Calculated MER: ${MER}`);
 
     const selectedFoodData = petFoodList.find(
       (food) => food.id === selectedFoodId
     );
-    console.log(`Selected food data: ${JSON.stringify(selectedFoodData)}`);
+    // console.log(`Selected food data: ${JSON.stringify(selectedFoodData)}`);
 
     if (!selectedFoodData) {
       console.error("Selected food data not found");
@@ -98,7 +98,7 @@ const FeedAmountComponent = ({
 
     // Convert kcalPerKg to caloriesPerGram
     const caloriesPerGram = selectedFoodData.kcalPerKg / 1000;
-    console.log(`Calories per Gram: ${caloriesPerGram}`);
+    // console.log(`Calories per Gram: ${caloriesPerGram}`);
 
     if (selectedFoodId === "" || isNaN(caloriesPerGram) || servings <= 0) {
       console.error("Invalid food ID, calories per gram, or servings");
@@ -225,16 +225,16 @@ const FeedAmountComponent = ({
   ) => {
     // Calculate RER and MER as per your original function
     const RER = 70 * Math.pow(weight, 0.75);
-    console.log(`Calculated RER: ${RER}`);
+    // console.log(`Calculated RER: ${RER}`);
 
     const MER = RER * activityLevel;
-    console.log(`Calculated MER: ${MER}`);
+    // console.log(`Calculated MER: ${MER}`);
 
     // Find the selected food data
     const selectedFoodData = petFoodList.find(
       (food) => food.id === selectedFoodId
     );
-    console.log(`Selected food data: ${JSON.stringify(selectedFoodData)}`);
+    // console.log(`Selected food data: ${JSON.stringify(selectedFoodData)}`);
 
     if (!selectedFoodData) {
       console.error("Selected food data not found");
@@ -242,7 +242,7 @@ const FeedAmountComponent = ({
     }
 
     const caloriesPerGram = selectedFoodData.kcalPerKg / 1000;
-    console.log(`Calories per Gram: ${caloriesPerGram}`);
+    // console.log(`Calories per Gram: ${caloriesPerGram}`);
 
     if (selectedFoodId === "" || isNaN(caloriesPerGram)) {
       console.error("Invalid food ID or calories per gram");
