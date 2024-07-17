@@ -104,7 +104,6 @@ const AddPetModal = ({ isModalOpen, toggleModal }) => {
       { value: 4, label: "Heavy Work (Multiply RER by 4 to 8)" },
     ],
   };
-
   return (
     <>
       <Modal
@@ -129,8 +128,8 @@ const AddPetModal = ({ isModalOpen, toggleModal }) => {
 
       {isModalOpen && (
         <div className="z-50 fixed w-full h-full top-0 left-0 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white p-10 rounded-md flex max-h-full overflow-auto">
-            <div className="flex flex-col">
+          <div className="bg-white p-6 sm:p-10 rounded-md flex flex-col sm:flex-row max-h-full overflow-auto">
+            <div className="flex flex-col w-full sm:w-1/2 mb-4 sm:mb-0 sm:mr-4">
               <div className="flex flex-col mb-4">
                 <h1 className="text-xl font-semibold">CREATE PET PROFILE</h1>
                 <hr />
@@ -168,7 +167,7 @@ const AddPetModal = ({ isModalOpen, toggleModal }) => {
                   <option value="Dog">Dog</option>
                 </select>
               </div>
-              <div className="flex flex-col mb-auto">
+              <div className="flex flex-col">
                 <label
                   htmlFor="activityLevel"
                   className="text-sm font-medium text-gray-700 mb-1"
@@ -199,8 +198,8 @@ const AddPetModal = ({ isModalOpen, toggleModal }) => {
                 )}
               </div>
             </div>
-            <div className="flex flex-col ml-10 justify-center">
-              <div className="flex justify-center items-center mt-16">
+            <div className="flex flex-col items-center w-full sm:w-1/2">
+              <div className="flex justify-center items-center mt-4 sm:mt-16">
                 <label
                   htmlFor="fileInput"
                   className="relative w-48 h-48 overflow-hidden rounded-full cursor-pointer"
@@ -222,7 +221,7 @@ const AddPetModal = ({ isModalOpen, toggleModal }) => {
                   />
                 </label>
               </div>
-              <div className="flex mt-16 justify-evenly items-center">
+              <div className="flex mt-8 sm:mt-16 justify-evenly w-full">
                 <button
                   className="bg-light-darkViolet hover:bg-light-mainColor text-white font-bold py-2 px-4 rounded h-fit border-solid border-2 border-light-darkViolet"
                   onClick={onSavePet}
