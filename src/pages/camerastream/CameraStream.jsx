@@ -11,10 +11,10 @@ const CameraStream = () => {
   );
 
   // useEffect(() => {
-  //   const ipRef = ref(realtimeDatabase, "/esp32/ip");
+  //   const ipRef = ref(realtimeDatabase, "/petnesspalCam/cam1");
 
   //   const handleIpUpdate = (snapshot) => {
-  //     const ip = snapshot.val();
+  //     const cam1 = snapshot.val();
   //     setEsp32Ip(ip);
   //   };
 
@@ -45,7 +45,7 @@ const CameraStream = () => {
           }}
           // src={`http://${esp32Ip}:49152`}
           src={petnessPalCamIP}
-          alt="ESP32 Camera Stream"
+          alt="PetnessPal Camera"
         />
       ) : (
         <div
