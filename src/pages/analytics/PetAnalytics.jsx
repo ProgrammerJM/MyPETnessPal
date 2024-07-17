@@ -38,21 +38,34 @@ const analyzeRecords = (records) => {
     return total;
   }, {});
 
+  // Correcting startDate and endDate calculation
+  const sortedDates = records
+    .map((record) => new Date(record.date))
+    .sort((a, b) => a - b);
+  const startDate = sortedDates[0]
+    ? sortedDates[0].toISOString().split("T")[0]
+    : null;
+  const endDate = sortedDates[sortedDates.length - 1]
+    ? sortedDates[sortedDates.length - 1].toISOString().split("T")[0]
+    : null;
+
   return {
     totalFoodConsumed,
     avgFoodConsumedPerDay,
     consumptionByMode,
     consumptionByUser,
+    startDate,
+    endDate,
   };
 };
 
-const TrendChart = ({ data, dataKey, name, stroke }) => (
+const TrendChart = ({ data, dataKey, name, stroke, customTooltip }) => (
   <ResponsiveContainer width="95%" height={300}>
     <LineChart data={data}>
       <CartesianGrid strokeDasharray="3 3" />
       <XAxis dataKey="date" />
       <YAxis />
-      <Tooltip />
+      {customTooltip ? <Tooltip content={customTooltip} /> : <Tooltip />}
       <Legend />
       <Line
         type="monotone"
@@ -75,6 +88,7 @@ TrendChart.propTypes = {
   dataKey: PropTypes.string.isRequired,
   name: PropTypes.string.isRequired,
   stroke: PropTypes.string.isRequired,
+  customTooltip: PropTypes.func,
 };
 
 const VisualizeWeightTrend = ({ records }) => {
@@ -96,11 +110,47 @@ const VisualizeWeightTrend = ({ records }) => {
   );
 };
 
+const CustomTooltip = ({ active, payload, label }) => {
+  if (active && payload && payload.length) {
+    return (
+      <div
+        className="custom-tooltip"
+        style={{
+          color: "#8884d8",
+          backgroundColor: "#fff",
+          padding: "10px",
+          border: "1px solid #ccc",
+        }}
+      >
+        <p className="text-black">{`Date: ${label}`}</p>
+        <p>{`Mode: ${payload[0].payload.mode}`}</p>
+        <p>{`Amount Dispensed: ${payload[0].value}g`}</p>
+      </div>
+    );
+  }
+
+  return null;
+};
+
+CustomTooltip.propTypes = {
+  active: PropTypes.bool,
+  payload: PropTypes.arrayOf(
+    PropTypes.shape({
+      value: PropTypes.number,
+      payload: PropTypes.shape({
+        mode: PropTypes.string,
+      }),
+    })
+  ),
+  label: PropTypes.string,
+};
+
 const VisualizeAmountRecords = ({ records }) => {
   const data = records.map((record) => ({
     date: record.date.toLocaleDateString(),
     amount: record.amount,
     weight: record.weight,
+    mode: record.mode,
   }));
 
   return (
@@ -111,6 +161,7 @@ const VisualizeAmountRecords = ({ records }) => {
         dataKey="amount"
         name="Amount Dispensed (g)"
         stroke="#8884d8"
+        customTooltip={<CustomTooltip />}
       />
     </>
   );
@@ -129,6 +180,23 @@ const VisualizeAmountRemainRecords = ({ records }) => {
     };
   });
 
+  // IF THE AMOUNT REMAIN SHOULD ONLY BE FOR SMART FEEDING
+  // const VisualizeAmountRemainRecords = ({ records }) => {
+  //   let cumulativeFoodConsumed = 0;
+
+  //   // Filter records to include only those with mode "Smart"
+  //   const filteredRecords = records.filter((record) => record.mode === "Smart");
+
+  //   const data = filteredRecords.map((record) => {
+  //     cumulativeFoodConsumed += record.foodConsumed;
+  //     const remainingAmount = cumulativeFoodConsumed - record.amountRemain;
+
+  //     return {
+  //       date: record.date.toLocaleDateString(),
+  //       amountRemain: remainingAmount >= 0 ? remainingAmount : 0,
+  //     };
+  //   });
+
   return (
     <>
       <h2 className="text-l font-bold">Food Amount Remain Trend</h2>
@@ -146,32 +214,43 @@ const Summary = ({
   totalFoodConsumed,
   avgFoodConsumedPerDay,
   consumptionByMode,
-  consumptionByUser,
+  startDate,
+  endDate,
 }) => (
-  <div className="mx-10 flex flex-col">
+  <div className="mx-10 lg:flex lg:flex-col items-center block justify-center">
     <p>
-      <span className="font-bold text-light-darkViolet">Summary</span>
+      <span className="font-bold text-light-darkViolet text-xl">Summary</span>
     </p>
     <p>
-      <span className="font-bold text-darkViolet">Total Food Consumed: </span>
-      {Number.isNaN(totalFoodConsumed) ? "N/A" : totalFoodConsumed} g
+      <span className="font-bold text-darkViolet mr-2 block sm:inline-block max-w-full break-words">
+        Date Range:{" "}
+      </span>
+      {startDate} to {endDate}
     </p>
     <p>
-      <span className="font-bold text-darkViolet">
+      <span className="font-bold text-darkViolet mr-2 block sm:inline-block max-w-full break-words">
+        Total Food Consumed:{" "}
+      </span>
+      {Number.isNaN(totalFoodConsumed)
+        ? "N/A"
+        : Number(totalFoodConsumed).toFixed(2)}{" "}
+      g
+    </p>
+    <p>
+      <span className="font-bold text-darkViolet mr-2 block sm:inline-block max-w-full break-words">
         Average Food Consumed Per Day:{" "}
       </span>
-      {Number.isNaN(avgFoodConsumedPerDay) ? "N/A" : avgFoodConsumedPerDay} g
+      {Number.isNaN(avgFoodConsumedPerDay)
+        ? "N/A"
+        : Number(avgFoodConsumedPerDay).toFixed(2)}{" "}
+      g
     </p>
-    <span className="font-bold text-darkViolet">Consumption By Mode: </span>
+    <span className="font-bold text-darkViolet mr-2 block sm:inline-block max-w-full break-words">
+      Consumption By Mode:{" "}
+    </span>
     {Object.entries(consumptionByMode).map(([mode, amount]) => (
-      <p key={mode} className="mx-2">
-        {mode}: {amount} g
-      </p>
-    ))}
-    <span className="font-bold text-darkViolet">Consumption by User: </span>
-    {Object.entries(consumptionByUser).map(([user, amount]) => (
-      <p key={user} className="mx-2">
-        {user}: {amount} g
+      <p key={mode}>
+        {mode}: {Number(amount).toFixed(2)} g
       </p>
     ))}
   </div>
@@ -184,7 +263,8 @@ const PetAnalytics = ({ petId, data }) => {
     totalFoodConsumed,
     avgFoodConsumedPerDay,
     consumptionByMode,
-    consumptionByUser,
+    startDate,
+    endDate,
   } = analyzeRecords(processedRecords);
 
   useEffect(() => {
@@ -222,7 +302,8 @@ const PetAnalytics = ({ petId, data }) => {
         totalFoodConsumed={totalFoodConsumed}
         avgFoodConsumedPerDay={avgFoodConsumedPerDay}
         consumptionByMode={consumptionByMode}
-        consumptionByUser={consumptionByUser}
+        startDate={startDate}
+        endDate={endDate}
       />
     </div>
   );
@@ -260,7 +341,8 @@ Summary.propTypes = {
   totalFoodConsumed: PropTypes.number.isRequired,
   avgFoodConsumedPerDay: PropTypes.number.isRequired,
   consumptionByMode: PropTypes.object.isRequired,
-  consumptionByUser: PropTypes.object.isRequired,
+  startDate: PropTypes.string,
+  endDate: PropTypes.string,
 };
 
 PetAnalytics.propTypes = {
