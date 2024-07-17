@@ -60,16 +60,22 @@ export default function Dashboard() {
                       <img
                         src={pet.imageURL}
                         alt={pet.name}
-                        className="w-full md:w-48 h-48 object-cover rounded-lg"
+                        className="w-full md:w-48 h-72 object-cover rounded-lg"
                       />
                     </div>
                     <div className="flex-grow pl-0 md:pl-4">
-                      <h3 className="text-xl font-bold">{pet.name}</h3>
+                      <h3 className="text-xl font-bold text-light-darkViolet">
+                        {pet.name}
+                      </h3>
                       <p>Type: {pet.petType}</p>
                       <p>Activity Level: {pet.activityLevel}</p>
                       <p>Weight: {pet.weight} kg</p>
                       {latestFeedingInfo[pet.name] && (
                         <div className="mt-2">
+                          <p className="text-sm text-gray-500">
+                            Mode of Feeding:{" "}
+                            {latestFeedingInfo[pet.name].feedingMode || "N/A"}
+                          </p>
                           {latestFeedingInfo[pet.name].feedingMode ===
                           "Smart" ? null : (
                             <p className="text-sm text-gray-500">
@@ -78,10 +84,6 @@ export default function Dashboard() {
                                 "N/A"}
                             </p>
                           )}
-                          <p className="text-sm text-gray-500">
-                            Mode of Feeding:{" "}
-                            {latestFeedingInfo[pet.name].feedingMode || "N/A"}
-                          </p>
                           <p className="text-sm text-gray-500">
                             RER:{" "}
                             {isNaN(Number(latestFeedingInfo[pet.name].RER))
@@ -133,9 +135,6 @@ export default function Dashboard() {
             </div>
           </section>
           <section>
-            <h2 className="text-xl font-bold mb-4 text-light-darkViolet">
-              Notifications
-            </h2>
             <Notifications notifications={notifications.slice(0, 5)} />
           </section>
         </main>
