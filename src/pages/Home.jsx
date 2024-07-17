@@ -271,6 +271,7 @@
 //   );
 // }
 
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Slider from "react-slick";
 import About from "./About";
@@ -369,12 +370,29 @@ export default function Home() {
     ],
   };
 
+  const [showScrollButton, setShowScrollButton] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const bottom =
+        window.innerHeight + window.scrollY >= document.body.offsetHeight;
+      setShowScrollButton(bottom);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
   return (
     <div
       style={{ backgroundImage: `url(${homeBG})` }}
-      className=" bg-no-repeat bg-cover min-h-screen flex flex-col overflow-auto"
+      className="bg-no-repeat bg-cover min-h-screen flex flex-col overflow-auto"
     >
-      <div className="flex-1 max-w-screen-xl p-8 lg:p-0 mx-auto pb-8 lg:gap-8 xl:gap-0 lg:grid lg:grid-cols-12 text-pretty">
+      <div className="flex-1 max-w-screen-xl lg:mt-0 p-4 mt-4 lg:p-0 mx-auto pb-8 lg:gap-8 xl:gap-0 lg:grid lg:grid-cols-12 text-pretty">
         <div className="lg:col-span-6 flex flex-col justify-center h-full lg:h-lvh">
           <h1 className="pb-10 max-w-3xl text-4xl font-extrabold leading-none tracking-tight md:text-5xl xl:text-6xl text-light-darkViolet text-center">
             Elevate Your Pet{"'"}s Health with PetnessPal
@@ -409,13 +427,13 @@ export default function Home() {
             alt="hero image"
             className="h-40 w-40 object-contain mb-6 lg:mb-0"
           />
-          <section className="features w-full px-4 h-fit">
+          <section className="features w-full flex flex-col justify-center items-center h-fit">
             <h2 className="text-3xl font-bold text-center mb-6 text-light-darkViolet">
               Features
             </h2>
             <Slider {...settings} className="w-72 lg:w-full md:w-4/6">
               {features.map((feature, index) => (
-                <div key={index} className="p-3 w-full">
+                <div key={index} className="w-full">
                   <div className="feature p-3 border border-gray-300 rounded-lg shadow-md bg-white dark:bg-gray-800 dark:border-gray-700">
                     <h3 className="text-xl font-bold mb-2 text-light-darkViolet">
                       {feature.title}
@@ -432,6 +450,14 @@ export default function Home() {
       </div>
       <About />
       <Contact />
+      {showScrollButton && (
+        <button
+          onClick={scrollToTop}
+          className="fixed bottom-16 right-2 bg-light-mainColor text-light-white p-3 rounded-full shadow-lg hover:bg-light-darkViolet focus:outline-none focus:ring-4 focus:ring-purple-200 dark:focus:ring-purple-800"
+        >
+          Back to Top
+        </button>
+      )}
     </div>
   );
 }
