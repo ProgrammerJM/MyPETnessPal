@@ -4,6 +4,7 @@ import { FaCat } from "react-icons/fa";
 export default function Help() {
   return (
     <>
+      <h1 className="text-xl font-bold text-light-darkViolet">Guidelines</h1>
       <div className="flex flex-col md:flex-row">
         <div className="bg-lavender-light min-h-screen flex items-center justify-center md:w-1/2">
           <div className="container mx-auto p-4">

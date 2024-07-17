@@ -187,6 +187,9 @@ export default function Tank() {
 
   return (
     <div className="mt-4">
+      <h2 className="text-xl font-bold mb-4 text-light-darkViolet">
+        Tank Management
+      </h2>
       <button
         className="bg-light-darkViolet hover:bg-light-mainColor text-white font-bold py-2 px-4 rounded mb-3 mr-6"
         onClick={toggleModal}

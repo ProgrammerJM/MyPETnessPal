@@ -30,6 +30,9 @@ const Notifications = ({ notifications: propNotifications }) => {
 
   return (
     <div className="mt-4">
+      <h2 className="text-xl font-bold mb-4 text-light-darkViolet">
+        Notifications
+      </h2>
       {noNotifications ? (
         <p className="text-gray-600">No notifications received yet.</p>
       ) : (
