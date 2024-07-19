@@ -1,4 +1,6 @@
 /* eslint-disable linebreak-style */
+/* eslint-disable operator-linebreak */
+/* eslint-disable linebreak-style */
 /* eslint-disable object-curly-spacing */
 /* eslint-disable no-trailing-spaces */
 /* eslint-disable arrow-parens */
@@ -73,14 +75,24 @@ exports.sendNotificationOnNewPet = functions
 
 // Function to format pet record data into a readable string
 function formatPetRecord(record) {
+  // Check if foodConsumed is a number and limit it to 2 decimal places
+  const foodConsumed =
+    typeof record.foodConsumed === "number"
+      ? record.foodConsumed.toFixed(2)
+      : record.foodConsumed;
+  const amount =
+    typeof record.amount === "number"
+      ? record.amount.toFixed(2)
+      : record.amount;
+
   const fields = [
     `User Name: ${record.userName}`,
     `Cage ID: ${record.cageID}`,
     `Date: ${record.date}`,
     `Time: ${record.time}`,
     `Mode: ${record.mode} Mode`,
-    `Amount: ${record.amount}`,
-    `Food Consumed: ${record.foodConsumed}`,
+    `Amount: ${amount}`,
+    `Food Consumed: ${foodConsumed}`,
     `Weight: ${record.weight}`,
   ];
   return fields
@@ -123,8 +135,35 @@ exports.sendNotificationOnNewPetRecord = functions
 
 // Function to format feeding information data into a readable string
 function formatFeedingInfo(feedingInfo) {
-  return `Scheduled Date: ${feedingInfo.scheduledDate}\nScheduled Time: ${feedingInfo.scheduledTime}\nAmount to Feed: ${feedingInfo.amountToFeed} 
-    \nRER: ${feedingInfo.RER} \nMER: ${feedingInfo.MER} \nFood Name: ${feedingInfo.foodSelectedName} & Calories Per Gram: ${feedingInfo.caloriesPerGram}`;
+  // Limit RER and MER to two decimal places
+  const RER =
+    typeof feedingInfo.RER === "number"
+      ? feedingInfo.RER.toFixed(2)
+      : feedingInfo.RER;
+  const MER =
+    typeof feedingInfo.MER === "number"
+      ? feedingInfo.MER.toFixed(2)
+      : feedingInfo.MER;
+  const amountToFeed =
+    typeof feedingInfo.amountToFeed === "number"
+      ? feedingInfo.amountToFeed.toFixed(2)
+      : feedingInfo.amountToFeed;
+
+  // return `Scheduled Date: ${feedingInfo.scheduledDate}\nScheduled Time: ${feedingInfo.scheduledTime}\nAmount to Feed: ${feedingInfo.amountToFeed}
+  //   \nRER: ${RER} \nMER: ${MER} \nFood Name: ${feedingInfo.foodSelectedName} & Calories Per Gram: ${feedingInfo.caloriesPerGram}`;
+  // Check if the feeding schedule mode is 'Scheduled'
+  if (feedingInfo.feedingMode === "Scheduled") {
+    return `Mode: ${feedingInfo.feedingMode}\n, Scheduled Date: ${feedingInfo.scheduledDate}\nScheduled Time: ${feedingInfo.scheduledTime}\nAmount to Feed: ${amountToFeed} 
+    \nRER: ${RER} \nMER: ${MER} \nFood Name: ${feedingInfo.foodSelectedName} & Calories Per Gram: ${feedingInfo.caloriesPerGram}`;
+  } else if (feedingInfo.feedingMode === "Smart") {
+    // For 'Smart' mode, include the mode and exclude the Scheduled Date and Time but limit Amount to Feed to two decimal places
+    return `Mode: ${feedingInfo.feedingMode}\n, Amount to Feed: ${amountToFeed} 
+    \nRER: ${RER} \nMER: ${MER} \nFood Name: ${feedingInfo.foodSelectedName} & Calories Per Gram: ${feedingInfo.caloriesPerGram}`;
+  } else {
+    // Fallback message or handling for other modes if necessary, including the mode
+    return `Mode: ${feedingInfo.feedingMode}\n, Amount to Feed: ${amountToFeed} 
+    \nRER: ${RER} \nMER: ${MER} \nFood Name: ${feedingInfo.foodSelectedName} & Calories Per Gram: ${feedingInfo.caloriesPerGram}`;
+  }
 }
 
 // Function to send notification on new feeding information added
@@ -172,9 +211,9 @@ exports.sendNotificationOnLatestFeedingInfo = functions
       } else if (food1Percentage > 50) {
         food1Status = "Good";
       } else if (food1Percentage > 25) {
-        food1Status = "Low";
+        food1Status = "Heads up! Food is running out! Please refill soon!";
       } else {
-        food1Status = "Empty";
+        food1Status = "Heads up! Food is running out! Please refill soon!";
       }
 
       let food2Status;
@@ -183,12 +222,12 @@ exports.sendNotificationOnLatestFeedingInfo = functions
       } else if (food2Percentage > 50) {
         food2Status = "Good";
       } else if (food2Percentage > 25) {
-        food2Status = "Low";
+        food2Status = "Heads up! Food is running out! Please refill soon!";
       } else {
-        food2Status = "Empty";
+        food2Status = "Heads up! Food is running out! Please refill soon!";
       }
 
-      const foodStatusMessage = `Current Food Status: \nFood 1: ${food1Percentage}% - ${food1Status}\nFood 2: ${food2Percentage}% - ${food2Status}`;
+      const foodStatusMessage = `Current Status: \nFood 1: ${food1Percentage}% - ${food1Status}\nFood 2: ${food2Percentage}% - ${food2Status}`;
 
       const foodStatusNotification = createNotificationMessage(
         "Pet Food Amount Status",
