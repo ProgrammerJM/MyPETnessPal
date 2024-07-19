@@ -160,6 +160,9 @@ export default function PetUser() {
                     <th className="py-2 px-6 border-b text-lavender-dark">
                       Amount Dispensed (g)
                     </th>
+                    <th className="py-2 px-6 border-b text-lavender-dark">
+                      Actual Machine Dispensed (g)
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="text-left">
@@ -179,6 +182,11 @@ export default function PetUser() {
                       </td>
                       <td className="py-2 px-6 border-b text-sm">
                         {record.amount} g
+                      </td>
+                      <td className="py-2 px-6 border-b text-sm">
+                        {record.smoothedWeight
+                          ? Number(record.smoothedWeight).toFixed(2)
+                          : "N/A"}
                       </td>
                     </tr>
                   ))}
