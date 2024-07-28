@@ -1,7 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { auth } from "../config/firebase";
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import {
+  createUserWithEmailAndPassword,
+  sendEmailVerification,
+  signOut,
+} from "firebase/auth";
 import petnessLogoSquare from "../assets/images/petness-logo-square.png";
 import homeBG from "../assets/images/bg-petness.png";
 
@@ -9,6 +13,8 @@ export default function Signup() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [message, setMessage] = useState("");
+  const [isVerificationSent, setIsVerificationSent] = useState(false);
   const navigate = useNavigate();
 
   const validateEmail = (email) => {
@@ -34,16 +40,50 @@ export default function Signup() {
     }
 
     try {
-      await createUserWithEmailAndPassword(auth, email, password);
-      navigate("/login");
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      const user = userCredential.user;
+
+      // Send verification email
+      await sendEmailVerification(user);
+      setMessage("Verification email sent! Please check your inbox.");
+      setIsVerificationSent(true);
+
+      // Clear input fields after signup
+      setEmail("");
+      setPassword("");
+      setError("");
     } catch (err) {
       console.error(err);
+      setError("Signup failed. Please try again.");
     }
-    // Clear input fields after signup
-    setEmail("");
-    setPassword("");
-    setError("");
   };
+
+  useEffect(() => {
+    let interval;
+    if (isVerificationSent) {
+      interval = setInterval(async () => {
+        const user = auth.currentUser;
+        if (user) {
+          await user.reload();
+          if (user.emailVerified) {
+            clearInterval(interval);
+            setMessage("Email verified successfully! Redirecting to login...");
+            // Sign out the user so they can log in again
+            await signOut(auth);
+            setTimeout(() => {
+              navigate("/login");
+            }, 2000); // Redirect after 2 seconds
+          }
+        }
+      }, 2000); // Check every 2 seconds
+    }
+
+    return () => clearInterval(interval);
+  }, [isVerificationSent, navigate]);
 
   return (
     <main
@@ -115,6 +155,7 @@ export default function Signup() {
             </div>
 
             {error && <p className="text-red-500 text-center">{error}</p>}
+            {message && <p className="text-green-500 text-center">{message}</p>}
           </form>
 
           <p className="mt-6 text-center text-sm text-gray-500">
